@@ -7,3 +7,9 @@
     @apply bg-neutral-900 text-gray-50;
   }
 }
+
+@layer utilities {
+  .Footer {
+    @apply fixed bottom-4 w-full;
+  }
+}
