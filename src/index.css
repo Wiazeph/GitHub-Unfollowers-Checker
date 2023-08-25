@@ -14,6 +14,14 @@
 
 @layer utilities {
   .Main {
-    @apply h-full overflow-hidden;
+    @apply h-full overflow-y-hidden;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
   }
 }
