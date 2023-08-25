@@ -4,12 +4,16 @@
 
 @layer base {
   body {
-    @apply bg-neutral-900 text-gray-50;
+    @apply bg-neutral-900 text-gray-50 h-screen py-4;
+  }
+
+  #root {
+    @apply h-full flex flex-col gap-4 sm:gap-6 md:gap-8;
   }
 }
 
 @layer utilities {
-  .Footer {
-    @apply fixed bottom-4 w-full;
+  .Main {
+    @apply h-full overflow-hidden;
   }
 }
