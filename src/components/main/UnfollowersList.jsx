@@ -1,12 +1,20 @@
+import { useUnfollowersContext } from "../context/UnfollowersContext";
+
 export const UnfollowersList = () => {
+  const { unfollowers } = useUnfollowersContext();
+
   return (
-    <div className="UnfollowersList no-scrollbar flex flex-col gap-3 overflow-y-scroll">
-      <div className="w-full h-20 shrink-0 bg-red-400">list</div>
-      <div className="w-full h-20 shrink-0 bg-red-400">list</div>
-      <div className="w-full h-20 shrink-0 bg-red-400">list</div>
-      <div className="w-full h-20 shrink-0 bg-red-400">list</div>
-      <div className="w-full h-20 shrink-0 bg-red-400">list</div>
-      <div className="w-full h-20 shrink-0 bg-red-400">list</div>
-    </div>
+    <>
+      <div>
+        {unfollowers.length === 0
+          ? "Enter Your Informations"
+          : `Unfollowers: ${unfollowers.length} Users`}
+      </div>
+      <ul className="UnfollowersList no-scrollbar flex flex-col gap-3 overflow-y-scroll">
+        {unfollowers.map((unfollower) => (
+          <li key={unfollower.id}>{unfollower}</li>
+        ))}
+      </ul>
+    </>
   );
 };

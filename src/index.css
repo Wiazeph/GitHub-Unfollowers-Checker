@@ -8,7 +8,7 @@
   }
 
   #root {
-    @apply h-full flex flex-col gap-4 sm:gap-6 md:gap-8;
+    @apply h-full flex flex-col gap-4 sm:gap-6 md:gap-8 px-4 sm:px-8 md:px-12;
   }
 }
 
