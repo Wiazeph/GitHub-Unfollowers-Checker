@@ -5,16 +5,35 @@ export const UnfollowersList = () => {
 
   return (
     <>
-      <div>
-        {unfollowers.length === 0
-          ? "Enter Your Informations"
-          : `Unfollowers: ${unfollowers.length} Users`}
-      </div>
-      <ul className="UnfollowersList no-scrollbar flex flex-col gap-3 overflow-y-scroll">
-        {unfollowers.map((unfollower) => (
-          <li key={unfollower.id}>{unfollower}</li>
-        ))}
-      </ul>
+      {unfollowers.length === 0 ? (
+        <div className="text-center text-xl">
+          Enter your username to find out who doesn't follow you!
+        </div>
+      ) : (
+        <>
+          <div className="text-center text-xl">{`${unfollowers.length} Users`}</div>
+
+          <ul className="UnfollowersList no-scrollbar overflow-y-scroll items-center flex flex-col sm:flex-row sm:flex-wrap gap-y-6">
+            {unfollowers.map((unfollower) => (
+              <li key={unfollower.id} className="w-fit sm:w-1/2 md:w-1/3">
+                <a
+                  href={unfollower.html_url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-fit flex gap-4 items-center"
+                >
+                  <img
+                    src={unfollower.avatar_url}
+                    alt="avatar"
+                    className="object-cover rounded-full w-10 h-10"
+                  />
+                  <div className="font-semibold">{unfollower.login}</div>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
     </>
   );
 };

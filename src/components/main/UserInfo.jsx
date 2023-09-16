@@ -6,24 +6,17 @@ import { useUnfollowersContext } from "../context/UnfollowersContext";
 
 export const UserInfo = () => {
   const [username, setUsername] = useState("");
-  const [userToken, setUserToken] = useState("");
 
   const { getUnfollowers } = useUnfollowersContext();
 
   const handleGetUnfollowers = async () => {
     try {
-      const config = {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-      };
-
-      const fetchAllUsers = async (url, config) => {
+      const fetchAllUsers = async (url) => {
         let allUsers = [];
         let page = 1;
 
         while (true) {
-          const response = await axios.get(`${url}?page=${page}`, config);
+          const response = await axios.get(`${url}?page=${page}`);
           if (response.data.length === 0) {
             break;
           }
@@ -35,36 +28,31 @@ export const UserInfo = () => {
       };
 
       const followersData = await fetchAllUsers(
-        `https://api.github.com/users/${username}/followers`,
-        config
+        `https://api.github.com/users/${username}/followers`
       );
 
       const followingData = await fetchAllUsers(
-        `https://api.github.com/users/${username}/following`,
-        config
+        `https://api.github.com/users/${username}/following`
       );
 
-      const following = followingData.map((user) => user.login);
-      const followers = followersData.map((user) => user.login);
-      const notFollowing = following.filter(
-        (follow) => !followers.includes(follow)
-      );
+      const notFollowing = followingData.filter((follow) => {
+        return !followersData.some(
+          (follower) => follower.login === follow.login
+        );
+      });
 
       getUnfollowers(notFollowing);
     } catch (error) {
+      alert("Something went wrong. Please try again.");
       console.error(error);
     }
   };
 
   return (
-    <div className="flex flex-col md:flex-row gap-4 items-center justify-center text-gray-950">
+    <div className="UserInfo flex flex-col sm:flex-row gap-4 sm:gap-6 items-center justify-center text-gray-950">
       <Input
         placeholder="Enter Your Username"
         onChange={(e) => setUsername(e.target.value)}
-      />
-      <Input
-        placeholder="Enter Your Token"
-        onChange={(e) => setUserToken(e.target.value)}
       />
       <Button onClick={handleGetUnfollowers}>Get Unfollowers</Button>
     </div>
