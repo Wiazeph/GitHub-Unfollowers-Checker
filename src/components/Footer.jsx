@@ -6,7 +6,7 @@ export const Footer = () => {
         <li className="border border-gray-50 h-fit"></li>
         <li className="w-full flex justify-start">
           <a
-            href="https://github.com/Wiazeph/ReactJS-GitHub-Unfollower-Checker"
+            href="https://github.com/Wiazeph/GitHub-Unfollowers-Checker"
             target="_blank"
             rel="noopener noreferrer"
             className="w-fit flex items-center gap-2 hover:text-gray-500 transition"
