@@ -2,7 +2,7 @@ export const Footer = () => {
   return (
     <footer className="Footer">
       <ul className="container mx-auto bg-neutral-800 rounded-xl py-4 flex items-center gap-5 sm:gap-10 select-none">
-        <li className="w-full text-right">GitHub Unfollower Checker</li>
+        <li className="w-full text-right">GitHub Unfollowers Checker</li>
         <li className="border border-gray-50 h-fit"></li>
         <li className="w-full flex justify-start">
           <a
