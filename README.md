@@ -6,9 +6,9 @@ An application where you can find those who do not follow you on your GitHub acc
 
 <br>
 
-## Technologies and Tools Used
+## Technologies, Tools or Packages Used
 
-[React JS](https://react.dev/) + [Tailwind CSS](https://tailwindcss.com/) + [Axios](https://axios-http.com/) + [GitHub API](https://docs.github.com/en/rest) + [Vite](https://vitejs.dev/)
+[React JS](https://react.dev/) + [GitHub API](https://docs.github.com/en/rest) + [Axios](https://axios-http.com/) + [Tailwind CSS](https://tailwindcss.com/) + [prop-types](https://www.npmjs.com/package/prop-types) + [Vite](https://vitejs.dev/)
 
 <br>
 
