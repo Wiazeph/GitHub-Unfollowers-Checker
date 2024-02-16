@@ -6,7 +6,7 @@ export const Input = ({ placeholder, onChange }) => {
       type="text"
       placeholder={placeholder}
       onChange={onChange}
-      className="outline-none rounded-xl py-2 px-3 w-full sm:w-2/3 max-w-xs sm:max-w-none"
+      className="outline-none rounded-md py-2 px-3 w-full sm:w-2/3 max-w-xs sm:max-w-none"
       required
     />
   );

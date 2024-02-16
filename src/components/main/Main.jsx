@@ -5,7 +5,7 @@ import { UnfollowersProvider } from "../context/UnfollowersContext";
 export const Main = () => {
   return (
     <main className="Main">
-      <div className="container mx-auto overflow-hidden h-full flex flex-col gap-6">
+      <div className="container mx-auto overflow-hidden h-full flex flex-col gap-y-6">
         <UnfollowersProvider>
           <UserInfo />
           <UnfollowersList />

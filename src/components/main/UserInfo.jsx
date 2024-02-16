@@ -49,7 +49,7 @@ export const UserInfo = () => {
   };
 
   return (
-    <div className="UserInfo flex flex-col sm:flex-row gap-4 sm:gap-6 items-center justify-center text-gray-950">
+    <div className="UserInfo flex flex-col sm:flex-row gap-x-4 items-center justify-center text-gray-950">
       <Input
         placeholder="Enter Your Username"
         onChange={(e) => setUsername(e.target.value)}
