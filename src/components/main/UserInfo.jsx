@@ -1,60 +1,61 @@
-import { useState } from "react";
-import axios from "axios";
-import { Input } from "../ui/Input";
-import { Button } from "../ui/Button";
-import { useUnfollowersContext } from "../context/UnfollowersContext";
+import { useState } from 'react'
+import axios from 'axios'
+import { Input } from '../ui/Input'
+import { Button } from '../ui/Button'
+import { useUnfollowersContext } from '../context/UnfollowersContext'
 
 export const UserInfo = () => {
-  const [username, setUsername] = useState("");
+  const [username, setUsername] = useState('')
 
-  const { getUnfollowers } = useUnfollowersContext();
+  const { getUnfollowers } = useUnfollowersContext()
 
   const handleGetUnfollowers = async () => {
     try {
       const fetchAllUsers = async (url) => {
-        let allUsers = [];
-        let page = 1;
+        let allUsers = []
+        let page = 1
 
         while (true) {
-          const response = await axios.get(`${url}?page=${page}`);
+          const response = await axios.get(`${url}?page=${page}`)
           if (response.data.length === 0) {
-            break;
+            break
           }
-          allUsers = allUsers.concat(response.data);
-          page++;
+          allUsers = allUsers.concat(response.data)
+          page++
         }
 
-        return allUsers;
-      };
+        return allUsers
+      }
 
       const followersData = await fetchAllUsers(
         `https://api.github.com/users/${username}/followers`
-      );
+      )
 
       const followingData = await fetchAllUsers(
         `https://api.github.com/users/${username}/following`
-      );
+      )
 
       const notFollowing = followingData.filter((follow) => {
         return !followersData.some(
           (follower) => follower.login === follow.login
-        );
-      });
+        )
+      })
 
-      getUnfollowers(notFollowing);
+      getUnfollowers(notFollowing)
     } catch (error) {
-      alert("Something went wrong. Please try again.");
-      console.error(error);
+      alert('Something went wrong. Please try again.')
+      console.error(error)
     }
-  };
+  }
 
   return (
-    <div className="UserInfo flex flex-col sm:flex-row gap-x-4 items-center justify-center text-gray-950">
+    <div className="UserInfo flex flex-col sm:flex-row gap-4 items-center justify-center text-gray-950">
       <Input
         placeholder="Enter Your Username"
         onChange={(e) => setUsername(e.target.value)}
       />
+
       <Button onClick={handleGetUnfollowers}>Get Unfollowers</Button>
     </div>
-  );
-};
+  )
+}

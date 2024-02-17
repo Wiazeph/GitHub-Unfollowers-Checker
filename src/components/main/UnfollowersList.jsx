@@ -11,7 +11,7 @@ export const UnfollowersList = () => {
         </div>
       ) : (
         <>
-          <div className="mt-6 text-center text-xl">{`${unfollowers.length} Users`}</div>
+          <div className="text-center text-xl">{`${unfollowers.length} Users`}</div>
 
           <ul className="UnfollowersList no-scrollbar overflow-y-scroll flex flex-wrap justify-center sm:justify-start">
             {unfollowers.length === 0
