@@ -6,22 +6,28 @@ import { useUnfollowersContext } from '../context/UnfollowersContext'
 
 export const UserInfo = () => {
   const [username, setUsername] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
   const { getUnfollowers } = useUnfollowersContext()
 
   const handleGetUnfollowers = async () => {
+    if (isLoading || !username.trim()) return // Prevent multiple clicks during loading and empty username
+
+    setIsLoading(true)
     try {
       const fetchAllUsers = async (url) => {
         let allUsers = []
         let page = 1
+        let hasMoreData = true
 
-        while (true) {
+        while (hasMoreData) {
           const response = await axios.get(`${url}?page=${page}`)
           if (response.data.length === 0) {
-            break
+            hasMoreData = false
+          } else {
+            allUsers = allUsers.concat(response.data)
+            page++
           }
-          allUsers = allUsers.concat(response.data)
-          page++
         }
 
         return allUsers
@@ -45,6 +51,14 @@ export const UserInfo = () => {
     } catch (error) {
       alert('Something went wrong. Please try again.')
       console.error(error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleGetUnfollowers()
     }
   }
 
@@ -53,9 +67,16 @@ export const UserInfo = () => {
       <Input
         placeholder="Enter Your Username"
         onChange={(e) => setUsername(e.target.value)}
+        onKeyDown={handleKeyDown}
       />
 
-      <Button onClick={handleGetUnfollowers}>Get Unfollowers</Button>
+      <Button onClick={handleGetUnfollowers} disabled={isLoading}>
+        {isLoading ? (
+          <div className="mx-auto h-5 w-5 rounded-full border-2 border-t-white border-black animate-spin"></div>
+        ) : (
+          'Get Unfollowers'
+        )}
+      </Button>
     </div>
   )
 }
