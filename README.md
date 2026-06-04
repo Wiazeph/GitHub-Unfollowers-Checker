@@ -1,50 +1,55 @@
-# GitHub-Unfollowers-Checker
+# GitHub Unfollowers Checker
 
-<br>
+Find out who you follow on GitHub that doesn't follow you back. Enter a username, and the app fetches the account's followers and following lists and shows the difference.
 
-An application where you can find those who do not follow you on your GitHub account. With simple usage, you only need to enter your username. Then you will be able to find those who do not follow you in a list.
+![GitHub Unfollowers Checker](./thumbnail/GitHub-Unfollowers-Checker.png)
 
-<br>
+## Features
 
-## Technologies, Tools or Packages Used
+- **One input** — just type a GitHub username and hit Check.
+- **Server-side proxy** — GitHub requests are made through a serverless function that holds the API token, so it stays off the client and you get the authenticated rate limit (5,000 req/h instead of 60).
+- **Full pagination** — handles accounts with thousands of followers/following via the GitHub `Link` header.
+- **Clear states** — loading skeletons, an empty prompt, a celebratory "everyone follows back" state, and friendly error toasts.
+- **Copy usernames** with one click.
 
-[React JS](https://react.dev/) + [GitHub API](https://docs.github.com/en/rest) + [Axios](https://axios-http.com/) + [Tailwind CSS](https://tailwindcss.com/) + [prop-types](https://www.npmjs.com/package/prop-types) + [Vite](https://vitejs.dev/)
+## Tech Stack
 
-<br>
+[React 19](https://react.dev/) · [TypeScript](https://www.typescriptlang.org/) · [Vite](https://vite.dev/) · [Tailwind CSS v4](https://tailwindcss.com/) · [TanStack Query](https://tanstack.com/query) · [sonner](https://sonner.emilkowal.ski/) · [lucide-react](https://lucide.dev/) · [Vercel Functions](https://vercel.com/docs/functions)
 
-## Run Locally
+## Running Locally
 
-Clone the project
-
-```bash
-  git clone https://github.com/Wiazeph/GitHub-Unfollowers-Checker.git
-```
-
-Go to the project directory
+This app uses a Vercel serverless function, so it runs with `vercel dev` (which serves both the Vite frontend and the `/api` route).
 
 ```bash
-  cd GitHub-Unfollowers-Checker
+# 1. Clone and install
+git clone https://github.com/Wiazeph/GitHub-Unfollowers-Checker.git
+cd GitHub-Unfollowers-Checker
+pnpm install
+
+# 2. Add a GitHub token
+cp .env.example .env.local
+# then edit .env.local and set GITHUB_TOKEN
 ```
 
-Install dependencies
+Create a token at [github.com/settings/tokens](https://github.com/settings/tokens). A fine-grained token with read-only public access is enough — no scopes are required for public follower data.
 
 ```bash
-  npm install
+# 3. Start the dev server (frontend + API)
+pnpm dev
 ```
 
-Start the server
+> Prefer the UI only, without the API route? Use `pnpm dev:vite`.
 
-```bash
-  npm run dev
-```
+## Deploying
 
-<br>
+Deploy to [Vercel](https://vercel.com/) and set the `GITHUB_TOKEN` environment variable in your project settings (Production, Preview, and Development). The `api/` directory is detected automatically.
 
-# React + Vite
+## Scripts
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+| Command         | Description                          |
+| --------------- | ------------------------------------ |
+| `pnpm dev`      | Vite + serverless API (`vercel dev`) |
+| `pnpm dev:vite` | Frontend only                        |
+| `pnpm build`    | Type-check and build for production  |
+| `pnpm preview`  | Preview the production build         |
+| `pnpm lint`     | Run ESLint                           |
