@@ -1,10 +1,11 @@
-import type { ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import {
   UserSearch,
   PartyPopper,
   AlertCircle,
   ArrowUpRight,
   Copy,
+  LoaderCircle,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import type { Unfollower, UnfollowersResponse } from '../../../types/github'
@@ -17,6 +18,14 @@ interface UnfollowersResultsProps {
 }
 
 const SKELETON_COUNT = 9
+
+const LOADING_MESSAGES = [
+  'Fetching the following list…',
+  'Gathering followers…',
+  'This can take a moment for popular accounts…',
+  'Comparing who follows back…',
+  'Almost there…',
+]
 
 export const UnfollowersResults = ({
   username,
@@ -119,19 +128,39 @@ const UnfollowerCard = ({ user }: { user: Unfollower }) => (
   </li>
 )
 
-const LoadingState = () => (
-  <Grid>
-    {Array.from({ length: SKELETON_COUNT }, (_, index) => (
-      <li
-        key={index}
-        className="flex items-center gap-3 rounded-card border border-border bg-surface px-3 py-2.5"
-      >
-        <div className="h-10 w-10 rounded-full bg-surface-hover motion-safe:animate-pulse" />
-        <div className="h-3.5 w-24 rounded bg-surface-hover motion-safe:animate-pulse" />
-      </li>
-    ))}
-  </Grid>
-)
+const LoadingState = () => {
+  const [messageIndex, setMessageIndex] = useState(0)
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setMessageIndex((index) => Math.min(index + 1, LOADING_MESSAGES.length - 1))
+    }, 2500)
+    return () => clearInterval(id)
+  }, [])
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center justify-center gap-2 text-sm text-fg-muted">
+        <LoaderCircle
+          className="h-4 w-4 motion-safe:animate-spin"
+          aria-hidden="true"
+        />
+        <span>{LOADING_MESSAGES[messageIndex]}</span>
+      </div>
+      <Grid>
+        {Array.from({ length: SKELETON_COUNT }, (_, index) => (
+          <li
+            key={index}
+            className="flex items-center gap-3 rounded-card border border-border bg-surface px-3 py-2.5"
+          >
+            <div className="h-10 w-10 rounded-full bg-surface-hover motion-safe:animate-pulse" />
+            <div className="h-3.5 w-24 rounded bg-surface-hover motion-safe:animate-pulse" />
+          </li>
+        ))}
+      </Grid>
+    </div>
+  )
+}
 
 const CenteredState = ({
   icon,

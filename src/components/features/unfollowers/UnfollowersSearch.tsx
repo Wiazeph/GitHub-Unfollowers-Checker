@@ -48,7 +48,8 @@ export const UnfollowersSearch = ({
           autoCapitalize="off"
           autoCorrect="off"
           spellCheck={false}
-          className="w-full rounded-lg border border-border bg-surface py-2.5 pr-3 pl-10 text-fg placeholder:text-fg-muted outline-none transition-colors focus-visible:border-brand-500 focus-visible:ring-2 focus-visible:ring-brand-400/40"
+          disabled={isPending}
+          className="w-full rounded-lg border border-border bg-surface py-2.5 pr-3 pl-10 text-fg placeholder:text-fg-muted outline-none transition-colors focus-visible:border-brand-500 focus-visible:ring-2 focus-visible:ring-brand-400/40 disabled:cursor-not-allowed disabled:opacity-60"
         />
       </div>
 
