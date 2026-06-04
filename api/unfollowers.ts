@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { getUnfollowers, GitHubError } from './_lib/github'
+import { getUnfollowers, GitHubError } from './_lib/github.js'
 
 /** GitHub username rules: 1–39 chars, alphanumeric or single hyphens (not leading/trailing). */
 const USERNAME_PATTERN = /^[a-zA-Z0-9](?:[a-zA-Z0-9]|-(?=[a-zA-Z0-9])){0,38}$/
