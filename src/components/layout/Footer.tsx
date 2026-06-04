@@ -1,4 +1,7 @@
+import { Globe } from 'lucide-react'
+
 const REPO_URL = 'https://github.com/Wiazeph/GitHub-Unfollowers-Checker'
+const SITE_URL = 'https://emreerden.dev'
 
 /** Lucide 1.x dropped the GitHub brand mark, so the logo stays as inline SVG. */
 const GithubIcon = () => (
@@ -15,7 +18,7 @@ const GithubIcon = () => (
 
 export const Footer = () => {
   return (
-    <footer className="mx-auto w-full max-w-3xl px-4 py-8 text-center text-sm text-fg-muted sm:px-6">
+    <footer className="mx-auto flex w-full max-w-3xl flex-wrap items-center justify-center gap-x-2 gap-y-1 px-4 py-8 text-sm text-fg-muted sm:px-6">
       <a
         href={REPO_URL}
         target="_blank"
@@ -24,6 +27,20 @@ export const Footer = () => {
       >
         <GithubIcon />
         <span>View source on GitHub</span>
+      </a>
+
+      <span aria-hidden="true" className="text-border">
+        •
+      </span>
+
+      <a
+        href={SITE_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-2 rounded-md px-2 py-1 outline-none transition-colors hover:text-fg focus-visible:ring-2 focus-visible:ring-brand-400"
+      >
+        <Globe className="h-4 w-4" aria-hidden="true" />
+        <span>emreerden.dev</span>
       </a>
     </footer>
   )
