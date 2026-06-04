@@ -11,11 +11,18 @@ node_modules
 dist
 dist-ssr
 *.local
+.vercel
+
+# Environment variables (keep .env.example committed)
+.env
+.env.*
+!.env.example
 
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
 .idea
+.claude/
 .DS_Store
 *.suo
 *.ntvs*
