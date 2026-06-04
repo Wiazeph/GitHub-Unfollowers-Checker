@@ -1,27 +1,27 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+@theme {
+  /* Brand / accent — GitHub-flavoured green */
+  --color-brand-400: oklch(0.78 0.16 150);
+  --color-brand-500: oklch(0.7 0.17 150);
+  --color-brand-600: oklch(0.62 0.16 150);
+
+  /* Dark surfaces */
+  --color-bg: oklch(0.18 0.005 250);
+  --color-surface: oklch(0.22 0.006 250);
+  --color-surface-hover: oklch(0.26 0.007 250);
+  --color-border: oklch(0.3 0.008 250);
+
+  /* Text */
+  --color-fg: oklch(0.97 0 0);
+  --color-fg-muted: oklch(0.72 0.01 250);
+
+  --radius-card: 0.75rem;
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+}
 
 @layer base {
   body {
-    @apply bg-neutral-900 text-gray-50 h-screen pb-4;
-  }
-
-  #root {
-    @apply h-full flex flex-col px-4 sm:px-8 md:px-12;
-  }
-}
-
-@layer utilities {
-  .Main {
-    @apply h-full overflow-y-hidden pt-1 pb-4;
-  }
-
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
+    @apply min-h-screen bg-bg font-sans text-fg antialiased;
   }
 }
