@@ -1,5 +1,10 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "devCommand": "vite",
-  "framework": "vite"
+  "framework": "vite",
+  "functions": {
+    "api/unfollowers.ts": {
+      "maxDuration": 60
+    }
+  }
 }

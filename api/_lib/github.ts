@@ -8,6 +8,8 @@
 
 const GITHUB_API = 'https://api.github.com'
 const PER_PAGE = 100
+/** How many list pages to fetch in parallel. Keeps large accounts under the timeout. */
+const CONCURRENCY = 8
 
 /** Subset of the GitHub user object we actually care about. */
 export interface GitHubUser {
@@ -46,16 +48,6 @@ const baseHeaders = (token: string): Record<string, string> => ({
   'User-Agent': 'github-unfollowers-checker',
 })
 
-/** Extract the `rel="next"` URL from a GitHub `Link` header, if present. */
-const parseNextLink = (linkHeader: string | null): string | null => {
-  if (!linkHeader) return null
-  for (const part of linkHeader.split(',')) {
-    const match = part.match(/<([^>]+)>;\s*rel="next"/)
-    if (match) return match[1]
-  }
-  return null
-}
-
 const mapErrorResponse = (response: Response): GitHubError => {
   if (response.status === 404) {
     return new GitHubError('NOT_FOUND', 'User not found', 404)
@@ -81,35 +73,75 @@ const mapErrorResponse = (response: Response): GitHubError => {
   return new GitHubError('UPSTREAM', 'GitHub API error', 502)
 }
 
-/** Fetch every page of a paginated GitHub list endpoint, following Link headers. */
-const fetchAllPages = async (
-  startPath: string,
+/** Read the total page count from a `Link` header's `rel="last"` URL (1 if absent). */
+const parseLastPage = (linkHeader: string | null): number => {
+  if (!linkHeader) return 1
+  for (const part of linkHeader.split(',')) {
+    const match = part.match(/[?&]page=(\d+)[^>]*>;\s*rel="last"/)
+    if (match) return Number(match[1])
+  }
+  return 1
+}
+
+const trim = (user: GitHubUser): GitHubUser => ({
+  login: user.login,
+  id: user.id,
+  avatar_url: user.avatar_url,
+  html_url: user.html_url,
+})
+
+const fetchPage = async (
+  path: string,
+  page: number,
   token: string,
 ): Promise<GitHubUser[]> => {
-  const users: GitHubUser[] = []
-  let url: string | null = `${GITHUB_API}${startPath}?per_page=${PER_PAGE}`
+  let response: Response
+  try {
+    response = await fetch(
+      `${GITHUB_API}${path}?per_page=${PER_PAGE}&page=${page}`,
+      { headers: baseHeaders(token) },
+    )
+  } catch {
+    throw new GitHubError('UPSTREAM', 'Network error reaching GitHub', 502)
+  }
+  if (!response.ok) throw mapErrorResponse(response)
+  return ((await response.json()) as GitHubUser[]).map(trim)
+}
 
-  while (url) {
-    let response: Response
-    try {
-      response = await fetch(url, { headers: baseHeaders(token) })
-    } catch {
-      throw new GitHubError('UPSTREAM', 'Network error reaching GitHub', 502)
-    }
+/**
+ * Fetch every page of a paginated GitHub list endpoint. The first page reveals
+ * the total page count via the `Link` header, so the rest are fetched in
+ * bounded-concurrency batches instead of one slow sequential chain — this keeps
+ * accounts with tens of thousands of followers inside the function timeout.
+ */
+const fetchAllPages = async (
+  path: string,
+  token: string,
+): Promise<GitHubUser[]> => {
+  let response: Response
+  try {
+    response = await fetch(`${GITHUB_API}${path}?per_page=${PER_PAGE}`, {
+      headers: baseHeaders(token),
+    })
+  } catch {
+    throw new GitHubError('UPSTREAM', 'Network error reaching GitHub', 502)
+  }
+  if (!response.ok) throw mapErrorResponse(response)
 
-    if (!response.ok) throw mapErrorResponse(response)
+  const users = ((await response.json()) as GitHubUser[]).map(trim)
+  const lastPage = parseLastPage(response.headers.get('link'))
+  if (lastPage <= 1) return users
 
-    const page = (await response.json()) as GitHubUser[]
-    for (const user of page) {
-      users.push({
-        login: user.login,
-        id: user.id,
-        avatar_url: user.avatar_url,
-        html_url: user.html_url,
-      })
-    }
+  // Pages 2..lastPage, fetched CONCURRENCY at a time.
+  const remaining = []
+  for (let page = 2; page <= lastPage; page++) remaining.push(page)
 
-    url = parseNextLink(response.headers.get('link'))
+  while (remaining.length > 0) {
+    const batch = remaining.splice(0, CONCURRENCY)
+    const results = await Promise.all(
+      batch.map((page) => fetchPage(path, page, token)),
+    )
+    for (const result of results) users.push(...result)
   }
 
   return users
@@ -123,11 +155,12 @@ export const getUnfollowers = async (
   username: string,
   token: string,
 ): Promise<GitHubUser[]> => {
-  const [followers, following] = await Promise.all([
-    fetchAllPages(`/users/${username}/followers`, token),
-    fetchAllPages(`/users/${username}/following`, token),
-  ])
+  // Fetch the (usually small) following list first; if it's empty there can be
+  // no unfollowers, so we skip pulling the follower list entirely.
+  const following = await fetchAllPages(`/users/${username}/following`, token)
+  if (following.length === 0) return []
 
+  const followers = await fetchAllPages(`/users/${username}/followers`, token)
   const followerLogins = new Set(followers.map((user) => user.login))
   return following.filter((user) => !followerLogins.has(user.login))
 }
