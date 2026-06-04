@@ -5,6 +5,7 @@ import {
   AlertCircle,
   ArrowUpRight,
   Copy,
+  Check,
   LoaderCircle,
 } from 'lucide-react'
 import { toast } from 'sonner'
@@ -66,17 +67,6 @@ const ResultsState = ({
   const count = unfollowers.length
   const label = count === 1 ? '1 user' : `${count} users`
 
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(
-        unfollowers.map((user) => user.login).join('\n'),
-      )
-      toast.success('Usernames copied to clipboard')
-    } catch {
-      toast.error('Could not copy to clipboard')
-    }
-  }
-
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -87,13 +77,7 @@ const ResultsState = ({
             {label}
           </span>
         </p>
-        <button
-          onClick={handleCopy}
-          className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-sm text-fg-muted outline-none transition-colors hover:text-fg focus-visible:ring-2 focus-visible:ring-brand-400"
-        >
-          <Copy className="h-4 w-4" aria-hidden="true" />
-          Copy usernames
-        </button>
+        <CopyButton logins={unfollowers.map((user) => user.login)} />
       </div>
 
       <Grid>
@@ -102,6 +86,45 @@ const ResultsState = ({
         ))}
       </Grid>
     </div>
+  )
+}
+
+const CopyButton = ({ logins }: { logins: string[] }) => {
+  const [copied, setCopied] = useState(false)
+
+  useEffect(() => {
+    if (!copied) return
+    const id = setTimeout(() => setCopied(false), 2000)
+    return () => clearTimeout(id)
+  }, [copied])
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(logins.join('\n'))
+      setCopied(true)
+      toast.success('Usernames copied to clipboard')
+    } catch {
+      toast.error('Could not copy to clipboard')
+    }
+  }
+
+  return (
+    <button
+      onClick={handleCopy}
+      className={`inline-flex cursor-pointer items-center gap-1.5 rounded-md px-2 py-1 text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-brand-400 ${
+        copied ? 'text-brand-400' : 'text-fg-muted hover:text-fg'
+      }`}
+    >
+      {copied ? (
+        <Check
+          className="h-4 w-4 motion-safe:animate-pop"
+          aria-hidden="true"
+        />
+      ) : (
+        <Copy className="h-4 w-4" aria-hidden="true" />
+      )}
+      {copied ? 'Copied!' : 'Copy usernames'}
+    </button>
   )
 }
 
