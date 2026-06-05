@@ -257,8 +257,9 @@ const OnboardingHint = ({ show }: { show: boolean }) => {
   return (
     <div className="flex items-start justify-between gap-3 rounded-lg border border-border bg-surface px-4 py-3 text-sm text-fg-muted">
       <p>
-        You&apos;re signed in. Select cards to unfollow in bulk, or remove them
-        one by one. Unfollowing only affects your own account.
+        You&apos;re signed in. Select the cards you want, then use
+        &ldquo;Unfollow selected&rdquo;. Unfollowing only affects your own
+        account.
       </p>
       <button
         onClick={dismiss}
