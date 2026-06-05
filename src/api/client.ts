@@ -1,7 +1,9 @@
 import {
   ApiError,
   type ApiErrorBody,
+  type AuthState,
   type UnfollowersResponse,
+  type UnfollowResult,
 } from '../types/github'
 
 /** Call the serverless proxy to compute the unfollowers for a username. */
@@ -29,4 +31,51 @@ export const fetchUnfollowers = async (
   }
 
   return (await response.json()) as UnfollowersResponse
+}
+
+/** Fetch the current authentication state. */
+export const fetchMe = async (): Promise<AuthState> => {
+  const response = await fetch('/api/auth/me')
+  if (!response.ok) return { authenticated: false }
+  return (await response.json()) as AuthState
+}
+
+/** Redirect the browser into the GitHub OAuth flow. */
+export const login = (): void => {
+  window.location.href = '/api/auth/login'
+}
+
+/** Clear the session and reload. */
+export const logout = async (): Promise<void> => {
+  await fetch('/api/auth/logout', { method: 'POST' })
+  window.location.reload()
+}
+
+/** Unfollow one or more users on behalf of the signed-in account. */
+export const unfollowUsers = async (
+  usernames: string[],
+): Promise<UnfollowResult> => {
+  let response: Response
+  try {
+    response = await fetch('/api/unfollow', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ usernames }),
+    })
+  } catch {
+    throw new ApiError(
+      { error: 'Network error. Check your connection and try again.', code: 'UPSTREAM' },
+      0,
+    )
+  }
+
+  if (!response.ok) {
+    const body = (await response.json().catch(() => null)) as ApiErrorBody | null
+    throw new ApiError(
+      body ?? { error: 'Could not unfollow. Please try again.', code: 'UPSTREAM' },
+      response.status,
+    )
+  }
+
+  return (await response.json()) as UnfollowResult
 }

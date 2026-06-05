@@ -18,6 +18,18 @@ export type ApiErrorCode =
   | 'UPSTREAM'
   | 'BAD_REQUEST'
   | 'CONFIG'
+  | 'UNAUTHORIZED'
+
+/** Current authentication state, from `/api/auth/me`. */
+export type AuthState =
+  | { authenticated: false }
+  | { authenticated: true; login: string }
+
+/** Result of an unfollow request from `/api/unfollow`. */
+export interface UnfollowResult {
+  removed: string[]
+  failed: string[]
+}
 
 /** Error response shape from `/api/unfollowers`. */
 export interface ApiErrorBody {

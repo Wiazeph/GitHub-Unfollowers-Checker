@@ -7,8 +7,12 @@ import {
   Copy,
   Check,
   LoaderCircle,
+  UserMinus,
 } from 'lucide-react'
 import { toast } from 'sonner'
+import { ConfirmDialog } from '../../ui/ConfirmDialog'
+import { useUnfollow } from '../../../hooks/useUnfollow'
+import { login } from '../../../api/client'
 import type { Unfollower, UnfollowersResponse } from '../../../types/github'
 
 interface UnfollowersResultsProps {
@@ -16,6 +20,9 @@ interface UnfollowersResultsProps {
   isPending: boolean
   isError: boolean
   data: UnfollowersResponse | undefined
+  isAuthed: boolean
+  isOwnList: boolean
+  onBackToMyList: () => void
 }
 
 const SKELETON_COUNT = 9
@@ -33,6 +40,9 @@ export const UnfollowersResults = ({
   isPending,
   isError,
   data,
+  isAuthed,
+  isOwnList,
+  onBackToMyList,
 }: UnfollowersResultsProps) => {
   return (
     <section aria-live="polite" aria-busy={isPending}>
@@ -41,11 +51,18 @@ export const UnfollowersResults = ({
       ) : isError ? (
         <ErrorState />
       ) : !data ? (
-        <IdleState />
+        <IdleState isAuthed={isAuthed} />
       ) : data.unfollowers.length === 0 ? (
         <ZeroState />
       ) : (
-        <ResultsState username={username} unfollowers={data.unfollowers} />
+        <ResultsState
+          key={username}
+          username={username}
+          initialUnfollowers={data.unfollowers}
+          isAuthed={isAuthed}
+          isOwnList={isOwnList}
+          onBackToMyList={onBackToMyList}
+        />
       )}
     </section>
   )
@@ -59,32 +76,204 @@ const Grid = ({ children }: { children: ReactNode }) => (
 
 const ResultsState = ({
   username,
-  unfollowers,
+  initialUnfollowers,
+  isAuthed,
+  isOwnList,
+  onBackToMyList,
 }: {
   username: string
-  unfollowers: Unfollower[]
+  initialUnfollowers: Unfollower[]
+  isAuthed: boolean
+  isOwnList: boolean
+  onBackToMyList: () => void
 }) => {
-  const count = unfollowers.length
+  // Local copy so we can drop users as they get unfollowed.
+  const [users, setUsers] = useState(initialUnfollowers)
+  const [selected, setSelected] = useState<Set<string>>(new Set())
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const [pendingTargets, setPendingTargets] = useState<string[]>([])
+
+  const unfollow = useUnfollow((result) => {
+    if (result.removed.length > 0) {
+      const removedSet = new Set(result.removed)
+      setUsers((prev) => prev.filter((u) => !removedSet.has(u.login)))
+      setSelected((prev) => {
+        const next = new Set(prev)
+        for (const login of result.removed) next.delete(login)
+        return next
+      })
+    }
+    setConfirmOpen(false)
+    setPendingTargets([])
+  })
+
+  const count = users.length
   const label = count === 1 ? '1 user' : `${count} users`
+  const allSelected = count > 0 && selected.size === count
+
+  const toggle = (loginName: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev)
+      if (next.has(loginName)) next.delete(loginName)
+      else next.add(loginName)
+      return next
+    })
+  }
+
+  const toggleAll = () => {
+    setSelected(allSelected ? new Set() : new Set(users.map((u) => u.login)))
+  }
+
+  const requestUnfollow = (targets: string[]) => {
+    setPendingTargets(targets)
+    setConfirmOpen(true)
+  }
 
   return (
     <div className="flex flex-col gap-4">
+      <OnboardingHint show={isOwnList} />
+
+      {/* Context line */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-fg-muted">
-          <span className="font-medium text-fg">@{username}</span> is not
-          followed back by{' '}
-          <span className="rounded-full bg-brand-500/15 px-2.5 py-0.5 font-medium text-brand-400">
-            {label}
-          </span>
+          {isOwnList ? (
+            <>
+              <span className="font-medium text-fg">{label}</span> don&apos;t
+              follow you back — select to remove.
+            </>
+          ) : (
+            <>
+              <span className="font-medium text-fg">@{username}</span> is not
+              followed back by{' '}
+              <span className="rounded-full bg-brand-500/15 px-2.5 py-0.5 font-medium text-brand-400">
+                {label}
+              </span>
+            </>
+          )}
         </p>
-        <CopyButton logins={unfollowers.map((user) => user.login)} />
+        <CopyButton logins={users.map((u) => u.login)} />
       </div>
 
+      {/* Viewing someone else while signed in → unfollow tools don't apply */}
+      {isAuthed && !isOwnList && (
+        <p className="text-sm text-fg-muted">
+          You can only remove people from your own account.{' '}
+          <button
+            onClick={onBackToMyList}
+            className="cursor-pointer font-medium text-brand-400 underline-offset-2 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-brand-400"
+          >
+            Back to my list
+          </button>
+        </p>
+      )}
+
+      {/* Guest CTA */}
+      {!isAuthed && <GuestCta />}
+
+      {/* Bulk action bar (own list only) */}
+      {isOwnList && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-surface px-3 py-2">
+          <label className="flex cursor-pointer items-center gap-2 text-sm text-fg-muted">
+            <input
+              type="checkbox"
+              checked={allSelected}
+              onChange={toggleAll}
+              className="h-4 w-4 cursor-pointer accent-brand-500"
+            />
+            {selected.size > 0 ? `${selected.size} selected` : 'Select all'}
+          </label>
+          <button
+            onClick={() => requestUnfollow([...selected])}
+            disabled={selected.size === 0 || unfollow.isPending}
+            className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-red-500 px-3 py-1.5 text-sm font-medium text-white outline-none transition-colors hover:bg-red-600 focus-visible:ring-2 focus-visible:ring-red-400 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {unfollow.isPending ? (
+              <LoaderCircle
+                className="h-4 w-4 motion-safe:animate-spin"
+                aria-hidden="true"
+              />
+            ) : (
+              <UserMinus className="h-4 w-4" aria-hidden="true" />
+            )}
+            Unfollow selected
+          </button>
+        </div>
+      )}
+
       <Grid>
-        {unfollowers.map((user) => (
-          <UnfollowerCard key={user.id} user={user} />
+        {users.map((user) => (
+          <UnfollowerCard
+            key={user.id}
+            user={user}
+            selectable={isOwnList}
+            selected={selected.has(user.login)}
+            onToggle={() => toggle(user.login)}
+            onUnfollow={() => requestUnfollow([user.login])}
+            disabled={unfollow.isPending}
+          />
         ))}
       </Grid>
+
+      <ConfirmDialog
+        open={confirmOpen}
+        title="Unfollow users?"
+        description={`You're about to unfollow ${pendingTargets.length} ${
+          pendingTargets.length === 1 ? 'user' : 'users'
+        }. This can't be undone here.`}
+        confirmLabel="Unfollow"
+        isPending={unfollow.isPending}
+        onConfirm={() => unfollow.mutate(pendingTargets)}
+        onCancel={() => {
+          if (unfollow.isPending) return
+          setConfirmOpen(false)
+          setPendingTargets([])
+        }}
+      />
+    </div>
+  )
+}
+
+const GuestCta = () => (
+  <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-brand-500/30 bg-brand-500/10 px-4 py-3">
+    <p className="text-sm text-fg">
+      Sign in to remove the people who don&apos;t follow you back.
+    </p>
+    <button
+      onClick={login}
+      className="inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg bg-brand-500 px-3 py-1.5 text-sm font-medium text-bg outline-none transition-colors hover:bg-brand-600 focus-visible:ring-2 focus-visible:ring-brand-400"
+    >
+      Sign in with GitHub
+    </button>
+  </div>
+)
+
+const ONBOARDING_KEY = 'guc.onboarding.dismissed'
+
+const OnboardingHint = ({ show }: { show: boolean }) => {
+  const [dismissed, setDismissed] = useState(
+    () => localStorage.getItem(ONBOARDING_KEY) === '1',
+  )
+
+  if (!show || dismissed) return null
+
+  const dismiss = () => {
+    localStorage.setItem(ONBOARDING_KEY, '1')
+    setDismissed(true)
+  }
+
+  return (
+    <div className="flex items-start justify-between gap-3 rounded-lg border border-border bg-surface px-4 py-3 text-sm text-fg-muted">
+      <p>
+        You&apos;re signed in. Select cards to unfollow in bulk, or remove them
+        one by one. Unfollowing only affects your own account.
+      </p>
+      <button
+        onClick={dismiss}
+        className="shrink-0 cursor-pointer rounded-md px-2 py-0.5 text-fg-muted outline-none transition-colors hover:text-fg focus-visible:ring-2 focus-visible:ring-brand-400"
+        aria-label="Dismiss"
+      >
+        ✕
+      </button>
     </div>
   )
 }
@@ -116,10 +305,7 @@ const CopyButton = ({ logins }: { logins: string[] }) => {
       }`}
     >
       {copied ? (
-        <Check
-          className="h-4 w-4 motion-safe:animate-pop"
-          aria-hidden="true"
-        />
+        <Check className="h-4 w-4 motion-safe:animate-pop" aria-hidden="true" />
       ) : (
         <Copy className="h-4 w-4" aria-hidden="true" />
       )}
@@ -128,35 +314,125 @@ const CopyButton = ({ logins }: { logins: string[] }) => {
   )
 }
 
-const UnfollowerCard = ({ user }: { user: Unfollower }) => (
-  <li>
+const UnfollowerCard = ({
+  user,
+  selectable,
+  selected,
+  onToggle,
+  onUnfollow,
+  disabled,
+}: {
+  user: Unfollower
+  selectable: boolean
+  selected: boolean
+  onToggle: () => void
+  onUnfollow: () => void
+  disabled: boolean
+}) => {
+  const profileLink = (
     <a
       href={user.html_url}
       target="_blank"
       rel="noreferrer"
-      className="group flex items-center gap-3 rounded-card border border-border bg-surface px-3 py-2.5 outline-none transition-colors hover:border-brand-500/40 hover:bg-surface-hover focus-visible:ring-2 focus-visible:ring-brand-400"
+      onClick={(event) => event.stopPropagation()}
+      aria-label={`Open ${user.login} on GitHub`}
+      className="shrink-0 rounded-md p-1 text-fg-muted outline-none transition-colors hover:text-fg focus-visible:ring-2 focus-visible:ring-brand-400"
     >
-      <img
-        src={user.avatar_url}
-        alt={`${user.login} avatar`}
-        loading="lazy"
-        className="h-10 w-10 rounded-full ring-1 ring-border"
-      />
-      <span className="truncate text-sm font-medium">{user.login}</span>
-      <ArrowUpRight
-        className="ml-auto h-4 w-4 shrink-0 text-fg-muted opacity-0 transition-opacity group-hover:opacity-100"
-        aria-hidden="true"
-      />
+      <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
     </a>
-  </li>
-)
+  )
+
+  // Guest / viewing someone else: the whole card is a profile link (unchanged).
+  if (!selectable) {
+    return (
+      <li>
+        <a
+          href={user.html_url}
+          target="_blank"
+          rel="noreferrer"
+          className="group flex items-center gap-3 rounded-card border border-border bg-surface px-3 py-2.5 outline-none transition-colors hover:border-brand-500/40 hover:bg-surface-hover focus-visible:ring-2 focus-visible:ring-brand-400"
+        >
+          <img
+            src={user.avatar_url}
+            alt={`${user.login} avatar`}
+            loading="lazy"
+            className="h-10 w-10 rounded-full ring-1 ring-border"
+          />
+          <span className="truncate text-sm font-medium">{user.login}</span>
+          <ArrowUpRight
+            className="ml-auto h-4 w-4 shrink-0 text-fg-muted opacity-0 transition-opacity group-hover:opacity-100"
+            aria-hidden="true"
+          />
+        </a>
+      </li>
+    )
+  }
+
+  // Signed in on own list: card body toggles selection; profile + unfollow are separate.
+  return (
+    <li>
+      <div
+        role="checkbox"
+        aria-checked={selected}
+        tabIndex={0}
+        onClick={onToggle}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault()
+            onToggle()
+          }
+        }}
+        className={`flex cursor-pointer items-center gap-3 rounded-card border px-3 py-2.5 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-brand-400 ${
+          selected
+            ? 'border-brand-500 bg-surface-hover'
+            : 'border-border bg-surface hover:bg-surface-hover'
+        }`}
+      >
+        <span
+          className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border transition-colors ${
+            selected
+              ? 'border-brand-500 bg-brand-500 text-bg'
+              : 'border-border bg-bg'
+          }`}
+          aria-hidden="true"
+        >
+          {selected && <Check className="h-3.5 w-3.5" />}
+        </span>
+        <img
+          src={user.avatar_url}
+          alt={`${user.login} avatar`}
+          loading="lazy"
+          className="h-10 w-10 rounded-full ring-1 ring-border"
+        />
+        <span className="truncate text-sm font-medium">{user.login}</span>
+
+        <div className="ml-auto flex shrink-0 items-center gap-1">
+          {profileLink}
+          <button
+            onClick={(event) => {
+              event.stopPropagation()
+              onUnfollow()
+            }}
+            disabled={disabled}
+            aria-label={`Unfollow ${user.login}`}
+            className="rounded-md p-1 text-fg-muted outline-none transition-colors hover:text-red-400 focus-visible:ring-2 focus-visible:ring-red-400 disabled:opacity-50"
+          >
+            <UserMinus className="h-4 w-4" aria-hidden="true" />
+          </button>
+        </div>
+      </div>
+    </li>
+  )
+}
 
 const LoadingState = () => {
   const [messageIndex, setMessageIndex] = useState(0)
 
   useEffect(() => {
     const id = setInterval(() => {
-      setMessageIndex((index) => Math.min(index + 1, LOADING_MESSAGES.length - 1))
+      setMessageIndex((index) =>
+        Math.min(index + 1, LOADING_MESSAGES.length - 1),
+      )
     }, 2500)
     return () => clearInterval(id)
   }, [])
@@ -213,11 +489,15 @@ const CenteredState = ({
   </div>
 )
 
-const IdleState = () => (
+const IdleState = ({ isAuthed }: { isAuthed: boolean }) => (
   <CenteredState
     icon={<UserSearch className="h-6 w-6" aria-hidden="true" />}
     title="Ready when you are"
-    description="Enter a GitHub username above to see who doesn't follow them back."
+    description={
+      isAuthed
+        ? 'Loading your list… or search for another user above.'
+        : "Enter a GitHub username above to see who doesn't follow them back."
+    }
   />
 )
 
