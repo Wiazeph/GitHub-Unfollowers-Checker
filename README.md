@@ -1,55 +1,27 @@
-# GitHub Unfollowers Checker
+# Unfollowers Checker
 
-Find out who you follow on GitHub that doesn't follow you back. Enter a username, and the app fetches the account's followers and following lists and shows the difference.
+See who you follow that doesn't follow you back — across **GitHub**, **Bluesky**, and **Instagram**, in one place. Pick a platform, enter a handle, and get the list of accounts you follow who don't follow you back. Sign in to clean it up with one click.
 
-![GitHub Unfollowers Checker](./thumbnail/GitHub-Unfollowers-Checker.png)
+![Unfollowers Checker](./thumbnail/GitHub-Unfollowers-Checker.png)
 
-## Features
+## Platforms
 
-- **One input** — just type a GitHub username and hit Check.
-- **Server-side proxy** — GitHub requests are made through a serverless function that holds the API token, so it stays off the client and you get the authenticated rate limit (5,000 req/h instead of 60).
-- **Full pagination** — handles accounts with thousands of followers/following via the GitHub `Link` header.
-- **Clear states** — loading skeletons, an empty prompt, a celebratory "everyone follows back" state, and friendly error toasts.
-- **Copy usernames** with one click.
+| Platform | View non-followers | Unfollow | How it works |
+| --- | :---: | :---: | --- |
+| **GitHub** | ✅ | ✅ | Public API, no sign-in needed to view any user. Sign in with GitHub to bulk-unfollow your own list. |
+| **Bluesky** | ✅ | ✅ | Public AT Protocol API to view any handle. Sign in with Bluesky to bulk-unfollow your own list. |
+| **Instagram** | ✅ | ✅ | A browser bookmarklet that runs in your own session — Instagram has no public follower API, so nothing touches our servers. |
 
-## Tech Stack
+> Twitter/X, LinkedIn, and Instagram's official APIs don't allow a free, frictionless follower-list lookup, so they're out of scope (Instagram is supported via the bookmarklet instead).
 
-[React 19](https://react.dev/) · [TypeScript](https://www.typescriptlang.org/) · [Vite](https://vite.dev/) · [Tailwind CSS v4](https://tailwindcss.com/) · [TanStack Query](https://tanstack.com/query) · [sonner](https://sonner.emilkowal.ski/) · [lucide-react](https://lucide.dev/) · [Vercel Functions](https://vercel.com/docs/functions)
+## How it works
 
-## Running Locally
+- **GitHub & Bluesky** — paste a handle (a bare name, an `@handle`, or even a full profile URL all work). The app fetches the account's followers and following lists and shows the difference. Reading is unauthenticated and free; signing in is only needed to unfollow on your own account.
+- **Instagram** — drag the provided bookmarklet to your bookmarks bar and run it on instagram.com. It scans the people you follow using your own session and never sends data to any server.
 
-This app uses a Vercel serverless function, so it runs with `vercel dev` (which serves both the Vite frontend and the `/api` route).
+## Privacy & security
 
-```bash
-# 1. Clone and install
-git clone https://github.com/Wiazeph/GitHub-Unfollowers-Checker.git
-cd GitHub-Unfollowers-Checker
-pnpm install
-
-# 2. Add a GitHub token
-cp .env.example .env.local
-# then edit .env.local and set GITHUB_TOKEN
-```
-
-Create a token at [github.com/settings/tokens](https://github.com/settings/tokens). A fine-grained token with read-only public access is enough — no scopes are required for public follower data.
-
-```bash
-# 3. Start the dev server (frontend + API)
-pnpm dev
-```
-
-> Prefer the UI only, without the API route? Use `pnpm dev:vite`.
-
-## Deploying
-
-Deploy to [Vercel](https://vercel.com/) and set the `GITHUB_TOKEN` environment variable in your project settings (Production, Preview, and Development). The `api/` directory is detected automatically.
-
-## Scripts
-
-| Command         | Description                          |
-| --------------- | ------------------------------------ |
-| `pnpm dev`      | Vite + serverless API (`vercel dev`) |
-| `pnpm dev:vite` | Frontend only                        |
-| `pnpm build`    | Type-check and build for production  |
-| `pnpm preview`  | Preview the production build         |
-| `pnpm lint`     | Run ESLint                           |
+- Public follower data is read through serverless functions that hold the API credentials, so tokens never reach the browser.
+- Sign-in tokens are kept server-side (GitHub: signed http-only cookie; Bluesky: stored server-side, only the account id rides in the cookie).
+- The Instagram tool runs entirely client-side in your own browser — your session and data stay with you.
+- Bulk unfollowing affects only your own account, and only after an explicit confirmation.

@@ -53,6 +53,37 @@ export const PLATFORMS: Record<PlatformId, PlatformConfig> = {
   },
 }
 
+/**
+ * Turn whatever a user pasted into a bare handle. People paste profile links
+ * (https://github.com/Wiazeph/, https://bsky.app/profile/name.bsky.social) or
+ * prefix an @, so we strip all of that down to the identifier.
+ */
+export const normalizeHandle = (platform: PlatformId, raw: string): string => {
+  let value = raw.trim()
+
+  // If it looks like a URL, pull out the relevant path segment.
+  if (/^https?:\/\//i.test(value) || /^[\w.-]+\.[a-z]{2,}\//i.test(value)) {
+    const withProtocol = /^https?:\/\//i.test(value) ? value : `https://${value}`
+    try {
+      const url = new URL(withProtocol)
+      const segments = url.pathname.split('/').filter(Boolean)
+      if (platform === 'bluesky') {
+        // bsky.app/profile/<handle-or-did>
+        const idx = segments.indexOf('profile')
+        value = idx >= 0 && segments[idx + 1] ? segments[idx + 1] : (segments[0] ?? '')
+      } else {
+        // github.com/<user>[/...]
+        value = segments[0] ?? ''
+      }
+    } catch {
+      // fall through with the raw value
+    }
+  }
+
+  // Strip a leading @ and any surrounding slashes/whitespace.
+  return value.replace(/^@+/, '').replace(/^\/+|\/+$/g, '').trim()
+}
+
 /** Ordered list for rendering the platform selector. */
 export const PLATFORM_LIST: PlatformConfig[] = [
   PLATFORMS.github,

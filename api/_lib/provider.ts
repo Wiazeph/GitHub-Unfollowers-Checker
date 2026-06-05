@@ -42,6 +42,32 @@ export class ProviderError extends Error {
 }
 
 /**
+ * Reduce whatever was passed (a profile URL, an @-prefixed handle, a bare name)
+ * to a plain identifier. Mirrors the client-side normalizer so direct API hits
+ * and legacy links are tolerant too.
+ */
+export const normalizeHandle = (platform: PlatformId, raw: string): string => {
+  let value = raw.trim()
+
+  if (/^https?:\/\//i.test(value) || /^[\w.-]+\.[a-z]{2,}\//i.test(value)) {
+    const withProtocol = /^https?:\/\//i.test(value) ? value : `https://${value}`
+    try {
+      const segments = new URL(withProtocol).pathname.split('/').filter(Boolean)
+      if (platform === 'bluesky') {
+        const idx = segments.indexOf('profile')
+        value = idx >= 0 && segments[idx + 1] ? segments[idx + 1] : segments[0] ?? ''
+      } else {
+        value = segments[0] ?? ''
+      }
+    } catch {
+      // keep the raw value
+    }
+  }
+
+  return value.replace(/^@+/, '').replace(/^\/+|\/+$/g, '').trim()
+}
+
+/**
  * The contract every platform implements. Auth/unfollow capabilities are added
  * incrementally per platform; the read path (`getUnfollowers`) is the baseline.
  */

@@ -13,10 +13,10 @@ dist-ssr
 *.local
 .vercel
 
-# Environment variables (keep .env.example committed)
+# Environment variables (keep .env.local.example committed)
 .env
 .env.*
-!.env.example
+!.env.local.example
 
 # Editor directories and files
 .vscode/*

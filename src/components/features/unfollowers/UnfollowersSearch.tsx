@@ -2,7 +2,7 @@ import { type FormEvent } from 'react'
 import { Search, LoaderCircle } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '../../ui/Button'
-import { PLATFORMS } from '../../../platforms'
+import { PLATFORMS, normalizeHandle } from '../../../platforms'
 import type { PlatformId } from '../../../types/platform'
 
 interface UnfollowersSearchProps {
@@ -28,12 +28,12 @@ export const UnfollowersSearch = ({
     event.preventDefault()
     if (isPending) return
 
-    const trimmed = value.trim()
-    if (!config.handlePattern.test(trimmed)) {
+    const normalized = normalizeHandle(platform, value)
+    if (!config.handlePattern.test(normalized)) {
       toast.error(config.validationMessage)
       return
     }
-    onSearch(trimmed)
+    onSearch(normalized)
   }
 
   return (

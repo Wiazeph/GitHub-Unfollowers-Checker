@@ -13,7 +13,7 @@ import { toast } from 'sonner'
 import { ConfirmDialog } from '../../ui/ConfirmDialog'
 import { useUnfollow } from '../../../hooks/useUnfollow'
 import { login, loginBluesky } from '../../../api/client'
-import { PLATFORMS } from '../../../platforms'
+import { PLATFORMS, normalizeHandle } from '../../../platforms'
 import type { Account, PlatformId, UnfollowersResponse } from '../../../types/platform'
 
 interface UnfollowersResultsProps {
@@ -300,13 +300,14 @@ const GuestCta = ({
 
 const BlueskySignIn = ({ defaultHandle }: { defaultHandle: string }) => {
   const [handle, setHandle] = useState(defaultHandle)
-  const valid = PLATFORMS.bluesky.handlePattern.test(handle.trim())
+  const normalized = normalizeHandle('bluesky', handle)
+  const valid = PLATFORMS.bluesky.handlePattern.test(normalized)
 
   return (
     <form
       onSubmit={(event) => {
         event.preventDefault()
-        if (valid) loginBluesky(handle.trim())
+        if (valid) loginBluesky(normalized)
       }}
       className="flex flex-col gap-2 rounded-lg border border-brand-500/30 bg-brand-500/10 px-4 py-3"
     >

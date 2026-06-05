@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { getOAuthClient } from '../../_lib/bluesky-oauth.js'
 import { randomToken } from '../../_lib/auth.js'
+import { normalizeHandle } from '../../_lib/provider.js'
 
 const param = (value: string | string[] | undefined): string =>
   (Array.isArray(value) ? value[0] : value)?.trim() ?? ''
@@ -13,7 +14,7 @@ export default async function handler(
   req: VercelRequest,
   res: VercelResponse,
 ): Promise<void> {
-  const handle = param(req.query.handle)
+  const handle = normalizeHandle('bluesky', param(req.query.handle))
   if (!handle || !HANDLE_PATTERN.test(handle)) {
     res
       .status(400)

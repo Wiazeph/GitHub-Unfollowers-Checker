@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { getProvider } from './_lib/registry.js'
-import { ProviderError } from './_lib/provider.js'
+import { ProviderError, normalizeHandle, type PlatformId } from './_lib/provider.js'
 
 /** Read a single string value from a query param that may be string | string[]. */
 const param = (raw: VercelRequest['query'][string]): string =>
@@ -26,8 +26,12 @@ export default async function handler(
     return
   }
 
-  // Accept `handle` (new) or `username` (legacy) interchangeably.
-  const handle = param(req.query.handle) || param(req.query.username)
+  // Accept `handle` (new) or `username` (legacy) interchangeably, and tolerate
+  // pasted profile URLs / @-prefixes.
+  const handle = normalizeHandle(
+    platform as PlatformId,
+    param(req.query.handle) || param(req.query.username),
+  )
   if (!handle) {
     res
       .status(400)
