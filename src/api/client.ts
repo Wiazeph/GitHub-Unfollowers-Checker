@@ -24,10 +24,16 @@ export const fetchUnfollowers = async (
 
   if (!response.ok) {
     const body = (await response.json().catch(() => null)) as ApiErrorBody | null
-    throw new ApiError(
-      body ?? { error: 'Something went wrong. Please try again.', code: 'UPSTREAM' },
-      response.status,
-    )
+    // Vercel returns no JSON body on a function timeout (504).
+    const fallback: ApiErrorBody =
+      response.status === 504
+        ? {
+            error:
+              'This account is very large and timed out. Try again, or a smaller account.',
+            code: 'UPSTREAM',
+          }
+        : { error: 'Something went wrong. Please try again.', code: 'UPSTREAM' }
+    throw new ApiError(body ?? fallback, response.status)
   }
 
   return (await response.json()) as UnfollowersResponse

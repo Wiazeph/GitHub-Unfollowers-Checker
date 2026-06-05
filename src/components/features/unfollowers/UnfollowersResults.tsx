@@ -26,6 +26,8 @@ interface UnfollowersResultsProps {
 }
 
 const SKELETON_COUNT = 9
+const ISSUES_URL =
+  'https://github.com/Wiazeph/GitHub-Unfollowers-Checker/issues'
 
 const LOADING_MESSAGES = [
   'Fetching the following list…',
@@ -187,14 +189,7 @@ const ResultsState = ({
             disabled={selected.size === 0 || unfollow.isPending}
             className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-red-500 px-3 py-1.5 text-sm font-medium text-white outline-none transition-colors hover:bg-red-600 focus-visible:ring-2 focus-visible:ring-red-400 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {unfollow.isPending ? (
-              <LoaderCircle
-                className="h-4 w-4 motion-safe:animate-spin"
-                aria-hidden="true"
-              />
-            ) : (
-              <UserMinus className="h-4 w-4" aria-hidden="true" />
-            )}
+            <UserMinus className="h-4 w-4" aria-hidden="true" />
             Unfollow selected
           </button>
         </div>
@@ -208,8 +203,6 @@ const ResultsState = ({
             selectable={isOwnList}
             selected={selected.has(user.login)}
             onToggle={() => toggle(user.login)}
-            onUnfollow={() => requestUnfollow([user.login])}
-            disabled={unfollow.isPending}
           />
         ))}
       </Grid>
@@ -319,29 +312,12 @@ const UnfollowerCard = ({
   selectable,
   selected,
   onToggle,
-  onUnfollow,
-  disabled,
 }: {
   user: Unfollower
   selectable: boolean
   selected: boolean
   onToggle: () => void
-  onUnfollow: () => void
-  disabled: boolean
 }) => {
-  const profileLink = (
-    <a
-      href={user.html_url}
-      target="_blank"
-      rel="noreferrer"
-      onClick={(event) => event.stopPropagation()}
-      aria-label={`Open ${user.login} on GitHub`}
-      className="shrink-0 rounded-md p-1 text-fg-muted outline-none transition-colors hover:text-fg focus-visible:ring-2 focus-visible:ring-brand-400"
-    >
-      <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
-    </a>
-  )
-
   // Guest / viewing someone else: the whole card is a profile link (unchanged).
   if (!selectable) {
     return (
@@ -406,20 +382,16 @@ const UnfollowerCard = ({
         />
         <span className="truncate text-sm font-medium">{user.login}</span>
 
-        <div className="ml-auto flex shrink-0 items-center gap-1">
-          {profileLink}
-          <button
-            onClick={(event) => {
-              event.stopPropagation()
-              onUnfollow()
-            }}
-            disabled={disabled}
-            aria-label={`Unfollow ${user.login}`}
-            className="rounded-md p-1 text-fg-muted outline-none transition-colors hover:text-red-400 focus-visible:ring-2 focus-visible:ring-red-400 disabled:opacity-50"
-          >
-            <UserMinus className="h-4 w-4" aria-hidden="true" />
-          </button>
-        </div>
+        <a
+          href={user.html_url}
+          target="_blank"
+          rel="noreferrer"
+          onClick={(event) => event.stopPropagation()}
+          aria-label={`Open ${user.login} on GitHub`}
+          className="ml-auto shrink-0 rounded-md p-1 text-fg-muted outline-none transition-colors hover:text-fg focus-visible:ring-2 focus-visible:ring-brand-400"
+        >
+          <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+        </a>
       </div>
     </li>
   )
@@ -466,11 +438,13 @@ const CenteredState = ({
   title,
   description,
   tone = 'muted',
+  footer,
 }: {
   icon: ReactNode
   title: string
   description: string
   tone?: 'muted' | 'brand'
+  footer?: ReactNode
 }) => (
   <div className="flex flex-col items-center gap-4 py-12 text-center">
     <div
@@ -486,6 +460,7 @@ const CenteredState = ({
       <p className="font-medium text-fg">{title}</p>
       <p className="max-w-sm text-sm text-fg-muted">{description}</p>
     </div>
+    {footer}
   </div>
 )
 
@@ -515,5 +490,15 @@ const ErrorState = () => (
     icon={<AlertCircle className="h-6 w-6" aria-hidden="true" />}
     title="Something went wrong"
     description="We couldn't complete that check. See the notification for details and try again."
+    footer={
+      <a
+        href={`${ISSUES_URL}/new`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-sm font-medium text-brand-400 underline-offset-2 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-brand-400"
+      >
+        Keeps happening? Report an issue
+      </a>
+    }
   />
 )
