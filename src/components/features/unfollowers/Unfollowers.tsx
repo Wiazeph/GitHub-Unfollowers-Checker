@@ -37,6 +37,20 @@ export const Unfollowers = () => {
     autoLoaded.current = false
   }
 
+  // On first load, land on the platform the user is signed in to (so a Bluesky
+  // login returns to the Bluesky tab, not GitHub). Only runs once; manual tab
+  // switches afterwards are respected.
+  const tabInitialized = useRef(false)
+  useEffect(() => {
+    if (tabInitialized.current || authLoading) return
+    tabInitialized.current = true
+    if (auth?.authenticated) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setTab(auth.platform)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authLoading])
+
   // When signed in (on the active platform), auto-load the user's own list once.
   const autoLoaded = useRef(false)
   useEffect(() => {
