@@ -47,12 +47,29 @@ export default async function handler(
     return
   }
 
-  const body = (req.body ?? {}) as { usernames?: unknown }
-  const usernames = Array.isArray(body.usernames)
-    ? body.usernames.filter(
-        (u): u is string => typeof u === 'string' && USERNAME_PATTERN.test(u),
-      )
-    : []
+  // Only GitHub supports unfollow today; reject other platforms explicitly.
+  const body = (req.body ?? {}) as {
+    platform?: unknown
+    targets?: unknown
+    usernames?: unknown
+  }
+  const platform = typeof body.platform === 'string' ? body.platform : 'github'
+  if (platform !== 'github') {
+    res
+      .status(400)
+      .json({ error: 'Unfollow is not supported for this platform yet', code: 'BAD_REQUEST' })
+    return
+  }
+
+  // Accept `targets` (new) or `usernames` (legacy).
+  const rawTargets = Array.isArray(body.targets)
+    ? body.targets
+    : Array.isArray(body.usernames)
+      ? body.usernames
+      : []
+  const usernames = rawTargets.filter(
+    (u): u is string => typeof u === 'string' && USERNAME_PATTERN.test(u),
+  )
 
   if (usernames.length === 0) {
     res.status(400).json({ error: 'No valid usernames provided', code: 'BAD_REQUEST' })

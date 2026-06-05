@@ -21,7 +21,7 @@ export const AuthStatus = () => {
 
   return (
     <div className="flex items-center gap-2 text-sm">
-      <span className="font-medium text-fg">@{auth.login}</span>
+      <span className="font-medium text-fg">@{auth.handle}</span>
       <span aria-hidden="true" className="text-border">
         ·
       </span>

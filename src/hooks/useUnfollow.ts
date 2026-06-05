@@ -1,17 +1,20 @@
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { unfollowUsers } from '../api/client'
-import type { ApiError, UnfollowResult } from '../types/github'
+import { unfollowAccounts } from '../api/client'
+import type { ApiError, PlatformId, UnfollowResult } from '../types/platform'
+
+interface UnfollowInput {
+  platform: PlatformId
+  targets: string[]
+}
 
 /**
- * Unfollow one or more users. The caller handles updating the list and clearing
- * the selection in onSuccess; this hook owns the toast feedback.
+ * Unfollow one or more accounts. The caller handles updating the list and
+ * clearing the selection in onSuccess; this hook owns the toast feedback.
  */
-export const useUnfollow = (
-  onSuccess: (result: UnfollowResult) => void,
-) =>
-  useMutation<UnfollowResult, ApiError, string[]>({
-    mutationFn: unfollowUsers,
+export const useUnfollow = (onSuccess: (result: UnfollowResult) => void) =>
+  useMutation<UnfollowResult, ApiError, UnfollowInput>({
+    mutationFn: ({ platform, targets }) => unfollowAccounts(platform, targets),
     onSuccess: (result) => {
       if (result.removed.length > 0) {
         const noun = result.removed.length === 1 ? 'user' : 'users'

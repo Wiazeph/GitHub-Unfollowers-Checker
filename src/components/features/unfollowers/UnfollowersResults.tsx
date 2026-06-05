@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import {
   UserSearch,
   PartyPopper,
@@ -13,10 +13,12 @@ import { toast } from 'sonner'
 import { ConfirmDialog } from '../../ui/ConfirmDialog'
 import { useUnfollow } from '../../../hooks/useUnfollow'
 import { login } from '../../../api/client'
-import type { Unfollower, UnfollowersResponse } from '../../../types/github'
+import { PLATFORMS } from '../../../platforms'
+import type { Account, PlatformId, UnfollowersResponse } from '../../../types/platform'
 
 interface UnfollowersResultsProps {
-  username: string
+  platform: PlatformId
+  handle: string
   isPending: boolean
   isError: boolean
   data: UnfollowersResponse | undefined
@@ -38,7 +40,8 @@ const LOADING_MESSAGES = [
 ]
 
 export const UnfollowersResults = ({
-  username,
+  platform,
+  handle,
   isPending,
   isError,
   data,
@@ -53,13 +56,14 @@ export const UnfollowersResults = ({
       ) : isError ? (
         <ErrorState />
       ) : !data ? (
-        <IdleState isAuthed={isAuthed} />
+        <IdleState platform={platform} isAuthed={isAuthed} />
       ) : data.unfollowers.length === 0 ? (
         <ZeroState />
       ) : (
         <ResultsState
-          key={username}
-          username={username}
+          key={`${platform}:${handle}`}
+          platform={platform}
+          handle={handle}
           initialUnfollowers={data.unfollowers}
           isAuthed={isAuthed}
           isOwnList={isOwnList}
@@ -77,31 +81,43 @@ const Grid = ({ children }: { children: ReactNode }) => (
 )
 
 const ResultsState = ({
-  username,
+  platform,
+  handle,
   initialUnfollowers,
   isAuthed,
   isOwnList,
   onBackToMyList,
 }: {
-  username: string
-  initialUnfollowers: Unfollower[]
+  platform: PlatformId
+  handle: string
+  initialUnfollowers: Account[]
   isAuthed: boolean
   isOwnList: boolean
   onBackToMyList: () => void
 }) => {
   // Local copy so we can drop users as they get unfollowed.
   const [users, setUsers] = useState(initialUnfollowers)
+  // Selection is keyed by Account.id (stable across platforms; a DID on Bluesky).
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [pendingTargets, setPendingTargets] = useState<string[]>([])
 
+  // Map id → handle, since the unfollow API takes handles (GitHub) today.
+  const handleById = useMemo(() => {
+    const map = new Map<string, string>()
+    for (const u of users) map.set(u.id, u.handle)
+    return map
+  }, [users])
+
   const unfollow = useUnfollow((result) => {
     if (result.removed.length > 0) {
-      const removedSet = new Set(result.removed)
-      setUsers((prev) => prev.filter((u) => !removedSet.has(u.login)))
+      const removedHandles = new Set(result.removed)
+      setUsers((prev) => prev.filter((u) => !removedHandles.has(u.handle)))
       setSelected((prev) => {
         const next = new Set(prev)
-        for (const login of result.removed) next.delete(login)
+        for (const u of users) {
+          if (removedHandles.has(u.handle)) next.delete(u.id)
+        }
         return next
       })
     }
@@ -113,20 +129,23 @@ const ResultsState = ({
   const label = count === 1 ? '1 user' : `${count} users`
   const allSelected = count > 0 && selected.size === count
 
-  const toggle = (loginName: string) => {
+  const toggle = (id: string) => {
     setSelected((prev) => {
       const next = new Set(prev)
-      if (next.has(loginName)) next.delete(loginName)
-      else next.add(loginName)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
       return next
     })
   }
 
   const toggleAll = () => {
-    setSelected(allSelected ? new Set() : new Set(users.map((u) => u.login)))
+    setSelected(allSelected ? new Set() : new Set(users.map((u) => u.id)))
   }
 
-  const requestUnfollow = (targets: string[]) => {
+  const requestUnfollow = (ids: string[]) => {
+    const targets = ids
+      .map((id) => handleById.get(id))
+      .filter((h): h is string => Boolean(h))
     setPendingTargets(targets)
     setConfirmOpen(true)
   }
@@ -145,7 +164,7 @@ const ResultsState = ({
             </>
           ) : (
             <>
-              <span className="font-medium text-fg">@{username}</span> is not
+              <span className="font-medium text-fg">@{handle}</span> is not
               followed back by{' '}
               <span className="rounded-full bg-brand-500/15 px-2.5 py-0.5 font-medium text-brand-400">
                 {label}
@@ -153,7 +172,7 @@ const ResultsState = ({
             </>
           )}
         </p>
-        <CopyButton logins={users.map((u) => u.login)} />
+        <CopyButton handles={users.map((u) => u.handle)} />
       </div>
 
       {/* Viewing someone else while signed in → unfollow tools don't apply */}
@@ -169,8 +188,8 @@ const ResultsState = ({
         </p>
       )}
 
-      {/* Guest CTA */}
-      {!isAuthed && <GuestCta />}
+      {/* Guest CTA (platform-aware) */}
+      {!isAuthed && <GuestCta platform={platform} />}
 
       {/* Bulk action bar (own list only) */}
       {isOwnList && (
@@ -200,9 +219,10 @@ const ResultsState = ({
           <UnfollowerCard
             key={user.id}
             user={user}
+            platform={platform}
             selectable={isOwnList}
-            selected={selected.has(user.login)}
-            onToggle={() => toggle(user.login)}
+            selected={selected.has(user.id)}
+            onToggle={() => toggle(user.id)}
           />
         ))}
       </Grid>
@@ -215,7 +235,7 @@ const ResultsState = ({
         }. This can't be undone here.`}
         confirmLabel="Unfollow"
         isPending={unfollow.isPending}
-        onConfirm={() => unfollow.mutate(pendingTargets)}
+        onConfirm={() => unfollow.mutate({ platform, targets: pendingTargets })}
         onCancel={() => {
           if (unfollow.isPending) return
           setConfirmOpen(false)
@@ -226,19 +246,35 @@ const ResultsState = ({
   )
 }
 
-const GuestCta = () => (
-  <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-brand-500/30 bg-brand-500/10 px-4 py-3">
-    <p className="text-sm text-fg">
-      Sign in to remove the people who don&apos;t follow you back.
-    </p>
-    <button
-      onClick={login}
-      className="inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg bg-brand-500 px-3 py-1.5 text-sm font-medium text-bg outline-none transition-colors hover:bg-brand-600 focus-visible:ring-2 focus-visible:ring-brand-400"
-    >
-      Sign in with GitHub
-    </button>
-  </div>
-)
+const GuestCta = ({ platform }: { platform: PlatformId }) => {
+  const config = PLATFORMS[platform]
+
+  // Read-only platform: no sign-in yet, so just explain it.
+  if (config.authKind !== 'oauth') {
+    return (
+      <div className="rounded-lg border border-border bg-surface px-4 py-3">
+        <p className="text-sm text-fg-muted">
+          Removing people on {config.profileNoun} isn&apos;t available yet —
+          this is a read-only view for now.
+        </p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-brand-500/30 bg-brand-500/10 px-4 py-3">
+      <p className="text-sm text-fg">
+        Sign in to remove the people who don&apos;t follow you back.
+      </p>
+      <button
+        onClick={login}
+        className="inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg bg-brand-500 px-3 py-1.5 text-sm font-medium text-bg outline-none transition-colors hover:bg-brand-600 focus-visible:ring-2 focus-visible:ring-brand-400"
+      >
+        Sign in with {config.profileNoun}
+      </button>
+    </div>
+  )
+}
 
 const ONBOARDING_KEY = 'guc.onboarding.dismissed'
 
@@ -272,7 +308,7 @@ const OnboardingHint = ({ show }: { show: boolean }) => {
   )
 }
 
-const CopyButton = ({ logins }: { logins: string[] }) => {
+const CopyButton = ({ handles }: { handles: string[] }) => {
   const [copied, setCopied] = useState(false)
 
   useEffect(() => {
@@ -283,7 +319,7 @@ const CopyButton = ({ logins }: { logins: string[] }) => {
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(logins.join('\n'))
+      await navigator.clipboard.writeText(handles.join('\n'))
       setCopied(true)
       toast.success('Usernames copied to clipboard')
     } catch {
@@ -308,47 +344,51 @@ const CopyButton = ({ logins }: { logins: string[] }) => {
   )
 }
 
-/** Truncated username with a CSS tooltip showing the full handle on hover. */
-const Username = ({ login }: { login: string }) => (
+/** Truncated handle with a CSS tooltip showing the full handle on hover. */
+const Handle = ({ handle }: { handle: string }) => (
   <span className="group/name relative min-w-0 flex-1">
-    <span className="block truncate text-sm font-medium">{login}</span>
+    <span className="block truncate text-sm font-medium">{handle}</span>
     <span
       role="tooltip"
       className="pointer-events-none absolute bottom-full left-0 z-10 mb-1 hidden w-max max-w-[16rem] rounded-md border border-border bg-bg px-2 py-1 text-xs font-medium text-fg shadow-lg group-hover/name:block"
     >
-      {login}
+      {handle}
     </span>
   </span>
 )
 
 const UnfollowerCard = ({
   user,
+  platform,
   selectable,
   selected,
   onToggle,
 }: {
-  user: Unfollower
+  user: Account
+  platform: PlatformId
   selectable: boolean
   selected: boolean
   onToggle: () => void
 }) => {
+  const profileNoun = PLATFORMS[platform].profileNoun
+
   // Guest / viewing someone else: the whole card is a profile link (unchanged).
   if (!selectable) {
     return (
       <li>
         <a
-          href={user.html_url}
+          href={user.profileUrl}
           target="_blank"
           rel="noreferrer"
           className="group flex items-center gap-3 rounded-card border border-border bg-surface px-3 py-2.5 outline-none transition-colors hover:border-brand-500/40 hover:bg-surface-hover focus-visible:ring-2 focus-visible:ring-brand-400"
         >
           <img
-            src={user.avatar_url}
-            alt={`${user.login} avatar`}
+            src={user.avatarUrl}
+            alt={`${user.handle} avatar`}
             loading="lazy"
             className="h-10 w-10 rounded-full ring-1 ring-border"
           />
-          <Username login={user.login} />
+          <Handle handle={user.handle} />
           <ArrowUpRight
             className="ml-auto h-4 w-4 shrink-0 text-fg-muted opacity-0 transition-opacity group-hover:opacity-100"
             aria-hidden="true"
@@ -389,19 +429,19 @@ const UnfollowerCard = ({
           {selected && <Check className="h-3.5 w-3.5" />}
         </span>
         <img
-          src={user.avatar_url}
-          alt={`${user.login} avatar`}
+          src={user.avatarUrl}
+          alt={`${user.handle} avatar`}
           loading="lazy"
           className="h-10 w-10 rounded-full ring-1 ring-border"
         />
-        <Username login={user.login} />
+        <Handle handle={user.handle} />
 
         <a
-          href={user.html_url}
+          href={user.profileUrl}
           target="_blank"
           rel="noreferrer"
           onClick={(event) => event.stopPropagation()}
-          aria-label={`Open ${user.login} on GitHub`}
+          aria-label={`Open ${user.handle} on ${profileNoun}`}
           className="ml-auto shrink-0 rounded-md p-1 text-fg-muted outline-none transition-colors hover:text-fg focus-visible:ring-2 focus-visible:ring-brand-400"
         >
           <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
@@ -478,14 +518,20 @@ const CenteredState = ({
   </div>
 )
 
-const IdleState = ({ isAuthed }: { isAuthed: boolean }) => (
+const IdleState = ({
+  platform,
+  isAuthed,
+}: {
+  platform: PlatformId
+  isAuthed: boolean
+}) => (
   <CenteredState
     icon={<UserSearch className="h-6 w-6" aria-hidden="true" />}
     title="Ready when you are"
     description={
       isAuthed
         ? 'Loading your list… or search for another user above.'
-        : "Enter a GitHub username above to see who doesn't follow them back."
+        : `Enter a ${PLATFORMS[platform].profileNoun} handle above to see who doesn't follow them back.`
     }
   />
 )

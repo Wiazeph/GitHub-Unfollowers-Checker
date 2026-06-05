@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { clearSessionCookie, getSessionToken } from '../_lib/auth.js'
 
-/** Report the current session: { authenticated, login? }. */
+/** Report the current session: { authenticated, platform?, handle? }. */
 export default async function handler(
   req: VercelRequest,
   res: VercelResponse,
@@ -37,5 +37,7 @@ export default async function handler(
   }
 
   const user = (await response.json()) as { login: string }
-  res.status(200).json({ authenticated: true, login: user.login })
+  res
+    .status(200)
+    .json({ authenticated: true, platform: 'github', handle: user.login })
 }

@@ -1,14 +1,19 @@
-/** A GitHub user the target follows who does not follow them back. */
-export interface Unfollower {
-  login: string
-  id: number
-  avatar_url: string
-  html_url: string
+/** A normalized account that a target follows but who does not follow back. */
+export interface Account {
+  /** Stable unique id — GitHub: numeric id as string; Bluesky: the DID. */
+  id: string
+  /** Human-readable handle — GitHub login; Bluesky handle (name.bsky.social). */
+  handle: string
+  displayName?: string
+  avatarUrl?: string
+  profileUrl: string
 }
+
+export type PlatformId = 'github' | 'bluesky'
 
 /** Successful response shape from `/api/unfollowers`. */
 export interface UnfollowersResponse {
-  unfollowers: Unfollower[]
+  unfollowers: Account[]
   count: number
 }
 
@@ -23,7 +28,7 @@ export type ApiErrorCode =
 /** Current authentication state, from `/api/auth/me`. */
 export type AuthState =
   | { authenticated: false }
-  | { authenticated: true; login: string }
+  | { authenticated: true; platform: PlatformId; handle: string }
 
 /** Result of an unfollow request from `/api/unfollow`. */
 export interface UnfollowResult {
