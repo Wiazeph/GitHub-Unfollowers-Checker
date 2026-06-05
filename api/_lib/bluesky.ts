@@ -123,3 +123,104 @@ export const blueskyProvider: Provider = {
   validateHandle: (handle) => HANDLE_PATTERN.test(handle),
   getUnfollowers,
 }
+
+/** DID format: did:method:identifier (we only ever pass plc/web DIDs). */
+const DID_PATTERN = /^did:[a-z]+:[a-zA-Z0-9._:%-]+$/
+
+export const isDid = (value: string): boolean => DID_PATTERN.test(value)
+
+const FOLLOW_COLLECTION = 'app.bsky.graph.follow'
+
+interface RepoLister {
+  com: {
+    atproto: {
+      repo: {
+        listRecords(input: {
+          repo: string
+          collection: string
+          limit?: number
+          cursor?: string
+        }): Promise<{
+          data: {
+            cursor?: string
+            records: { uri: string; value: { subject?: string } }[]
+          }
+        }>
+        deleteRecord(input: {
+          repo: string
+          collection: string
+          rkey: string
+        }): Promise<unknown>
+      }
+    }
+  }
+}
+
+/** Read all of the user's follow records, mapping subject DID → follow rkey. */
+const loadFollowMap = async (
+  agent: RepoLister,
+  repoDid: string,
+): Promise<Map<string, string>> => {
+  const map = new Map<string, string>()
+  let cursor: string | undefined
+  for (let page = 0; page < MAX_PAGES; page++) {
+    const { data } = await agent.com.atproto.repo.listRecords({
+      repo: repoDid,
+      collection: FOLLOW_COLLECTION,
+      limit: PER_PAGE,
+      cursor,
+    })
+    for (const record of data.records) {
+      const subject = record.value?.subject
+      const rkey = record.uri.split('/').pop()
+      if (subject && rkey) map.set(subject, rkey)
+    }
+    cursor = data.cursor
+    if (!cursor || data.records.length === 0) break
+  }
+  return map
+}
+
+/**
+ * Unfollow the given subject DIDs on behalf of `repoDid`. The `agent` is an
+ * authenticated `@atproto/api` Agent. Returns the DIDs removed and those that
+ * failed (e.g. the follow record no longer exists).
+ */
+export const unfollow = async (
+  agent: RepoLister,
+  repoDid: string,
+  subjectDids: string[],
+): Promise<{ removed: string[]; failed: string[] }> => {
+  const followMap = await loadFollowMap(agent, repoDid)
+  const removed: string[] = []
+  const failed: string[] = []
+
+  // Delete in small batches to stay friendly with the PDS.
+  const CONCURRENCY = 5
+  const queue = [...new Set(subjectDids)]
+  while (queue.length > 0) {
+    const batch = queue.splice(0, CONCURRENCY)
+    const results = await Promise.all(
+      batch.map(async (did) => {
+        const rkey = followMap.get(did)
+        if (!rkey) return { did, ok: false }
+        try {
+          await agent.com.atproto.repo.deleteRecord({
+            repo: repoDid,
+            collection: FOLLOW_COLLECTION,
+            rkey,
+          })
+          return { did, ok: true }
+        } catch {
+          return { did, ok: false }
+        }
+      }),
+    )
+    for (const { did, ok } of results) {
+      if (ok) removed.push(did)
+      else failed.push(did)
+    }
+  }
+
+  return { removed, failed }
+}

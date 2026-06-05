@@ -48,7 +48,7 @@ export const PLATFORMS: Record<PlatformId, PlatformConfig> = {
     placeholder: (authed) =>
       authed ? 'Look up another handle…' : 'Enter a Bluesky handle (name.bsky.social)',
     validationMessage: 'Please enter a valid Bluesky handle (e.g. name.bsky.social)',
-    authKind: 'none', // read-only until Bluesky OAuth ships
+    authKind: 'oauth',
     profileNoun: 'Bluesky',
   },
 }

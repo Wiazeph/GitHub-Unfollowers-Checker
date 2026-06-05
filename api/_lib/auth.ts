@@ -109,5 +109,46 @@ export const clearStateCookie = (res: VercelResponse): void => {
 
 /** Return the verified GitHub access token from the session cookie, or null. */
 export const getSessionToken = (req: VercelRequest): string | null => {
-  return unsign(parseCookies(req)[SESSION_COOKIE])
+  const value = unsign(parseCookies(req)[SESSION_COOKIE])
+  if (!value) return null
+  // New sessions are JSON {platform, value}; old ones are a bare token.
+  const session = parseSession(value)
+  if (session) return session.platform === 'github' ? session.value : null
+  return value
+}
+
+/** A platform-tagged session: GitHub stores its token, Bluesky stores the DID. */
+export interface Session {
+  platform: 'github' | 'bluesky'
+  /** GitHub: access token. Bluesky: the user's DID (tokens live in Redis). */
+  value: string
+}
+
+const parseSession = (value: string): Session | null => {
+  try {
+    const parsed = JSON.parse(value) as Partial<Session>
+    if (
+      (parsed.platform === 'github' || parsed.platform === 'bluesky') &&
+      typeof parsed.value === 'string'
+    ) {
+      return { platform: parsed.platform, value: parsed.value }
+    }
+  } catch {
+    // Not JSON — a legacy bare-token cookie.
+  }
+  return null
+}
+
+/** Return the verified platform-tagged session, or null. */
+export const getSession = (req: VercelRequest): Session | null => {
+  const value = unsign(parseCookies(req)[SESSION_COOKIE])
+  if (!value) return null
+  const session = parseSession(value)
+  // Legacy bare token → treat as a GitHub session.
+  return session ?? { platform: 'github', value }
+}
+
+/** Store a platform-tagged session in the signed cookie. */
+export const setSession = (res: VercelResponse, session: Session): void => {
+  setSessionCookie(res, JSON.stringify(session))
 }
