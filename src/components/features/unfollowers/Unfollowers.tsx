@@ -6,6 +6,7 @@ import { UnfollowersResults } from './UnfollowersResults'
 
 export const Unfollowers = () => {
   const { data: auth, isLoading: authLoading } = useAuth()
+  const [inputValue, setInputValue] = useState('')
   const [searchedUsername, setSearchedUsername] = useState('')
   const mutation = useUnfollowers()
 
@@ -13,6 +14,7 @@ export const Unfollowers = () => {
   const ownLogin = auth?.authenticated ? auth.login : ''
 
   const handleSearch = (username: string) => {
+    setInputValue(username)
     setSearchedUsername(username)
     mutation.mutate(username)
   }
@@ -38,11 +40,11 @@ export const Unfollowers = () => {
   return (
     <div className="flex flex-col gap-8">
       <UnfollowersSearch
+        value={inputValue}
+        onChange={setInputValue}
         onSearch={handleSearch}
         isPending={mutation.isPending}
         isAuthed={isAuthed}
-        ownLogin={ownLogin}
-        currentUsername={searchedUsername}
       />
       <UnfollowersResults
         username={searchedUsername}
