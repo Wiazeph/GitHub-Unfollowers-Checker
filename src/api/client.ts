@@ -2,18 +2,20 @@ import {
   ApiError,
   type ApiErrorBody,
   type AuthState,
+  type PlatformId,
   type UnfollowersResponse,
   type UnfollowResult,
-} from '../types/github'
+} from '../types/platform'
 
-/** Call the serverless proxy to compute the unfollowers for a username. */
+/** Call the serverless proxy to compute the unfollowers for a handle. */
 export const fetchUnfollowers = async (
-  username: string,
+  platform: PlatformId,
+  handle: string,
 ): Promise<UnfollowersResponse> => {
   let response: Response
   try {
     response = await fetch(
-      `/api/unfollowers?username=${encodeURIComponent(username)}`,
+      `/api/unfollowers?platform=${platform}&handle=${encodeURIComponent(handle)}`,
     )
   } catch {
     throw new ApiError(
@@ -51,22 +53,28 @@ export const login = (): void => {
   window.location.href = '/api/auth/login'
 }
 
+/** Redirect the browser into the Bluesky OAuth flow for a given handle. */
+export const loginBluesky = (handle: string): void => {
+  window.location.href = `/api/auth/bluesky/login?handle=${encodeURIComponent(handle)}`
+}
+
 /** Clear the session and reload. */
 export const logout = async (): Promise<void> => {
   await fetch('/api/auth/logout', { method: 'POST' })
   window.location.reload()
 }
 
-/** Unfollow one or more users on behalf of the signed-in account. */
-export const unfollowUsers = async (
-  usernames: string[],
+/** Unfollow one or more accounts on behalf of the signed-in user. */
+export const unfollowAccounts = async (
+  platform: PlatformId,
+  targets: string[],
 ): Promise<UnfollowResult> => {
   let response: Response
   try {
     response = await fetch('/api/unfollow', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ usernames }),
+      body: JSON.stringify({ platform, targets }),
     })
   } catch {
     throw new ApiError(

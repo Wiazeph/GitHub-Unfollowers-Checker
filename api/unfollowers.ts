@@ -1,8 +1,10 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { getUnfollowers, GitHubError } from './_lib/github.js'
+import { getProvider } from './_lib/registry.js'
+import { ProviderError } from './_lib/provider.js'
 
-/** GitHub username rules: 1–39 chars, alphanumeric or single hyphens (not leading/trailing). */
-const USERNAME_PATTERN = /^[a-zA-Z0-9](?:[a-zA-Z0-9]|-(?=[a-zA-Z0-9])){0,38}$/
+/** Read a single string value from a query param that may be string | string[]. */
+const param = (raw: VercelRequest['query'][string]): string =>
+  (Array.isArray(raw) ? raw[0] : raw)?.trim() ?? ''
 
 export default async function handler(
   req: VercelRequest,
@@ -14,35 +16,38 @@ export default async function handler(
     return
   }
 
-  const token = process.env.GITHUB_TOKEN
-  if (!token) {
-    res.status(500).json({ error: 'Server is misconfigured', code: 'CONFIG' })
+  // Default to GitHub so existing `?username=` links keep working unchanged.
+  const platform = param(req.query.platform) || 'github'
+  const provider = getProvider(platform)
+  if (!provider) {
+    res
+      .status(400)
+      .json({ error: 'Unsupported platform', code: 'BAD_REQUEST' })
     return
   }
 
-  const raw = req.query.username
-  const username = (Array.isArray(raw) ? raw[0] : raw)?.trim() ?? ''
-
-  if (!username) {
+  // Accept `handle` (new) or `username` (legacy) interchangeably.
+  const handle = param(req.query.handle) || param(req.query.username)
+  if (!handle) {
     res
       .status(400)
-      .json({ error: 'A GitHub username is required', code: 'BAD_REQUEST' })
+      .json({ error: 'A username is required', code: 'BAD_REQUEST' })
     return
   }
 
-  if (!USERNAME_PATTERN.test(username)) {
+  if (!provider.validateHandle(handle)) {
     res
       .status(400)
-      .json({ error: 'That is not a valid GitHub username', code: 'BAD_REQUEST' })
+      .json({ error: 'That is not a valid username', code: 'BAD_REQUEST' })
     return
   }
 
   try {
-    const unfollowers = await getUnfollowers(username, token)
+    const unfollowers = await provider.getUnfollowers(handle)
     res.setHeader('Cache-Control', 'private, max-age=0')
     res.status(200).json({ unfollowers, count: unfollowers.length })
   } catch (error) {
-    if (error instanceof GitHubError) {
+    if (error instanceof ProviderError) {
       res.status(error.status).json({
         error: error.message,
         code: error.code,
@@ -50,8 +55,6 @@ export default async function handler(
       })
       return
     }
-    res
-      .status(502)
-      .json({ error: 'Unexpected server error', code: 'UPSTREAM' })
+    res.status(502).json({ error: 'Unexpected server error', code: 'UPSTREAM' })
   }
 }

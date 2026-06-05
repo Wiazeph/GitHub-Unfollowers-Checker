@@ -1,44 +1,30 @@
 /**
- * Server-side GitHub API helpers.
+ * Server-side GitHub provider.
  *
  * The GitHub token lives only on the server (process.env.GITHUB_TOKEN), so the
  * browser never sees it and we get the authenticated rate limit (5000 req/h)
  * instead of the unauthenticated one (60 req/h).
  */
 
+import { ProviderError, type Account, type Provider } from './provider.js'
+
 const GITHUB_API = 'https://api.github.com'
 const PER_PAGE = 100
 /** How many list pages to fetch in parallel. Keeps large accounts under the timeout. */
 const CONCURRENCY = 8
 
-/** Subset of the GitHub user object we actually care about. */
-export interface GitHubUser {
+/** GitHub username rules: 1–39 chars, alphanumeric or single hyphens (not leading/trailing). */
+const USERNAME_PATTERN = /^[a-zA-Z0-9](?:[a-zA-Z0-9]|-(?=[a-zA-Z0-9])){0,38}$/
+
+/** Back-compat alias: GitHubError used to be a distinct class with the same codes. */
+export { ProviderError as GitHubError }
+
+/** Raw subset of the GitHub user object we read off the wire. */
+interface GitHubUser {
   login: string
   id: number
   avatar_url: string
   html_url: string
-}
-
-export type GitHubErrorCode = 'NOT_FOUND' | 'RATE_LIMIT' | 'UPSTREAM'
-
-/** Thrown by the fetch layer and mapped to an HTTP response by the route. */
-export class GitHubError extends Error {
-  status: number
-  code: GitHubErrorCode
-  retryAfter?: number
-
-  constructor(
-    code: GitHubErrorCode,
-    message: string,
-    status: number,
-    retryAfter?: number,
-  ) {
-    super(message)
-    this.name = 'GitHubError'
-    this.code = code
-    this.status = status
-    this.retryAfter = retryAfter
-  }
 }
 
 const baseHeaders = (token: string): Record<string, string> => ({
@@ -48,9 +34,9 @@ const baseHeaders = (token: string): Record<string, string> => ({
   'User-Agent': 'github-unfollowers-checker',
 })
 
-const mapErrorResponse = (response: Response): GitHubError => {
+const mapErrorResponse = (response: Response): ProviderError => {
   if (response.status === 404) {
-    return new GitHubError('NOT_FOUND', 'User not found', 404)
+    return new ProviderError('NOT_FOUND', 'User not found', 404)
   }
 
   const remaining = response.headers.get('x-ratelimit-remaining')
@@ -62,7 +48,7 @@ const mapErrorResponse = (response: Response): GitHubError => {
     const retryAfter = Number.isFinite(reset)
       ? Math.max(0, reset - Math.floor(Date.now() / 1000))
       : undefined
-    return new GitHubError(
+    return new ProviderError(
       'RATE_LIMIT',
       'GitHub rate limit exceeded. Please try again later.',
       429,
@@ -70,7 +56,7 @@ const mapErrorResponse = (response: Response): GitHubError => {
     )
   }
 
-  return new GitHubError('UPSTREAM', 'GitHub API error', 502)
+  return new ProviderError('UPSTREAM', 'GitHub API error', 502)
 }
 
 /** Read the total page count from a `Link` header's `rel="last"` URL (1 if absent). */
@@ -83,18 +69,19 @@ const parseLastPage = (linkHeader: string | null): number => {
   return 1
 }
 
-const trim = (user: GitHubUser): GitHubUser => ({
-  login: user.login,
-  id: user.id,
-  avatar_url: user.avatar_url,
-  html_url: user.html_url,
+/** Normalize a raw GitHub user into the platform-agnostic Account. */
+const toAccount = (user: GitHubUser): Account => ({
+  id: String(user.id),
+  handle: user.login,
+  avatarUrl: user.avatar_url,
+  profileUrl: user.html_url,
 })
 
 const fetchPage = async (
   path: string,
   page: number,
   token: string,
-): Promise<GitHubUser[]> => {
+): Promise<Account[]> => {
   let response: Response
   try {
     response = await fetch(
@@ -102,10 +89,10 @@ const fetchPage = async (
       { headers: baseHeaders(token) },
     )
   } catch {
-    throw new GitHubError('UPSTREAM', 'Network error reaching GitHub', 502)
+    throw new ProviderError('UPSTREAM', 'Network error reaching GitHub', 502)
   }
   if (!response.ok) throw mapErrorResponse(response)
-  return ((await response.json()) as GitHubUser[]).map(trim)
+  return ((await response.json()) as GitHubUser[]).map(toAccount)
 }
 
 /**
@@ -117,18 +104,18 @@ const fetchPage = async (
 const fetchAllPages = async (
   path: string,
   token: string,
-): Promise<GitHubUser[]> => {
+): Promise<Account[]> => {
   let response: Response
   try {
     response = await fetch(`${GITHUB_API}${path}?per_page=${PER_PAGE}`, {
       headers: baseHeaders(token),
     })
   } catch {
-    throw new GitHubError('UPSTREAM', 'Network error reaching GitHub', 502)
+    throw new ProviderError('UPSTREAM', 'Network error reaching GitHub', 502)
   }
   if (!response.ok) throw mapErrorResponse(response)
 
-  const users = ((await response.json()) as GitHubUser[]).map(trim)
+  const users = ((await response.json()) as GitHubUser[]).map(toAccount)
   const lastPage = parseLastPage(response.headers.get('link'))
   if (lastPage <= 1) return users
 
@@ -154,13 +141,26 @@ const fetchAllPages = async (
 export const getUnfollowers = async (
   username: string,
   token: string,
-): Promise<GitHubUser[]> => {
+): Promise<Account[]> => {
   // Fetch the (usually small) following list first; if it's empty there can be
   // no unfollowers, so we skip pulling the follower list entirely.
   const following = await fetchAllPages(`/users/${username}/following`, token)
   if (following.length === 0) return []
 
   const followers = await fetchAllPages(`/users/${username}/followers`, token)
-  const followerLogins = new Set(followers.map((user) => user.login))
-  return following.filter((user) => !followerLogins.has(user.login))
+  const followerHandles = new Set(followers.map((user) => user.handle))
+  return following.filter((user) => !followerHandles.has(user.handle))
+}
+
+/** The GitHub provider. Reads its token from the environment itself. */
+export const githubProvider: Provider = {
+  id: 'github',
+  validateHandle: (handle) => USERNAME_PATTERN.test(handle),
+  getUnfollowers: (handle) => {
+    const token = process.env.GITHUB_TOKEN
+    if (!token) {
+      throw new ProviderError('UPSTREAM', 'Server is misconfigured', 500)
+    }
+    return getUnfollowers(handle, token)
+  },
 }

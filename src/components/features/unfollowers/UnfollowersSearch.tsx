@@ -2,31 +2,35 @@ import { type FormEvent } from 'react'
 import { Search, LoaderCircle } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '../../ui/Button'
-
-const USERNAME_PATTERN = /^[a-zA-Z0-9](?:[a-zA-Z0-9]|-(?=[a-zA-Z0-9])){0,38}$/
+import { PLATFORMS } from '../../../platforms'
+import type { PlatformId } from '../../../types/platform'
 
 interface UnfollowersSearchProps {
+  platform: PlatformId
   value: string
   onChange: (value: string) => void
-  onSearch: (username: string) => void
+  onSearch: (handle: string) => void
   isPending: boolean
   isAuthed: boolean
 }
 
 export const UnfollowersSearch = ({
+  platform,
   value,
   onChange,
   onSearch,
   isPending,
   isAuthed,
 }: UnfollowersSearchProps) => {
+  const config = PLATFORMS[platform]
+
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault()
     if (isPending) return
 
     const trimmed = value.trim()
-    if (!USERNAME_PATTERN.test(trimmed)) {
-      toast.error('Please enter a valid GitHub username')
+    if (!config.handlePattern.test(trimmed)) {
+      toast.error(config.validationMessage)
       return
     }
     onSearch(trimmed)
@@ -46,10 +50,8 @@ export const UnfollowersSearch = ({
           type="text"
           value={value}
           onChange={(event) => onChange(event.target.value)}
-          placeholder={
-            isAuthed ? 'Look up another user…' : 'Enter a GitHub username'
-          }
-          aria-label="GitHub username"
+          placeholder={config.placeholder(isAuthed)}
+          aria-label={`${config.label} handle`}
           autoComplete="off"
           autoCapitalize="off"
           autoCorrect="off"
