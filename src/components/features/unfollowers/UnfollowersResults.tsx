@@ -334,7 +334,12 @@ const UnfollowerCard = ({
             loading="lazy"
             className="h-10 w-10 rounded-full ring-1 ring-border"
           />
-          <span className="truncate text-sm font-medium">{user.login}</span>
+          <span
+            title={user.login}
+            className="truncate text-sm font-medium"
+          >
+            {user.login}
+          </span>
           <ArrowUpRight
             className="ml-auto h-4 w-4 shrink-0 text-fg-muted opacity-0 transition-opacity group-hover:opacity-100"
             aria-hidden="true"
