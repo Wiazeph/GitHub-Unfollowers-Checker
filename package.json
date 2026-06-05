@@ -11,8 +11,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@atproto/api": "^0.20.9",
+    "@atproto/oauth-client-node": "^0.4.1",
     "@fontsource-variable/inter": "^5.2.8",
     "@tanstack/react-query": "^5.101.0",
+    "@upstash/redis": "^1.38.0",
     "@vercel/analytics": "^2.0.1",
     "lucide-react": "^1.17.0",
     "react": "^19.2.7",

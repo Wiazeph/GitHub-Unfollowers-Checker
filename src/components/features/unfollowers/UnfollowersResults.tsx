@@ -12,7 +12,7 @@ import {
 import { toast } from 'sonner'
 import { ConfirmDialog } from '../../ui/ConfirmDialog'
 import { useUnfollow } from '../../../hooks/useUnfollow'
-import { login } from '../../../api/client'
+import { login, loginBluesky } from '../../../api/client'
 import { PLATFORMS } from '../../../platforms'
 import type { Account, PlatformId, UnfollowersResponse } from '../../../types/platform'
 
@@ -102,22 +102,30 @@ const ResultsState = ({
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [pendingTargets, setPendingTargets] = useState<string[]>([])
 
-  // Map id → handle, since the unfollow API takes handles (GitHub) today.
-  const handleById = useMemo(() => {
+  // The unfollow API identifies targets differently per platform: GitHub uses
+  // the handle (login), Bluesky uses the account id (DID). Map selected ids to
+  // the right identifier, and map results back to ids to update the list.
+  const targetOf = (account: Account): string =>
+    platform === 'bluesky' ? account.id : account.handle
+
+  const idByTarget = useMemo(() => {
     const map = new Map<string, string>()
-    for (const u of users) map.set(u.id, u.handle)
+    for (const u of users) map.set(targetOf(u), u.id)
     return map
-  }, [users])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [users, platform])
 
   const unfollow = useUnfollow((result) => {
     if (result.removed.length > 0) {
-      const removedHandles = new Set(result.removed)
-      setUsers((prev) => prev.filter((u) => !removedHandles.has(u.handle)))
+      const removedIds = new Set(
+        result.removed
+          .map((target) => idByTarget.get(target))
+          .filter((id): id is string => Boolean(id)),
+      )
+      setUsers((prev) => prev.filter((u) => !removedIds.has(u.id)))
       setSelected((prev) => {
         const next = new Set(prev)
-        for (const u of users) {
-          if (removedHandles.has(u.handle)) next.delete(u.id)
-        }
+        for (const id of removedIds) next.delete(id)
         return next
       })
     }
@@ -143,9 +151,11 @@ const ResultsState = ({
   }
 
   const requestUnfollow = (ids: string[]) => {
+    const byId = new Map(users.map((u) => [u.id, u]))
     const targets = ids
-      .map((id) => handleById.get(id))
-      .filter((h): h is string => Boolean(h))
+      .map((id) => byId.get(id))
+      .filter((u): u is Account => Boolean(u))
+      .map(targetOf)
     setPendingTargets(targets)
     setConfirmOpen(true)
   }
@@ -189,7 +199,7 @@ const ResultsState = ({
       )}
 
       {/* Guest CTA (platform-aware) */}
-      {!isAuthed && <GuestCta platform={platform} />}
+      {!isAuthed && <GuestCta platform={platform} handle={handle} />}
 
       {/* Bulk action bar (own list only) */}
       {isOwnList && (
@@ -246,10 +256,16 @@ const ResultsState = ({
   )
 }
 
-const GuestCta = ({ platform }: { platform: PlatformId }) => {
+const GuestCta = ({
+  platform,
+  handle,
+}: {
+  platform: PlatformId
+  handle: string
+}) => {
   const config = PLATFORMS[platform]
 
-  // Read-only platform: no sign-in yet, so just explain it.
+  // Read-only platform: no sign-in, so just explain it.
   if (config.authKind !== 'oauth') {
     return (
       <div className="rounded-lg border border-border bg-surface px-4 py-3">
@@ -261,6 +277,12 @@ const GuestCta = ({ platform }: { platform: PlatformId }) => {
     )
   }
 
+  // Bluesky's OAuth flow needs the handle up front, so prompt for it.
+  if (platform === 'bluesky') {
+    return <BlueskySignIn defaultHandle={handle} />
+  }
+
+  // GitHub: one-click redirect.
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-brand-500/30 bg-brand-500/10 px-4 py-3">
       <p className="text-sm text-fg">
@@ -273,6 +295,47 @@ const GuestCta = ({ platform }: { platform: PlatformId }) => {
         Sign in with {config.profileNoun}
       </button>
     </div>
+  )
+}
+
+const BlueskySignIn = ({ defaultHandle }: { defaultHandle: string }) => {
+  const [handle, setHandle] = useState(defaultHandle)
+  const valid = PLATFORMS.bluesky.handlePattern.test(handle.trim())
+
+  return (
+    <form
+      onSubmit={(event) => {
+        event.preventDefault()
+        if (valid) loginBluesky(handle.trim())
+      }}
+      className="flex flex-col gap-2 rounded-lg border border-brand-500/30 bg-brand-500/10 px-4 py-3"
+    >
+      <p className="text-sm text-fg">
+        Sign in with Bluesky to remove the people who don&apos;t follow you
+        back.
+      </p>
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <input
+          type="text"
+          value={handle}
+          onChange={(event) => setHandle(event.target.value)}
+          placeholder="your-handle.bsky.social"
+          aria-label="Your Bluesky handle"
+          autoComplete="off"
+          autoCapitalize="off"
+          autoCorrect="off"
+          spellCheck={false}
+          className="flex-1 rounded-lg border border-border bg-surface px-3 py-1.5 text-sm text-fg placeholder:text-fg-muted outline-none focus-visible:border-brand-500 focus-visible:ring-2 focus-visible:ring-brand-400/40"
+        />
+        <button
+          type="submit"
+          disabled={!valid}
+          className="inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3 py-1.5 text-sm font-medium text-bg outline-none transition-colors hover:bg-brand-600 focus-visible:ring-2 focus-visible:ring-brand-400 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          Sign in with Bluesky
+        </button>
+      </div>
+    </form>
   )
 }
 

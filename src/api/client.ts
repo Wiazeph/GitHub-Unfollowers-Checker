@@ -53,6 +53,11 @@ export const login = (): void => {
   window.location.href = '/api/auth/login'
 }
 
+/** Redirect the browser into the Bluesky OAuth flow for a given handle. */
+export const loginBluesky = (handle: string): void => {
+  window.location.href = `/api/auth/bluesky/login?handle=${encodeURIComponent(handle)}`
+}
+
 /** Clear the session and reload. */
 export const logout = async (): Promise<void> => {
   await fetch('/api/auth/logout', { method: 'POST' })

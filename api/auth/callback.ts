@@ -3,7 +3,7 @@ import {
   STATE_COOKIE,
   clearStateCookie,
   parseCookies,
-  setSessionCookie,
+  setSession,
   unsign,
 } from '../_lib/auth.js'
 import {
@@ -77,6 +77,6 @@ export default async function handler(
     return
   }
 
-  setSessionCookie(res, data.access_token)
+  setSession(res, { platform: 'github', value: data.access_token })
   res.redirect(302, `${origin}/`)
 }

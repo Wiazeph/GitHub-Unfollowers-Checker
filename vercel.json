@@ -9,5 +9,9 @@
     "api/unfollow.ts": {
       "maxDuration": 60
     }
-  }
+  },
+  "rewrites": [
+    { "source": "/client-metadata.json", "destination": "/api/client-metadata" },
+    { "source": "/jwks.json", "destination": "/api/jwks" }
+  ]
 }
