@@ -308,6 +308,19 @@ const CopyButton = ({ logins }: { logins: string[] }) => {
   )
 }
 
+/** Truncated username with a CSS tooltip showing the full handle on hover. */
+const Username = ({ login }: { login: string }) => (
+  <span className="group/name relative min-w-0 flex-1">
+    <span className="block truncate text-sm font-medium">{login}</span>
+    <span
+      role="tooltip"
+      className="pointer-events-none absolute bottom-full left-0 z-10 mb-1 hidden w-max max-w-[16rem] rounded-md border border-border bg-bg px-2 py-1 text-xs font-medium text-fg shadow-lg group-hover/name:block"
+    >
+      {login}
+    </span>
+  </span>
+)
+
 const UnfollowerCard = ({
   user,
   selectable,
@@ -335,12 +348,7 @@ const UnfollowerCard = ({
             loading="lazy"
             className="h-10 w-10 rounded-full ring-1 ring-border"
           />
-          <span
-            title={user.login}
-            className="truncate text-sm font-medium"
-          >
-            {user.login}
-          </span>
+          <Username login={user.login} />
           <ArrowUpRight
             className="ml-auto h-4 w-4 shrink-0 text-fg-muted opacity-0 transition-opacity group-hover:opacity-100"
             aria-hidden="true"
@@ -386,7 +394,7 @@ const UnfollowerCard = ({
           loading="lazy"
           className="h-10 w-10 rounded-full ring-1 ring-border"
         />
-        <span className="truncate text-sm font-medium">{user.login}</span>
+        <Username login={user.login} />
 
         <a
           href={user.html_url}
