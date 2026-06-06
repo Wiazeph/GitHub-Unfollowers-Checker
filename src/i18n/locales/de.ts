@@ -50,6 +50,10 @@ export const de: Translation = {
     readOnly:
       'Das Entfernen auf {{platform}} ist noch nicht verfügbar — dies ist vorerst eine reine Ansicht.',
     signInCta: 'Melde dich an, um Personen zu entfernen, die dir nicht zurückfolgen.',
+    signInNote:
+      'Ansehen funktioniert ohne Anmeldung — du meldest dich nur zum Entfolgen an.',
+    privacyNote:
+      'Wird über die offizielle API gelesen. Nichts wird gespeichert; Tokens erreichen nie deinen Browser.',
     signInWith: 'Mit {{platform}} anmelden',
     signingIn: 'Weiterleitung…',
     blueskySignInCta:
@@ -70,9 +74,9 @@ export const de: Translation = {
     dismiss: 'Schließen',
     confirmTitle: 'Nutzer entfolgen?',
     confirmBody_one:
-      'Du bist dabei, {{count}} Nutzer zu entfolgen. Das kann hier nicht rückgängig gemacht werden.',
+      'Du bist dabei, {{count}} Nutzer zu entfolgen. Dieses Tool kann ihnen nicht wieder folgen — das müsstest du manuell tun.',
     confirmBody_other:
-      'Du bist dabei, {{count}} Nutzern zu entfolgen. Das kann hier nicht rückgängig gemacht werden.',
+      'Du bist dabei, {{count}} Nutzern zu entfolgen. Dieses Tool kann ihnen nicht wieder folgen — das müsstest du manuell tun.',
     confirmLabel: 'Entfolgen',
     idleTitle: 'Bereit, wenn du es bist',
     idleAuthed: 'Deine Liste wird geladen… oder suche oben nach einem anderen Nutzer.',
@@ -82,7 +86,9 @@ export const de: Translation = {
     zeroBody: 'Hier folgt dir niemand nicht zurück. Schön aufgeräumt.',
     errorTitle: 'Etwas ist schiefgelaufen',
     errorBody:
-      'Wir konnten diese Prüfung nicht abschließen. Details findest du in der Benachrichtigung — versuch es erneut.',
+      'Wir konnten diese Prüfung nicht abschließen. Bitte versuch es erneut.',
+    largeAccountNote:
+      'Sehr große Konten werden nur bis zu einem Limit verglichen, daher können die Ergebnisse unvollständig sein.',
     reportIssue: 'Tritt es weiterhin auf? Melde ein Problem',
     prevPage: 'Zurück',
     nextPage: 'Weiter',
@@ -113,6 +119,9 @@ export const de: Translation = {
       'Dieses Konto ist sehr groß und hat das Zeitlimit überschritten. Versuch es erneut oder ein kleineres Konto.',
     generic: 'Etwas ist schiefgelaufen. Bitte versuch es erneut.',
     unfollowGeneric: 'Entfolgen nicht möglich. Bitte versuch es erneut.',
+    rateLimit:
+      'Du hast das Anfragelimit der Plattform erreicht. Warte ein paar Minuten und versuch es erneut.',
+    notFound: 'Konto nicht gefunden. Prüfe das Handle und versuch es erneut.',
   },
 
   footer: {
@@ -175,6 +184,8 @@ export const de: Translation = {
     step4_enter: 'Enter',
     step4_post:
       '. Ein Panel erscheint in der Ecke — drücke auf Scan, um zu sehen, wer dir nicht zurückfolgt, dann auswählen und entfolgen.',
+    troubleshoot:
+      'Kein Panel nach dem Drücken von Enter? Stelle sicher, dass du angemeldet und auf instagram.com bist, lade die Seite neu und füge das Skript erneut ein.',
     tip_pre:
       'Tipp: Browser warnen möglicherweise, bevor du in die Konsole einfügen darfst — diese Warnung gibt es, weil das Einfügen von Code, den du nicht verstehst, gefährlich sein kann. Dieses Skript liest nur deine Folgt-Liste und entfolgt, was du auswählst. Du kannst es jederzeit hier lesen:',
     bmTitle: 'Oder ein Bookmarklet verwenden',
@@ -219,6 +230,8 @@ export const de: Translation = {
     resultSummary_other: '<0>{{count}} Konten</0>, denen du folgst, folgen dir nicht zurück.',
     idLimitNote:
       'X-Archive enthalten nur numerische Konto-IDs, daher können keine Handles angezeigt werden. Jeder Link öffnet das echte Profil auf X.',
+    viewOnlyNote:
+      'Dies ist eine reine Ansichtsliste — Entfolgen auf X ist hier nicht möglich. Öffne ein Profil, um auf X zu entfolgen.',
     idLabel: 'ID {{id}}',
     openProfile: 'Profil öffnen',
     copyLinks: 'Links kopieren',

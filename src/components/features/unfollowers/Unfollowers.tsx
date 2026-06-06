@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useUnfollowers } from '../../../hooks/useUnfollowers'
 import { useAuth } from '../../../hooks/useAuth'
 import { useActiveTab } from '../../../hooks/activeTab'
@@ -11,6 +12,7 @@ import type { PlatformId } from '../../../types/platform'
 import type { SelectorTab } from '../../../platforms'
 
 export const Unfollowers = () => {
+  const { t } = useTranslation()
   const { data: auth, isLoading: authLoading } = useAuth()
   const { tab, setTab } = useActiveTab()
   const [inputValue, setInputValue] = useState('')
@@ -86,19 +88,24 @@ export const Unfollowers = () => {
         <TwitterArchiveGuide />
       ) : (
         <div className="flex flex-col gap-8">
-          <UnfollowersSearch
-            platform={platform}
-            value={inputValue}
-            onChange={setInputValue}
-            onSearch={handleSearch}
-            isPending={mutation.isPending}
-            isAuthed={isAuthed}
-          />
+          <div className="flex flex-col gap-2">
+            <UnfollowersSearch
+              platform={platform}
+              value={inputValue}
+              onChange={setInputValue}
+              onSearch={handleSearch}
+              isPending={mutation.isPending}
+              isAuthed={isAuthed}
+            />
+            {/* Inline privacy reassurance for the platforms we query server-side. */}
+            <p className="px-1 text-xs text-fg-muted">{t('results.privacyNote')}</p>
+          </div>
           <UnfollowersResults
             platform={platform}
             handle={searchedHandle}
             isPending={mutation.isPending}
             isError={mutation.isError}
+            errorMessage={mutation.error?.message}
             data={mutation.data}
             isAuthed={isAuthed}
             isOwnList={isOwnList}

@@ -7,7 +7,7 @@
  * stores. Vercel functions are stateless, so the stores are backed by Upstash
  * Redis rather than memory.
  *
- * Required env vars (see SETUP-bluesky-oauth.md):
+ * Required env vars (see .env.local.example):
  *   PUBLIC_URL            e.g. https://your-app.vercel.app (no trailing slash)
  *   BLUESKY_PRIVATE_KEY   a PEM/JWK private key (ES256) for private_key_jwt
  *   UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN

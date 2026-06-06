@@ -25,6 +25,8 @@ interface UnfollowersResultsProps {
   handle: string
   isPending: boolean
   isError: boolean
+  /** The localized error message to show in the error state, if any. */
+  errorMessage?: string
   data: UnfollowersResponse | undefined
   isAuthed: boolean
   isOwnList: boolean
@@ -48,6 +50,7 @@ export const UnfollowersResults = ({
   handle,
   isPending,
   isError,
+  errorMessage,
   data,
   isAuthed,
   isOwnList,
@@ -58,7 +61,7 @@ export const UnfollowersResults = ({
       {isPending ? (
         <LoadingState />
       ) : isError ? (
-        <ErrorState />
+        <ErrorState message={errorMessage} />
       ) : !data ? (
         <IdleState platform={platform} isAuthed={isAuthed} />
       ) : data.unfollowers.length === 0 ? (
@@ -225,6 +228,11 @@ const ResultsState = ({
         <CopyButton handles={users.map((u) => u.handle)} />
       </div>
 
+      {/* For genuinely large lists, hint that results may be capped/partial. */}
+      {count >= 1000 && (
+        <p className="text-xs text-fg-muted">{t('results.largeAccountNote')}</p>
+      )}
+
       {/* Viewing someone else while signed in → unfollow tools don't apply */}
       {isAuthed && !isOwnList && (
         <p className="text-sm text-fg-muted">
@@ -385,12 +393,15 @@ const GithubSignIn = () => {
   }
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-brand-500/30 bg-brand-500/10 px-4 py-3">
-      <p className="text-sm text-fg">{t('results.signInCta')}</p>
+    <div className="flex flex-col gap-2 rounded-lg border border-brand-500/30 bg-brand-500/10 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+      <div className="space-y-0.5">
+        <p className="text-sm text-fg">{t('results.signInCta')}</p>
+        <p className="text-xs text-fg-muted">{t('results.signInNote')}</p>
+      </div>
       <button
         onClick={start}
         disabled={redirecting}
-        className="inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg bg-brand-500 px-3 py-1.5 text-sm font-medium text-bg outline-none transition-colors hover:bg-brand-600 focus-visible:ring-2 focus-visible:ring-brand-400 disabled:cursor-not-allowed disabled:opacity-70"
+        className="inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3 py-1.5 text-sm font-medium text-bg outline-none transition-colors hover:bg-brand-600 focus-visible:ring-2 focus-visible:ring-brand-400 disabled:cursor-not-allowed disabled:opacity-70"
       >
         {redirecting && (
           <LoaderCircle
@@ -423,7 +434,10 @@ const BlueskySignIn = ({ defaultHandle }: { defaultHandle: string }) => {
       }}
       className="flex flex-col gap-2 rounded-lg border border-brand-500/30 bg-brand-500/10 px-4 py-3"
     >
-      <p className="text-sm text-fg">{t('results.blueskySignInCta')}</p>
+      <div className="space-y-0.5">
+        <p className="text-sm text-fg">{t('results.blueskySignInCta')}</p>
+        <p className="text-xs text-fg-muted">{t('results.signInNote')}</p>
+      </div>
       <div className="flex flex-col gap-2 sm:flex-row">
         <input
           type="text"
@@ -736,13 +750,15 @@ const ZeroState = () => {
   )
 }
 
-const ErrorState = () => {
+const ErrorState = ({ message }: { message?: string }) => {
   const { t } = useTranslation()
   return (
     <CenteredState
       icon={<AlertCircle className="h-6 w-6" aria-hidden="true" />}
       title={t('results.errorTitle')}
-      description={t('results.errorBody')}
+      // Show the specific (localized) reason — rate limit, not found, etc. — so
+      // it persists in the page rather than only flashing in a toast.
+      description={message || t('results.errorBody')}
       footer={
         <a
           href={`${ISSUES_URL}/new`}

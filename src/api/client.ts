@@ -27,15 +27,29 @@ export const fetchUnfollowers = async (
 
   if (!response.ok) {
     const body = (await response.json().catch(() => null)) as ApiErrorBody | null
-    // Vercel returns no JSON body on a function timeout (504).
+    // Localize known error codes (the server's own message is English); fall
+    // back to a 504 timeout message or a generic one.
+    const localized = body ? localizeError(body) : null
     const fallback: ApiErrorBody =
       response.status === 504
         ? { error: i18n.t('errors.timeout'), code: 'UPSTREAM' }
         : { error: i18n.t('errors.generic'), code: 'UPSTREAM' }
-    throw new ApiError(body ?? fallback, response.status)
+    throw new ApiError(localized ?? fallback, response.status)
   }
 
   return (await response.json()) as UnfollowersResponse
+}
+
+/** Replace the server's English message with a localized one when we know the code. */
+const localizeError = (body: ApiErrorBody): ApiErrorBody => {
+  switch (body.code) {
+    case 'RATE_LIMIT':
+      return { ...body, error: i18n.t('errors.rateLimit') }
+    case 'NOT_FOUND':
+      return { ...body, error: i18n.t('errors.notFound') }
+    default:
+      return body
+  }
 }
 
 /** Fetch the current per-platform authentication state. */

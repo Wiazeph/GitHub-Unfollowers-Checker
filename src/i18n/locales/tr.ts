@@ -50,6 +50,10 @@ export const tr: Translation = {
     readOnly:
       '{{platform}} üzerinde kaldırma henüz mümkün değil — şimdilik bu yalnızca görüntüleme.',
     signInCta: 'Seni geri takip etmeyenleri kaldırmak için giriş yap.',
+    signInNote:
+      'Görüntüleme giriş yapmadan da çalışır — yalnızca takibi bırakmak için giriş yaparsın.',
+    privacyNote:
+      'Resmi API üzerinden okunur. Hiçbir şey saklanmaz; token’lar tarayıcına ulaşmaz.',
     signInWith: '{{platform}} ile giriş yap',
     signingIn: 'Yönlendiriliyor…',
     blueskySignInCta:
@@ -70,9 +74,9 @@ export const tr: Translation = {
     dismiss: 'Kapat',
     confirmTitle: 'Takibi bırak?',
     confirmBody_one:
-      '{{count}} kişinin takibini bırakmak üzeresin. Bu işlem burada geri alınamaz.',
+      '{{count}} kişinin takibini bırakmak üzeresin. Bu araç onları yeniden takip edemez — bunu elle yapman gerekir.',
     confirmBody_other:
-      '{{count}} kişinin takibini bırakmak üzeresin. Bu işlem burada geri alınamaz.',
+      '{{count}} kişinin takibini bırakmak üzeresin. Bu araç onları yeniden takip edemez — bunu elle yapman gerekir.',
     confirmLabel: 'Takibi bırak',
     idleTitle: 'Hazır olduğunda başla',
     idleAuthed: 'Listen yükleniyor… ya da yukarıdan başka bir kullanıcı ara.',
@@ -81,8 +85,9 @@ export const tr: Translation = {
     zeroTitle: 'Herkes geri takip ediyor!',
     zeroBody: 'Burada seni geri takip etmeyen kimse yok. Tertemiz.',
     errorTitle: 'Bir şeyler ters gitti',
-    errorBody:
-      'Bu kontrolü tamamlayamadık. Ayrıntılar için bildirime bak ve tekrar dene.',
+    errorBody: 'Bu kontrolü tamamlayamadık. Lütfen tekrar dene.',
+    largeAccountNote:
+      'Çok büyük hesaplar bir sınıra kadar karşılaştırılır, bu yüzden sonuçlar eksik olabilir.',
     reportIssue: 'Sürekli mi oluyor? Bir sorun bildir',
     prevPage: 'Önceki',
     nextPage: 'Sonraki',
@@ -113,6 +118,9 @@ export const tr: Translation = {
       'Bu hesap çok büyük ve zaman aşımına uğradı. Tekrar dene ya da daha küçük bir hesap.',
     generic: 'Bir şeyler ters gitti. Lütfen tekrar dene.',
     unfollowGeneric: 'Takip bırakılamadı. Lütfen tekrar dene.',
+    rateLimit:
+      'Platformun istek sınırına ulaştın. Birkaç dakika bekleyip tekrar dene.',
+    notFound: 'Hesap bulunamadı. Handle’ı kontrol edip tekrar dene.',
   },
 
   footer: {
@@ -175,6 +183,8 @@ export const tr: Translation = {
     step4_enter: 'Enter',
     step4_post:
       '’a bas. Köşede bir panel belirir — kimin geri takip etmediğini görmek için Scan’e bas, sonra seç ve takibi bırak.',
+    troubleshoot:
+      'Enter’a bastıktan sonra panel çıkmadıysa: giriş yaptığından ve instagram.com’da olduğundan emin ol, sayfayı yenile ve script’i tekrar yapıştır.',
     tip_pre:
       'İpucu: tarayıcılar konsola yapıştırmadan önce uyarı verebilir — bu uyarı, anlamadığın bir kodu yapıştırmanın tehlikeli olabileceği içindir. Bu script yalnızca takip listeni okur ve senin seçtiklerinin takibini bırakır. Dilediğin zaman şu adresten okuyabilirsin:',
     bmTitle: 'Veya bir bookmarklet kullan',
@@ -219,6 +229,8 @@ export const tr: Translation = {
     resultSummary_other: 'Takip ettiğin <0>{{count}} hesap</0> seni geri takip etmiyor.',
     idLimitNote:
       'X arşivleri yalnızca sayısal hesap ID’leri içerir, bu yüzden kullanıcı adları gösterilemez. Her bağlantı gerçek profili X’te açar.',
+    viewOnlyNote:
+      'Bu yalnızca görüntüleme listesi — burada X’te takibi bırakma yok. Bırakmak için profili aç.',
     idLabel: 'ID {{id}}',
     openProfile: 'Profili aç',
     copyLinks: 'Bağlantıları kopyala',

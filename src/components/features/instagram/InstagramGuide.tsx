@@ -188,6 +188,11 @@ export const InstagramGuide = () => {
         ))}
       </ol>
 
+      {/* Troubleshooting */}
+      <p className="rounded-lg border border-border bg-surface px-4 py-2.5 text-xs text-fg-muted">
+        {t('instagram.troubleshoot')}
+      </p>
+
       {/* Console-paste safety note */}
       <p className="text-xs text-fg-muted">
         {t('instagram.tip_pre')}{' '}

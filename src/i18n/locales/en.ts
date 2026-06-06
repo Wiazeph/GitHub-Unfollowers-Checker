@@ -48,6 +48,9 @@ export const en = {
     readOnly:
       "Removing people on {{platform}} isn't available yet — this is a read-only view for now.",
     signInCta: "Sign in to remove the people who don't follow you back.",
+    signInNote: 'Viewing works without signing in — you only sign in to unfollow.',
+    privacyNote:
+      'Read through the official API. Nothing is stored; tokens never reach your browser.',
     signInWith: 'Sign in with {{platform}}',
     signingIn: 'Redirecting…',
     blueskySignInCta:
@@ -68,9 +71,9 @@ export const en = {
     dismiss: 'Dismiss',
     confirmTitle: 'Unfollow users?',
     confirmBody_one:
-      "You're about to unfollow {{count}} user. This can't be undone here.",
+      "You're about to unfollow {{count}} user. This tool can't re-follow them — you'd have to do that manually.",
     confirmBody_other:
-      "You're about to unfollow {{count}} users. This can't be undone here.",
+      "You're about to unfollow {{count}} users. This tool can't re-follow them — you'd have to do that manually.",
     confirmLabel: 'Unfollow',
     idleTitle: 'Ready when you are',
     idleAuthed: 'Loading your list… or search for another user above.',
@@ -80,7 +83,9 @@ export const en = {
     zeroBody: "There's no one here that isn't following back. Nice and tidy.",
     errorTitle: 'Something went wrong',
     errorBody:
-      "We couldn't complete that check. See the notification for details and try again.",
+      "We couldn't complete that check. Please try again.",
+    largeAccountNote:
+      'Very large accounts are compared up to a limit, so results may be partial.',
     reportIssue: 'Keeps happening? Report an issue',
     prevPage: 'Previous',
     nextPage: 'Next',
@@ -111,6 +116,9 @@ export const en = {
       'This account is very large and timed out. Try again, or a smaller account.',
     generic: 'Something went wrong. Please try again.',
     unfollowGeneric: 'Could not unfollow. Please try again.',
+    rateLimit:
+      "You've hit the platform's rate limit. Wait a few minutes and try again.",
+    notFound: 'Account not found. Check the handle and try again.',
   },
 
   footer: {
@@ -173,6 +181,8 @@ export const en = {
     step4_enter: 'Enter',
     step4_post:
       ". A panel appears in the corner — press Scan to see who doesn't follow you back, then select and unfollow.",
+    troubleshoot:
+      'No panel after pressing Enter? Make sure you’re logged in and on instagram.com, refresh the page, and paste the script again.',
     tip_pre:
       "Tip: browsers may warn before letting you paste into the console — that warning exists because pasting code you don't understand can be dangerous. This script only reads your following list and unfollows what you pick. You can read it any time at",
     bmTitle: 'Or use a bookmarklet',
@@ -217,6 +227,8 @@ export const en = {
     resultSummary_other: '<0>{{count}} accounts</0> you follow don’t follow you back.',
     idLimitNote:
       "X archives only contain numeric account IDs, so handles can't be shown. Each link opens the real profile on X.",
+    viewOnlyNote:
+      'This is a view-only list — unfollowing on X isn’t available here. Open a profile to unfollow on X.',
     idLabel: 'ID {{id}}',
     openProfile: 'Open profile',
     copyLinks: 'Copy links',

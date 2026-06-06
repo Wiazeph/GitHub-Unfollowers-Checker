@@ -50,6 +50,10 @@ export const es: Translation = {
     readOnly:
       'Quitar en {{platform}} aún no está disponible — por ahora es solo una vista de lectura.',
     signInCta: 'Inicia sesión para quitar a quienes no te siguen de vuelta.',
+    signInNote:
+      'Ver funciona sin iniciar sesión — solo inicias sesión para dejar de seguir.',
+    privacyNote:
+      'Se lee a través de la API oficial. No se guarda nada; los tokens nunca llegan a tu navegador.',
     signInWith: 'Iniciar sesión con {{platform}}',
     signingIn: 'Redirigiendo…',
     blueskySignInCta:
@@ -70,9 +74,9 @@ export const es: Translation = {
     dismiss: 'Cerrar',
     confirmTitle: '¿Dejar de seguir a estos usuarios?',
     confirmBody_one:
-      'Vas a dejar de seguir a {{count}} usuario. Esto no se puede deshacer aquí.',
+      'Vas a dejar de seguir a {{count}} usuario. Esta herramienta no puede volver a seguirlo — tendrías que hacerlo manualmente.',
     confirmBody_other:
-      'Vas a dejar de seguir a {{count}} usuarios. Esto no se puede deshacer aquí.',
+      'Vas a dejar de seguir a {{count}} usuarios. Esta herramienta no puede volver a seguirlos — tendrías que hacerlo manualmente.',
     confirmLabel: 'Dejar de seguir',
     idleTitle: 'Listo cuando tú lo estés',
     idleAuthed: 'Cargando tu lista… o busca otro usuario arriba.',
@@ -81,8 +85,9 @@ export const es: Translation = {
     zeroTitle: '¡Todos te siguen de vuelta!',
     zeroBody: 'Aquí no hay nadie que no te siga de vuelta. Todo en orden.',
     errorTitle: 'Algo salió mal',
-    errorBody:
-      'No pudimos completar esa comprobación. Mira la notificación para más detalles e inténtalo de nuevo.',
+    errorBody: 'No pudimos completar esa comprobación. Inténtalo de nuevo.',
+    largeAccountNote:
+      'Las cuentas muy grandes se comparan hasta un límite, así que los resultados pueden ser parciales.',
     reportIssue: '¿Sigue ocurriendo? Informa de un problema',
     prevPage: 'Anterior',
     nextPage: 'Siguiente',
@@ -113,6 +118,9 @@ export const es: Translation = {
       'Esta cuenta es muy grande y se agotó el tiempo. Inténtalo de nuevo o con una cuenta más pequeña.',
     generic: 'Algo salió mal. Inténtalo de nuevo.',
     unfollowGeneric: 'No se pudo dejar de seguir. Inténtalo de nuevo.',
+    rateLimit:
+      'Has alcanzado el límite de solicitudes de la plataforma. Espera unos minutos e inténtalo de nuevo.',
+    notFound: 'Cuenta no encontrada. Revisa el identificador e inténtalo de nuevo.',
   },
 
   footer: {
@@ -175,6 +183,8 @@ export const es: Translation = {
     step4_enter: 'Intro',
     step4_post:
       '. Aparece un panel en la esquina — pulsa Scan para ver quién no te sigue de vuelta, luego selecciona y deja de seguir.',
+    troubleshoot:
+      '¿No aparece el panel tras pulsar Intro? Asegúrate de haber iniciado sesión y estar en instagram.com, recarga la página y pega el script de nuevo.',
     tip_pre:
       'Consejo: los navegadores pueden advertirte antes de dejarte pegar en la consola — esa advertencia existe porque pegar código que no entiendes puede ser peligroso. Este script solo lee tu lista de seguidos y deja de seguir lo que elijas. Puedes leerlo en cualquier momento en',
     bmTitle: 'O usa un bookmarklet',
@@ -219,6 +229,8 @@ export const es: Translation = {
     resultSummary_other: '<0>{{count}} cuentas</0> que sigues no te siguen de vuelta.',
     idLimitNote:
       'Los archivos de X solo contienen ID numéricos de cuenta, así que no se pueden mostrar los identificadores. Cada enlace abre el perfil real en X.',
+    viewOnlyNote:
+      'Esta es una lista de solo lectura — dejar de seguir en X no está disponible aquí. Abre un perfil para dejar de seguir en X.',
     idLabel: 'ID {{id}}',
     openProfile: 'Abrir perfil',
     copyLinks: 'Copiar enlaces',

@@ -50,6 +50,10 @@ export const fr: Translation = {
     readOnly:
       'Le retrait sur {{platform}} n’est pas encore disponible — c’est une vue en lecture seule pour l’instant.',
     signInCta: 'Connectez-vous pour retirer les personnes qui ne vous suivent pas en retour.',
+    signInNote:
+      'La consultation fonctionne sans connexion — vous ne vous connectez que pour vous désabonner.',
+    privacyNote:
+      'Lu via l’API officielle. Rien n’est stocké ; les jetons n’atteignent jamais votre navigateur.',
     signInWith: 'Se connecter avec {{platform}}',
     signingIn: 'Redirection…',
     blueskySignInCta:
@@ -70,9 +74,9 @@ export const fr: Translation = {
     dismiss: 'Fermer',
     confirmTitle: 'Ne plus suivre ces utilisateurs ?',
     confirmBody_one:
-      'Vous allez vous désabonner de {{count}} utilisateur. Cette action est irréversible ici.',
+      'Vous allez vous désabonner de {{count}} utilisateur. Cet outil ne peut pas le réabonner — vous devrez le faire manuellement.',
     confirmBody_other:
-      'Vous allez vous désabonner de {{count}} utilisateurs. Cette action est irréversible ici.',
+      'Vous allez vous désabonner de {{count}} utilisateurs. Cet outil ne peut pas les réabonner — vous devrez le faire manuellement.',
     confirmLabel: 'Ne plus suivre',
     idleTitle: 'Prêt quand vous l’êtes',
     idleAuthed: 'Chargement de votre liste… ou recherchez un autre utilisateur ci-dessus.',
@@ -81,8 +85,9 @@ export const fr: Translation = {
     zeroTitle: 'Tout le monde vous suit en retour !',
     zeroBody: 'Personne ici ne manque de vous suivre en retour. Tout est en ordre.',
     errorTitle: 'Une erreur est survenue',
-    errorBody:
-      'Nous n’avons pas pu terminer cette vérification. Consultez la notification pour les détails et réessayez.',
+    errorBody: 'Nous n’avons pas pu terminer cette vérification. Veuillez réessayer.',
+    largeAccountNote:
+      'Les très grands comptes sont comparés jusqu’à une limite, les résultats peuvent donc être partiels.',
     reportIssue: 'Cela persiste ? Signalez un problème',
     prevPage: 'Précédent',
     nextPage: 'Suivant',
@@ -113,6 +118,9 @@ export const fr: Translation = {
       'Ce compte est très grand et a expiré. Réessayez, ou choisissez un compte plus petit.',
     generic: 'Une erreur est survenue. Veuillez réessayer.',
     unfollowGeneric: 'Impossible de se désabonner. Veuillez réessayer.',
+    rateLimit:
+      'Vous avez atteint la limite de requêtes de la plateforme. Patientez quelques minutes et réessayez.',
+    notFound: 'Compte introuvable. Vérifiez l’identifiant et réessayez.',
   },
 
   footer: {
@@ -175,6 +183,8 @@ export const fr: Translation = {
     step4_enter: 'Entrée',
     step4_post:
       '. Un panneau apparaît dans le coin — appuyez sur Scan pour voir qui ne vous suit pas en retour, puis sélectionnez et désabonnez-vous.',
+    troubleshoot:
+      'Pas de panneau après avoir appuyé sur Entrée ? Assurez-vous d’être connecté et sur instagram.com, rechargez la page et recollez le script.',
     tip_pre:
       'Astuce : les navigateurs peuvent avertir avant de vous laisser coller dans la console — cet avertissement existe car coller du code que vous ne comprenez pas peut être dangereux. Ce script lit uniquement votre liste d’abonnements et désabonne ce que vous choisissez. Vous pouvez le consulter à tout moment sur',
     bmTitle: 'Ou utilisez un bookmarklet',
@@ -219,6 +229,8 @@ export const fr: Translation = {
     resultSummary_other: '<0>{{count}} comptes</0> que vous suivez ne vous suivent pas en retour.',
     idLimitNote:
       'Les archives X ne contiennent que des ID de compte numériques, donc les identifiants ne peuvent pas être affichés. Chaque lien ouvre le vrai profil sur X.',
+    viewOnlyNote:
+      'Liste en lecture seule — le désabonnement sur X n’est pas disponible ici. Ouvrez un profil pour vous désabonner sur X.',
     idLabel: 'ID {{id}}',
     openProfile: 'Ouvrir le profil',
     copyLinks: 'Copier les liens',
