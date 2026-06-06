@@ -113,6 +113,9 @@ const ResultsState = ({
   const pageSize = usePageSize()
   const [page, setPage] = useState(0)
   const topRef = useRef<HTMLDivElement>(null)
+  // Set when the user clicks prev/next, so we only auto-scroll on real page
+  // changes — not on the initial render or a clamp after unfollowing.
+  const pageChangedRef = useRef(false)
 
   // The unfollow API identifies targets differently per platform: GitHub uses
   // the handle (login), Bluesky uses the account id (DID). Map selected ids to
@@ -155,9 +158,18 @@ const ResultsState = ({
   const pageStart = safePage * pageSize
   const visibleUsers = users.slice(pageStart, pageStart + pageSize)
 
-  const goToPage = (next: number) => {
-    setPage(next)
+  // Scroll the list back to the top after the new page has rendered. Doing it
+  // in an effect (not inline in the click handler) means it fires on every page
+  // change, even when the previous scroll already left us near the top.
+  useEffect(() => {
+    if (!pageChangedRef.current) return
+    pageChangedRef.current = false
     topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, [safePage])
+
+  const goToPage = (next: number) => {
+    pageChangedRef.current = true
+    setPage(next)
   }
 
   const toggle = (id: string) => {
