@@ -2,6 +2,7 @@ import {
   GithubIcon,
   BlueskyIcon,
   InstagramIcon,
+  TwitterIcon,
   type BrandIcon,
 } from './components/ui/BrandIcons'
 import type { PlatformId } from './types/platform'
@@ -97,4 +98,11 @@ export const INSTAGRAM_TAB = {
   icon: InstagramIcon,
 }
 
-export type SelectorTab = PlatformId | 'instagram'
+/** X (Twitter) is offline-only: the user uploads their data archive, we diff it. */
+export const TWITTER_TAB = {
+  id: 'twitter' as const,
+  label: 'X',
+  icon: TwitterIcon,
+}
+
+export type SelectorTab = PlatformId | 'instagram' | 'twitter'

@@ -1,5 +1,5 @@
 /*!
- * Instagram Unfollower — browser bookmarklet
+ * Instagram Unfollower — paste into the browser console on instagram.com
  * Runs entirely in your own browser using your own Instagram session.
  * No data is sent to any server.
  */

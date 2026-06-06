@@ -11,8 +11,8 @@ export const Header = () => {
           Unfollowers Checker
         </h1>
         <p className="mx-auto mt-3 max-w-md text-base text-fg-muted sm:text-lg">
-          Find out who you follow that doesn&apos;t follow you back — across
-          GitHub, Bluesky, and more.
+          Find out who you follow that doesn&apos;t follow you back — across the
+          platforms you use.
         </p>
       </div>
     </header>

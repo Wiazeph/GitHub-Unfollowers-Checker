@@ -1,4 +1,9 @@
-import { INSTAGRAM_TAB, PLATFORM_LIST, type SelectorTab } from '../../platforms'
+import {
+  INSTAGRAM_TAB,
+  TWITTER_TAB,
+  PLATFORM_LIST,
+  type SelectorTab,
+} from '../../platforms'
 
 interface PlatformSelectorProps {
   value: SelectorTab
@@ -7,10 +12,11 @@ interface PlatformSelectorProps {
 
 const TABS = [
   ...PLATFORM_LIST.map((p) => ({ id: p.id as SelectorTab, label: p.label, icon: p.icon })),
+  { id: TWITTER_TAB.id as SelectorTab, label: TWITTER_TAB.label, icon: TWITTER_TAB.icon },
   { id: INSTAGRAM_TAB.id as SelectorTab, label: INSTAGRAM_TAB.label, icon: INSTAGRAM_TAB.icon },
 ]
 
-/** Segmented control to switch between GitHub / Bluesky / Instagram. */
+/** Segmented control to switch between GitHub / Bluesky / X / Instagram. */
 export const PlatformSelector = ({ value, onChange }: PlatformSelectorProps) => (
   <div
     role="tablist"

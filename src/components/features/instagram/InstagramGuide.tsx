@@ -1,35 +1,41 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Check,
   Copy,
-  Hand,
   ShieldAlert,
-  Bookmark,
   ExternalLink,
+  LoaderCircle,
+  Terminal,
 } from 'lucide-react'
 import { toast } from 'sonner'
 
 /**
  * Instagram has no server-side follower API, so this can't run on our backend.
- * The only viable free + unblocked path is a bookmarklet the user runs in their
- * own browser, on their own Instagram session. We host the script statically and
- * hand the user a loader bookmarklet that injects it.
+ * The reliable path is a small script the user copies and pastes into their own
+ * browser console while on instagram.com — it runs in their own session and
+ * never sends data anywhere. (A loader bookmarklet won't work: Instagram's
+ * Content-Security-Policy blocks loading an external script onto its pages, so
+ * the whole script must be pasted directly.)
  */
 
 const SCRIPT_PATH = '/instagram-unfollower.js'
 
-/** Loader bookmarklet: injects the hosted script. Kept short so the href fits. */
-const buildBookmarklet = (origin: string): string =>
-  `javascript:(function(){var s=document.createElement('script');s.src='${origin}${SCRIPT_PATH}';document.body.appendChild(s);})();`
-
 export const InstagramGuide = () => {
-  // Client-only SPA, so window is available at first render.
-  const [origin] = useState(() => window.location.origin)
+  const [code, setCode] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
-  // React refuses to render `javascript:` hrefs (it replaces them with a
-  // security-error throw), which would make the bookmark unusable. Set the
-  // attribute directly on the DOM node after mount to keep it draggable.
-  const dragRef = useRef<HTMLAnchorElement>(null)
+
+  // Fetch our own script text (same-origin) so the Copy button hands over the
+  // full code to paste — no external load, so Instagram's CSP is never involved.
+  useEffect(() => {
+    let active = true
+    fetch(SCRIPT_PATH)
+      .then((r) => (r.ok ? r.text() : Promise.reject(new Error())))
+      .then((text) => active && setCode(text))
+      .catch(() => active && setCode(''))
+    return () => {
+      active = false
+    }
+  }, [])
 
   useEffect(() => {
     if (!copied) return
@@ -37,19 +43,12 @@ export const InstagramGuide = () => {
     return () => clearTimeout(id)
   }, [copied])
 
-  const bookmarklet = origin ? buildBookmarklet(origin) : ''
-
-  useEffect(() => {
-    if (dragRef.current && bookmarklet) {
-      dragRef.current.setAttribute('href', bookmarklet)
-    }
-  }, [bookmarklet])
-
-  const copyBookmarklet = async () => {
+  const copyCode = async () => {
+    if (!code) return
     try {
-      await navigator.clipboard.writeText(bookmarklet)
+      await navigator.clipboard.writeText(code)
       setCopied(true)
-      toast.success('Bookmarklet copied to clipboard')
+      toast.success('Code copied — now paste it into the console')
     } catch {
       toast.error('Could not copy to clipboard')
     }
@@ -61,9 +60,8 @@ export const InstagramGuide = () => {
       <div className="rounded-lg border border-border bg-surface px-4 py-3">
         <p className="text-sm text-fg">
           Instagram doesn&apos;t offer a public API for follower lists, so this
-          one works differently: it&apos;s a small{' '}
-          <span className="font-medium">bookmarklet</span> that runs in your own
-          browser, on your own Instagram session.
+          one works differently: you copy a small script and paste it into your
+          browser&apos;s console while on Instagram. It runs in your own session.
         </p>
         <p className="mt-2 text-sm text-fg-muted">
           Nothing is sent to any server — the script talks only to Instagram,
@@ -72,59 +70,57 @@ export const InstagramGuide = () => {
         </p>
       </div>
 
-      {/* The bookmarklet */}
-      <div className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-4">
-        <div className="flex items-center gap-2 text-sm font-medium text-fg">
-          <Bookmark className="h-4 w-4 text-brand-400" aria-hidden="true" />
-          Get the bookmarklet
-        </div>
-
-        <div className="flex flex-wrap items-center gap-3">
-          {/* Draggable link — browsers block clicking javascript: links but allow
-              dragging them to the bookmarks bar. */}
-          <a
-            ref={dragRef}
-            href="#"
-            title="Instagram Unfollower"
-            onClick={(event) => event.preventDefault()}
-            draggable
-            className="inline-flex cursor-grab items-center gap-1.5 rounded-lg border border-brand-500/40 bg-brand-500/10 px-3 py-1.5 text-sm font-medium text-brand-400 select-none active:cursor-grabbing"
-          >
-            <Hand className="h-4 w-4" aria-hidden="true" />
-            Instagram Unfollower
-          </a>
-          <span className="text-xs text-fg-muted">
-            ← Drag this to your bookmarks bar (don&apos;t click it)
+      {/* The script + copy button */}
+      <div className="overflow-hidden rounded-lg border border-border bg-bg">
+        <div className="flex items-center justify-between gap-3 border-b border-border bg-surface px-3 py-2">
+          <span className="inline-flex items-center gap-2 font-mono text-xs text-fg-muted">
+            <Terminal className="h-3.5 w-3.5" aria-hidden="true" />
+            Paste into the DevTools console
           </span>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <span className="text-xs text-fg-muted">No bookmarks bar?</span>
           <button
-            onClick={copyBookmarklet}
-            disabled={!bookmarklet}
-            className={`inline-flex cursor-pointer items-center gap-1.5 rounded-md px-2 py-1 text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-brand-400 disabled:opacity-50 ${
-              copied ? 'text-brand-400' : 'text-fg-muted hover:text-fg'
-            }`}
+            onClick={copyCode}
+            disabled={!code}
+            className="inline-flex cursor-pointer items-center gap-1.5 rounded-md bg-brand-500 px-3 py-1.5 text-sm font-medium text-bg outline-none transition-colors hover:bg-brand-600 focus-visible:ring-2 focus-visible:ring-brand-400 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {copied ? (
-              <Check className="h-4 w-4 motion-safe:animate-pop" aria-hidden="true" />
+            {code === null ? (
+              <>
+                <LoaderCircle
+                  className="h-4 w-4 motion-safe:animate-spin"
+                  aria-hidden="true"
+                />
+                Loading…
+              </>
+            ) : copied ? (
+              <>
+                <Check
+                  className="h-4 w-4 motion-safe:animate-pop"
+                  aria-hidden="true"
+                />
+                Copied!
+              </>
             ) : (
-              <Copy className="h-4 w-4" aria-hidden="true" />
+              <>
+                <Copy className="h-4 w-4" aria-hidden="true" />
+                Copy the code
+              </>
             )}
-            {copied ? 'Copied!' : 'Copy the code instead'}
           </button>
         </div>
+        <pre className="max-h-56 overflow-auto px-3 py-3 text-xs leading-relaxed text-fg-muted">
+          <code className="font-mono break-all whitespace-pre-wrap">
+            {code === null ? 'Loading the script…' : code}
+          </code>
+        </pre>
       </div>
+      <p className="-mt-2 text-xs text-fg-muted">
+        A one-time script you paste yourself — it isn&apos;t installed and
+        changes nothing until you run it.
+      </p>
 
       {/* Steps */}
       <ol className="flex flex-col gap-3">
         {[
-          <>
-            Drag the <span className="font-medium text-fg">Instagram Unfollower</span>{' '}
-            button above onto your browser&apos;s bookmarks bar (or copy the code
-            and create a new bookmark with it as the URL).
-          </>,
+          <>Copy the script using the button above.</>,
           <>
             Open{' '}
             <a
@@ -135,12 +131,32 @@ export const InstagramGuide = () => {
             >
               instagram.com <ExternalLink className="h-3 w-3" aria-hidden="true" />
             </a>{' '}
-            and make sure you&apos;re signed in.
+            in this browser and make sure you&apos;re signed in.
           </>,
           <>
-            Click the bookmark. A panel appears in the corner — press{' '}
-            <span className="font-medium text-fg">Scan</span> to see who
-            doesn&apos;t follow you back, then select and unfollow.
+            Open the developer console, then click the{' '}
+            <span className="font-medium text-fg">Console</span> tab:
+            <span className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1 text-xs text-fg-muted">
+              <span>
+                <span className="font-medium text-fg">Windows / Linux:</span>{' '}
+                <kbd className="rounded bg-surface px-1 font-mono">F12</kbd> or{' '}
+                <kbd className="rounded bg-surface px-1 font-mono">
+                  Ctrl+Shift+J
+                </kbd>
+              </span>
+              <span>
+                <span className="font-medium text-fg">Mac:</span>{' '}
+                <kbd className="rounded bg-surface px-1 font-mono">
+                  Cmd+Option+J
+                </kbd>
+              </span>
+            </span>
+          </>,
+          <>
+            Paste the script and press{' '}
+            <span className="font-medium text-fg">Enter</span>. A panel appears in
+            the corner — press <span className="font-medium text-fg">Scan</span>{' '}
+            to see who doesn&apos;t follow you back, then select and unfollow.
           </>,
         ].map((content, index) => (
           <li key={index} className="flex gap-3">
@@ -151,6 +167,23 @@ export const InstagramGuide = () => {
           </li>
         ))}
       </ol>
+
+      {/* Console-paste safety note */}
+      <p className="text-xs text-fg-muted">
+        Tip: browsers may warn before letting you paste into the console — that
+        warning exists because pasting code you don&apos;t understand can be
+        dangerous. This script only reads your following list and unfollows what
+        you pick. You can read it any time at{' '}
+        <a
+          href={SCRIPT_PATH}
+          target="_blank"
+          rel="noreferrer"
+          className="font-medium text-brand-400 underline-offset-2 hover:underline"
+        >
+          {SCRIPT_PATH}
+        </a>
+        .
+      </p>
 
       {/* Risk / ToS callout */}
       <div className="flex gap-3 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3">
@@ -163,9 +196,8 @@ export const InstagramGuide = () => {
           <p className="text-fg-muted">
             Bulk unfollowing can run against Instagram&apos;s automated-behavior
             policies and may trigger a temporary action block. The tool spaces
-            requests out with randomized delays and cooldowns to stay
-            human-like, but use is at your own risk. Again: nothing leaves your
-            browser.
+            requests out with randomized delays and cooldowns to stay human-like,
+            but use is at your own risk. Again: nothing leaves your browser.
           </p>
         </div>
       </div>

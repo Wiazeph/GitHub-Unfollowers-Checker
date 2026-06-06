@@ -5,6 +5,7 @@ import { UnfollowersSearch } from './UnfollowersSearch'
 import { UnfollowersResults } from './UnfollowersResults'
 import { PlatformSelector } from '../PlatformSelector'
 import { InstagramGuide } from '../instagram/InstagramGuide'
+import { TwitterArchiveGuide } from '../twitter/TwitterArchiveGuide'
 import type { PlatformId } from '../../../types/platform'
 import type { SelectorTab } from '../../../platforms'
 
@@ -15,8 +16,12 @@ export const Unfollowers = () => {
   const [searchedHandle, setSearchedHandle] = useState('')
   const mutation = useUnfollowers()
 
+  // Instagram (bookmarklet) and X (archive upload) are browser-only tabs with no
+  // server provider, so they don't drive the search/results flow below.
   const isInstagram = tab === 'instagram'
-  const platform = (isInstagram ? 'github' : tab) as PlatformId
+  const isTwitter = tab === 'twitter'
+  const isStandaloneTab = isInstagram || isTwitter
+  const platform = (isStandaloneTab ? 'github' : tab) as PlatformId
 
   // Auth is GitHub-only today; only treat the user as authed on their platform.
   const isAuthed = auth?.authenticated === true && auth.platform === platform
@@ -54,14 +59,14 @@ export const Unfollowers = () => {
   // When signed in (on the active platform), auto-load the user's own list once.
   const autoLoaded = useRef(false)
   useEffect(() => {
-    if (autoLoaded.current || isInstagram) return
+    if (autoLoaded.current || isStandaloneTab) return
     if (isAuthed && ownHandle) {
       autoLoaded.current = true
       // eslint-disable-next-line react-hooks/set-state-in-effect
       handleSearch(ownHandle)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthed, ownHandle, isInstagram])
+  }, [isAuthed, ownHandle, isStandaloneTab])
 
   const isOwnList =
     isAuthed &&
@@ -74,6 +79,8 @@ export const Unfollowers = () => {
 
       {isInstagram ? (
         <InstagramGuide />
+      ) : isTwitter ? (
+        <TwitterArchiveGuide />
       ) : (
         <div className="flex flex-col gap-8">
           <UnfollowersSearch
