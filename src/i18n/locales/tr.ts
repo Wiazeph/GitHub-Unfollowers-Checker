@@ -173,6 +173,13 @@ export const tr: Translation = {
       '’a bas. Köşede bir panel belirir — kimin geri takip etmediğini görmek için Scan’e bas, sonra seç ve takibi bırak.',
     tip_pre:
       'İpucu: tarayıcılar konsola yapıştırmadan önce uyarı verebilir — bu uyarı, anlamadığın bir kodu yapıştırmanın tehlikeli olabileceği içindir. Bu script yalnızca takip listeni okur ve senin seçtiklerinin takibini bırakır. Dilediğin zaman şu adresten okuyabilirsin:',
+    bmTitle: 'Veya bir bookmarklet kullan',
+    bmIntro:
+      'Tek tıkla mı istersin? Bu butonu yer imi çubuğuna sürükle, sonra Instagram’ı açıp tıklayarak çalıştır.',
+    bmButton: 'Instagram Takip Etmeyenler',
+    bmDrag: 'Bunu yer imi çubuğuna sürükle (burada tıklama).',
+    bmRecommend:
+      'En sağlamı Chrome ve Edge’de. Safari ve Firefox’ta bookmarklet kaydedilemeyecek kadar uzun olabilir — çalışmazsa yukarıdaki “Kodu kopyala”yı kullan.',
     riskTitle: 'Kendi takdirine göre kullan',
     riskBody:
       'Toplu takip bırakma, Instagram’ın otomatik davranış politikalarına aykırı olabilir ve geçici bir işlem engeline yol açabilir. Araç, insansı kalmak için istekleri rastgele gecikmeler ve molalarla yayar, ama kullanım kendi sorumluluğundadır. Yine: tarayıcından hiçbir şey çıkmaz.',

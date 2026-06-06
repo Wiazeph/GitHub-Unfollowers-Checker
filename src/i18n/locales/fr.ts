@@ -173,6 +173,13 @@ export const fr: Translation = {
       '. Un panneau apparaît dans le coin — appuyez sur Scan pour voir qui ne vous suit pas en retour, puis sélectionnez et désabonnez-vous.',
     tip_pre:
       'Astuce : les navigateurs peuvent avertir avant de vous laisser coller dans la console — cet avertissement existe car coller du code que vous ne comprenez pas peut être dangereux. Ce script lit uniquement votre liste d’abonnements et désabonne ce que vous choisissez. Vous pouvez le consulter à tout moment sur',
+    bmTitle: 'Ou utilisez un bookmarklet',
+    bmIntro:
+      'Vous préférez un seul clic ? Glissez ce bouton dans votre barre de favoris, puis ouvrez Instagram et cliquez dessus pour l’exécuter.',
+    bmButton: 'Instagram Unfollower',
+    bmDrag: 'Glissez ceci dans votre barre de favoris (ne cliquez pas ici).',
+    bmRecommend:
+      'Plus fiable sur Chrome et Edge. Sur Safari et Firefox, le bookmarklet peut être trop long à enregistrer — s’il ne s’exécute pas, utilisez plutôt « Copier le code » ci-dessus.',
     riskTitle: 'À utiliser à votre discrétion',
     riskBody:
       'Le désabonnement en masse peut enfreindre les politiques d’Instagram sur les comportements automatisés et déclencher un blocage temporaire des actions. L’outil espace les requêtes avec des délais et des pauses aléatoires pour rester humain, mais l’utilisation se fait à vos risques. Encore une fois : rien ne quitte votre navigateur.',

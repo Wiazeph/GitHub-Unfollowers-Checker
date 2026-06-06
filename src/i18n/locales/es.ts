@@ -173,6 +173,13 @@ export const es: Translation = {
       '. Aparece un panel en la esquina — pulsa Scan para ver quién no te sigue de vuelta, luego selecciona y deja de seguir.',
     tip_pre:
       'Consejo: los navegadores pueden advertirte antes de dejarte pegar en la consola — esa advertencia existe porque pegar código que no entiendes puede ser peligroso. Este script solo lee tu lista de seguidos y deja de seguir lo que elijas. Puedes leerlo en cualquier momento en',
+    bmTitle: 'O usa un bookmarklet',
+    bmIntro:
+      '¿Prefieres un solo clic? Arrastra este botón a tu barra de marcadores, luego abre Instagram y haz clic en él para ejecutarlo.',
+    bmButton: 'Instagram Unfollower',
+    bmDrag: 'Arrastra esto a tu barra de marcadores (no hagas clic aquí).',
+    bmRecommend:
+      'Más fiable en Chrome y Edge. En Safari y Firefox el bookmarklet puede ser demasiado largo para guardarlo — si no funciona, usa «Copiar el código» de arriba.',
     riskTitle: 'Úsalo a tu criterio',
     riskBody:
       'Dejar de seguir de forma masiva puede infringir las políticas de comportamiento automatizado de Instagram y provocar un bloqueo temporal de acciones. La herramienta espacia las solicitudes con retrasos y pausas aleatorias para parecer humana, pero el uso es bajo tu responsabilidad. De nuevo: nada sale de tu navegador.',

@@ -173,6 +173,13 @@ export const de: Translation = {
       '. Ein Panel erscheint in der Ecke — drücke auf Scan, um zu sehen, wer dir nicht zurückfolgt, dann auswählen und entfolgen.',
     tip_pre:
       'Tipp: Browser warnen möglicherweise, bevor du in die Konsole einfügen darfst — diese Warnung gibt es, weil das Einfügen von Code, den du nicht verstehst, gefährlich sein kann. Dieses Skript liest nur deine Folgt-Liste und entfolgt, was du auswählst. Du kannst es jederzeit hier lesen:',
+    bmTitle: 'Oder ein Bookmarklet verwenden',
+    bmIntro:
+      'Lieber mit einem Klick? Zieh diesen Button in deine Lesezeichenleiste, öffne dann Instagram und klicke darauf, um ihn auszuführen.',
+    bmButton: 'Instagram Unfollower',
+    bmDrag: 'Zieh dies in deine Lesezeichenleiste (hier nicht anklicken).',
+    bmRecommend:
+      'Am zuverlässigsten in Chrome und Edge. In Safari und Firefox kann das Bookmarklet zu lang zum Speichern sein — wenn es nicht läuft, nutze stattdessen oben „Code kopieren“.',
     riskTitle: 'Nutzung nach eigenem Ermessen',
     riskBody:
       'Massenhaftes Entfolgen kann gegen Instagrams Richtlinien zu automatisiertem Verhalten verstoßen und eine vorübergehende Aktionssperre auslösen. Das Tool verteilt Anfragen mit zufälligen Verzögerungen und Pausen, um menschlich zu wirken, aber die Nutzung erfolgt auf eigene Gefahr. Nochmals: Nichts verlässt deinen Browser.',

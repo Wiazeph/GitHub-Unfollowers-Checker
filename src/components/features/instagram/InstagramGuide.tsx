@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   Check,
   Copy,
@@ -6,6 +6,8 @@ import {
   ExternalLink,
   LoaderCircle,
   Terminal,
+  Bookmark,
+  Hand,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
@@ -25,6 +27,9 @@ export const InstagramGuide = () => {
   const { t } = useTranslation()
   const [code, setCode] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
+  // React refuses to render `javascript:` hrefs, so we set the bookmarklet on
+  // the DOM node directly once the script text is available.
+  const bookmarkletRef = useRef<HTMLAnchorElement>(null)
 
   // Fetch our own script text (same-origin) so the Copy button hands over the
   // full code to paste — no external load, so Instagram's CSP is never involved.
@@ -38,6 +43,18 @@ export const InstagramGuide = () => {
       active = false
     }
   }, [])
+
+  // Build an inline bookmarklet (the whole script in the URL). Inline avoids
+  // Instagram's CSP, which blocks loading an external script — and a
+  // user-triggered bookmarklet is exempt from the page CSP. Set it via a ref
+  // because React strips `javascript:` hrefs.
+  useEffect(() => {
+    if (!code || !bookmarkletRef.current) return
+    bookmarkletRef.current.setAttribute(
+      'href',
+      `javascript:${encodeURIComponent(code)}`,
+    )
+  }, [code])
 
   useEffect(() => {
     if (!copied) return
@@ -177,6 +194,32 @@ export const InstagramGuide = () => {
         </a>
         .
       </p>
+
+      {/* Bookmarklet alternative (one drag instead of copy-paste) */}
+      <div className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-4">
+        <div className="flex items-center gap-2 text-sm font-medium text-fg">
+          <Bookmark className="h-4 w-4 text-brand-400" aria-hidden="true" />
+          {t('instagram.bmTitle')}
+        </div>
+        <p className="text-sm text-fg-muted">{t('instagram.bmIntro')}</p>
+        <div className="flex flex-wrap items-center gap-3">
+          <a
+            ref={bookmarkletRef}
+            href="#"
+            title={t('instagram.bmButton')}
+            onClick={(event) => event.preventDefault()}
+            draggable
+            className={`inline-flex cursor-grab items-center gap-1.5 rounded-lg border border-brand-500/40 bg-brand-500/10 px-3 py-1.5 text-sm font-medium text-brand-400 select-none active:cursor-grabbing ${
+              code ? '' : 'pointer-events-none opacity-50'
+            }`}
+          >
+            <Hand className="h-4 w-4" aria-hidden="true" />
+            {t('instagram.bmButton')}
+          </a>
+          <span className="text-xs text-fg-muted">{t('instagram.bmDrag')}</span>
+        </div>
+        <p className="text-xs text-fg-muted">{t('instagram.bmRecommend')}</p>
+      </div>
 
       {/* Risk / ToS callout */}
       <div className="flex gap-3 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3">

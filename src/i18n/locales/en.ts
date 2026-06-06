@@ -171,6 +171,13 @@ export const en = {
       ". A panel appears in the corner — press Scan to see who doesn't follow you back, then select and unfollow.",
     tip_pre:
       "Tip: browsers may warn before letting you paste into the console — that warning exists because pasting code you don't understand can be dangerous. This script only reads your following list and unfollows what you pick. You can read it any time at",
+    bmTitle: 'Or use a bookmarklet',
+    bmIntro:
+      'Prefer one click? Drag this button to your bookmarks bar, then open Instagram and click it to run.',
+    bmButton: 'Instagram Unfollower',
+    bmDrag: 'Drag this to your bookmarks bar (don’t click it here).',
+    bmRecommend:
+      'Most reliable in Chrome and Edge. On Safari and Firefox the bookmarklet can be too long to save — if it doesn’t run, use “Copy the code” above instead.',
     riskTitle: 'Use at your own discretion',
     riskBody:
       "Bulk unfollowing can run against Instagram's automated-behavior policies and may trigger a temporary action block. The tool spaces requests out with randomized delays and cooldowns to stay human-like, but use is at your own risk. Again: nothing leaves your browser.",
