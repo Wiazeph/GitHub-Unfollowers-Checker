@@ -83,6 +83,10 @@ export const tr: Translation = {
     idleAuthed: 'Listen yükleniyor… ya da yukarıdan başka bir kullanıcı ara.',
     idleGuest:
       'Kimlerin geri takip etmediğini görmek için yukarıya bir {{platform}} handle gir.',
+    idleGuest_github:
+      'Kimlerin geri takip etmediğini görmek için yukarıya bir {{platform}} kullanıcı adı gir.',
+    idleGuest_bluesky:
+      'Kimlerin geri takip etmediğini görmek için yukarıya bir {{platform}} handle gir.',
     zeroTitle: 'Herkes geri takip ediyor!',
     zeroBody: 'Burada seni geri takip etmeyen kimse yok. Tertemiz.',
     errorTitle: 'Bir şeyler ters gitti',
@@ -125,7 +129,7 @@ export const tr: Translation = {
   },
 
   footer: {
-    viewSource: 'GitHub’da kaynağı gör',
+    viewSource: 'Kaynak kodu',
     sponsor: 'Destek ol',
     privacy: 'Gizlilik',
     disclaimer:

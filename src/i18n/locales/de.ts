@@ -83,6 +83,10 @@ export const de: Translation = {
     idleAuthed: 'Deine Liste wird geladen… oder suche oben nach einem anderen Nutzer.',
     idleGuest:
       'Gib oben ein {{platform}}-Handle ein, um zu sehen, wer nicht zurückfolgt.',
+    idleGuest_github:
+      'Gib oben einen {{platform}}-Benutzernamen ein, um zu sehen, wer nicht zurückfolgt.',
+    idleGuest_bluesky:
+      'Gib oben ein {{platform}}-Handle ein, um zu sehen, wer nicht zurückfolgt.',
     zeroTitle: 'Alle folgen zurück!',
     zeroBody: 'Hier folgt dir niemand nicht zurück. Schön aufgeräumt.',
     errorTitle: 'Etwas ist schiefgelaufen',
@@ -126,7 +130,7 @@ export const de: Translation = {
   },
 
   footer: {
-    viewSource: 'Quellcode auf GitHub ansehen',
+    viewSource: 'Quellcode',
     sponsor: 'Unterstützen',
     privacy: 'Datenschutz',
     disclaimer:

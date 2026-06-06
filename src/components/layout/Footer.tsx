@@ -53,13 +53,15 @@ export const Footer = () => {
           •
         </span>
 
+        {/* Sponsor is the one link we want to stand out — a brand-colored badge,
+            while the others stay muted so the emphasis lands in a single place. */}
         <a
           href={SPONSOR_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 rounded-md px-2 py-1 outline-none transition-colors hover:text-fg focus-visible:ring-2 focus-visible:ring-brand-400"
+          className="inline-flex items-center gap-1.5 rounded-full border border-brand-500/30 bg-brand-500/10 px-2.5 py-1 font-medium text-brand-400 outline-none transition-colors hover:bg-brand-500/20 hover:text-brand-300 focus-visible:ring-2 focus-visible:ring-brand-400"
         >
-          <Heart className="h-4 w-4" aria-hidden="true" />
+          <Heart className="h-4 w-4 fill-current" aria-hidden="true" />
           <span>{t('footer.sponsor')}</span>
         </a>
 

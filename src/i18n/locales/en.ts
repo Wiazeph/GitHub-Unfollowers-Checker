@@ -80,6 +80,10 @@ export const en = {
     idleAuthed: 'Loading your list… or search for another user above.',
     idleGuest:
       "Enter a {{platform}} handle above to see who doesn't follow them back.",
+    idleGuest_github:
+      "Enter a {{platform}} username above to see who doesn't follow them back.",
+    idleGuest_bluesky:
+      "Enter a {{platform}} handle above to see who doesn't follow them back.",
     zeroTitle: 'Everyone follows back!',
     zeroBody: "There's no one here that isn't following back. Nice and tidy.",
     errorTitle: 'Something went wrong',
@@ -123,7 +127,7 @@ export const en = {
   },
 
   footer: {
-    viewSource: 'View source on GitHub',
+    viewSource: 'Source code',
     sponsor: 'Sponsor',
     privacy: 'Privacy',
     disclaimer:

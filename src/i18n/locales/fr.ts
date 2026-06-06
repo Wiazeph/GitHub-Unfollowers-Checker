@@ -83,6 +83,10 @@ export const fr: Translation = {
     idleAuthed: 'Chargement de votre liste… ou recherchez un autre utilisateur ci-dessus.',
     idleGuest:
       'Saisissez un identifiant {{platform}} ci-dessus pour voir qui ne le suit pas en retour.',
+    idleGuest_github:
+      "Saisissez un nom d'utilisateur {{platform}} ci-dessus pour voir qui ne le suit pas en retour.",
+    idleGuest_bluesky:
+      'Saisissez un identifiant {{platform}} ci-dessus pour voir qui ne le suit pas en retour.',
     zeroTitle: 'Tout le monde vous suit en retour !',
     zeroBody: 'Personne ici ne manque de vous suivre en retour. Tout est en ordre.',
     errorTitle: 'Une erreur est survenue',
@@ -125,7 +129,7 @@ export const fr: Translation = {
   },
 
   footer: {
-    viewSource: 'Voir le code source sur GitHub',
+    viewSource: 'Code source',
     sponsor: 'Faire un don',
     privacy: 'Confidentialité',
     disclaimer:

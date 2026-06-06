@@ -731,6 +731,7 @@ const IdleState = ({
         isAuthed
           ? t('results.idleAuthed')
           : t('results.idleGuest', {
+              context: platform,
               platform: PLATFORMS[platform].profileNoun,
             })
       }
