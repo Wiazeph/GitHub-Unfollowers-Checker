@@ -12,7 +12,7 @@ export const Header = () => {
         </h1>
         <p className="mx-auto mt-3 max-w-md text-base text-fg-muted sm:text-lg">
           Find out who you follow that doesn&apos;t follow you back — across
-          GitHub, Bluesky, and more.
+          GitHub, Bluesky, X, and Instagram.
         </p>
       </div>
     </header>
