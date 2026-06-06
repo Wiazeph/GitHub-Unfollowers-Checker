@@ -1,10 +1,11 @@
 import { useState } from 'react'
-import { Globe, ShieldCheck } from 'lucide-react'
+import { Globe, ShieldCheck, Heart } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { PrivacyDialog } from './PrivacyDialog'
 
 const REPO_URL = 'https://github.com/Wiazeph/GitHub-Unfollowers-Checker'
 const SITE_URL = 'https://emreerden.dev'
+const SPONSOR_URL = 'https://github.com/sponsors/Wiazeph'
 
 /** Lucide 1.x dropped the GitHub brand mark, so the logo stays as inline SVG. */
 const GithubIcon = () => (
@@ -47,6 +48,20 @@ export const Footer = () => {
           <ShieldCheck className="h-4 w-4" aria-hidden="true" />
           <span>{t('footer.privacy')}</span>
         </button>
+
+        <span aria-hidden="true" className="text-border">
+          •
+        </span>
+
+        <a
+          href={SPONSOR_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 rounded-md px-2 py-1 outline-none transition-colors hover:text-fg focus-visible:ring-2 focus-visible:ring-brand-400"
+        >
+          <Heart className="h-4 w-4" aria-hidden="true" />
+          <span>{t('footer.sponsor')}</span>
+        </a>
 
         <span aria-hidden="true" className="text-border">
           •

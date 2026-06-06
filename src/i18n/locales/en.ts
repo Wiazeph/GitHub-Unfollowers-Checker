@@ -123,6 +123,7 @@ export const en = {
 
   footer: {
     viewSource: 'View source on GitHub',
+    sponsor: 'Sponsor',
     privacy: 'Privacy',
     disclaimer:
       'Not affiliated with GitHub, Bluesky, X, or Instagram. Use on your own accounts, at your own discretion.',

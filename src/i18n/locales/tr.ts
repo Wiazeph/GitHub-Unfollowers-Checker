@@ -125,6 +125,7 @@ export const tr: Translation = {
 
   footer: {
     viewSource: 'GitHub’da kaynağı gör',
+    sponsor: 'Destek ol',
     privacy: 'Gizlilik',
     disclaimer:
       'GitHub, Bluesky, X veya Instagram ile bağlantılı değildir. Kendi hesaplarında, kendi sorumluluğunda kullan.',

@@ -126,6 +126,7 @@ export const de: Translation = {
 
   footer: {
     viewSource: 'Quellcode auf GitHub ansehen',
+    sponsor: 'Unterstützen',
     privacy: 'Datenschutz',
     disclaimer:
       'Nicht verbunden mit GitHub, Bluesky, X oder Instagram. Nutzung mit eigenen Konten, auf eigene Verantwortung.',

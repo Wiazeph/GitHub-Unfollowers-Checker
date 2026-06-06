@@ -125,6 +125,7 @@ export const es: Translation = {
 
   footer: {
     viewSource: 'Ver el código en GitHub',
+    sponsor: 'Apóyame',
     privacy: 'Privacidad',
     disclaimer:
       'Sin afiliación con GitHub, Bluesky, X o Instagram. Úsalo en tus propias cuentas, bajo tu propia responsabilidad.',
