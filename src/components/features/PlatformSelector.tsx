@@ -6,8 +6,6 @@ import {
   PLATFORM_LIST,
   type SelectorTab,
 } from '../../platforms'
-import { ThemeToggle } from '../ui/ThemeToggle'
-import { LanguageToggle } from '../ui/LanguageToggle'
 
 interface PlatformSelectorProps {
   value: SelectorTab
@@ -32,10 +30,9 @@ const edgeMask = (left: boolean, right: boolean): string | undefined => {
 }
 
 /**
- * Top bar: the platform tabs scroll horizontally when they don't fit (mobile);
- * the scrollable edges fade out (via a mask) to hint there's more. The
- * theme/language actions stay pinned on the right — outside the scroll area, so
- * the language dropdown is never clipped — separated by a divider.
+ * Platform tabs. They scroll horizontally when they don't fit (mobile); the
+ * scrollable edges fade out (via a mask) to hint there's more. Theme, language
+ * and sign-in now live in the header, so this bar is just the tabs.
  */
 export const PlatformSelector = ({ value, onChange }: PlatformSelectorProps) => {
   const { t } = useTranslation()
@@ -99,13 +96,6 @@ export const PlatformSelector = ({ value, onChange }: PlatformSelectorProps) => 
             </button>
           )
         })}
-      </div>
-
-      {/* Divider + pinned actions (theme, language). */}
-      <div className="h-full w-px shrink-0 bg-border" aria-hidden="true" />
-      <div className="flex shrink-0 items-center gap-1">
-        <ThemeToggle />
-        <LanguageToggle />
       </div>
     </div>
   )

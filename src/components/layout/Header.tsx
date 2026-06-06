@@ -1,12 +1,12 @@
 import { useTranslation } from 'react-i18next'
-import { AuthStatus } from './AuthStatus'
+import { HeaderActions } from './HeaderActions'
 
 export const Header = () => {
   const { t } = useTranslation()
   return (
     <header className="mx-auto w-full max-w-3xl px-4 sm:px-6">
       <div className="flex justify-end pt-4">
-        <AuthStatus />
+        <HeaderActions />
       </div>
       <div className="pt-8 pb-10 text-center sm:pt-12">
         <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">

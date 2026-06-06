@@ -24,6 +24,7 @@ export const de: Translation = {
   },
 
   auth: {
+    signIn: 'Anmelden',
     signOut: 'Abmelden',
   },
 

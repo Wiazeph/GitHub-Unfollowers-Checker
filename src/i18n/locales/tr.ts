@@ -24,6 +24,7 @@ export const tr: Translation = {
   },
 
   auth: {
+    signIn: 'Giriş yap',
     signOut: 'Çıkış yap',
   },
 

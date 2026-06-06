@@ -22,6 +22,7 @@ export const en = {
   },
 
   auth: {
+    signIn: 'Sign in',
     signOut: 'Sign out',
   },
 

@@ -7,32 +7,18 @@ import { PLATFORMS } from '../../platforms'
 import type { PlatformId } from '../../types/platform'
 
 /**
- * Top-right session indicator. Sessions are per-platform, so this shows the
- * one for the active tab: "@handle · Sign out". On the standalone tabs
- * (X / Instagram) it falls back to any signed-in platform, if one exists.
+ * Session indicator for the active tab's platform: "@handle · Sign out".
+ * Only rendered (by HeaderActions) when there's a session for that platform.
  */
 export const AuthStatus = () => {
   const { t } = useTranslation()
-  const { data: auth, isLoading } = useAuth()
+  const { data: auth } = useAuth()
   const { tab } = useActiveTab()
 
-  if (isLoading || !auth) return null
-
-  // Prefer the active tab's platform; otherwise the first signed-in one.
-  const active = tab === 'github' || tab === 'bluesky' ? tab : null
   const platform: PlatformId | null =
-    active && auth[active]
-      ? active
-      : auth.github
-        ? 'github'
-        : auth.bluesky
-          ? 'bluesky'
-          : null
-
-  if (!platform) return null
-
-  const session = auth[platform]
-  if (!session) return null
+    tab === 'github' || tab === 'bluesky' ? tab : null
+  const session = platform ? auth?.[platform] : null
+  if (!platform || !session) return null
 
   const Icon = PLATFORMS[platform].icon
 
