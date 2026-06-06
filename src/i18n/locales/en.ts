@@ -201,6 +201,16 @@ export const en = {
     riskTitle: 'Use at your own discretion',
     riskBody:
       "Bulk unfollowing can run against Instagram's automated-behavior policies and may trigger a temporary action block. The tool spaces requests out with randomized delays and cooldowns to stay human-like, but use is at your own risk. Again: nothing leaves your browser.",
+    featuresTitle: 'What the panel can do',
+    features: {
+      scan: 'Scans only the people you follow and uses Instagram’s follow-back status, so it stays fast even on large accounts.',
+      manage: 'Search, and filter by verified / private / no profile picture, with quick “select all verified / private / no-photo” shortcuts.',
+      unfollow: 'Select accounts and bulk-unfollow, with a live progress bar and a one-click retry for any that failed.',
+      safety: 'Randomized delays and cooldowns keep it human-like; on rate-limits it auto-backs-off and pauses instead of failing silently.',
+      settings: 'Tune every timing (scan/unfollow delays, cooldowns) in settings, or restore the conservative defaults.',
+      comfort: 'Drag the panel anywhere, resize it from any edge, minimize it, and switch theme (light/dark/system) and language — your choices are remembered.',
+    },
+    inspiredBy: 'Inspired by the workflows from',
   },
 
   twitter: {

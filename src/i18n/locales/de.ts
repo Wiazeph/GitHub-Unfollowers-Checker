@@ -204,6 +204,16 @@ export const de: Translation = {
     riskTitle: 'Nutzung nach eigenem Ermessen',
     riskBody:
       'Massenhaftes Entfolgen kann gegen Instagrams Richtlinien zu automatisiertem Verhalten verstoßen und eine vorübergehende Aktionssperre auslösen. Das Tool verteilt Anfragen mit zufälligen Verzögerungen und Pausen, um menschlich zu wirken, aber die Nutzung erfolgt auf eigene Gefahr. Nochmals: Nichts verlässt deinen Browser.',
+    featuresTitle: 'Was das Panel kann',
+    features: {
+      scan: 'Scannt nur die Personen, denen du folgst, und nutzt Instagrams Rückfolge-Status — so bleibt es auch bei großen Konten schnell.',
+      manage: 'Suche und filtere nach verifiziert / privat / kein Profilbild, mit Schnellbefehlen „alle verifizierten / privaten / ohne Bild auswählen“.',
+      unfollow: 'Konten auswählen und massenhaft entfolgen, mit Live-Fortschrittsbalken und Ein-Klick-Wiederholung für fehlgeschlagene.',
+      safety: 'Zufällige Verzögerungen und Pausen wirken menschlich; bei Rate-Limits wird automatisch gedrosselt und pausiert, statt still zu scheitern.',
+      settings: 'Stelle jedes Timing (Scan-/Entfolgen-Verzögerungen, Pausen) in den Einstellungen ein oder setze die konservativen Standardwerte zurück.',
+      comfort: 'Ziehe das Panel überallhin, ändere die Größe an jeder Kante, minimiere es und wechsle Design (hell/dunkel/System) und Sprache — deine Auswahl wird gespeichert.',
+    },
+    inspiredBy: 'Inspiriert von den Workflows von',
   },
 
   twitter: {

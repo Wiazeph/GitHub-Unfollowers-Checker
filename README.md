@@ -21,6 +21,17 @@ See who you follow that doesn't follow you back — across **GitHub**, **Bluesky
 - **X (Twitter)** — download your data archive from X (Settings → *Download an archive of your data*), then upload `following.js` and `follower.js` from it. The diff is computed offline in your browser; results link to each profile (X archives only contain numeric account IDs, so handles aren't shown).
 - **Instagram** — copy the provided script and paste it into your browser's developer console while on instagram.com. It scans the people you follow using your own session and never sends data to any server.
 
+### Instagram panel features
+
+The pasted script injects a small, self-contained panel into instagram.com. It can:
+
+- **Scan smart** — only checks the people you follow and reads Instagram's follow-back status, so it stays fast even on large accounts.
+- **Search & filter** — find by name/username and filter by verified / private / no profile picture, with one-tap "select all verified / private / no-photo" shortcuts.
+- **Bulk unfollow** — select accounts and unfollow them in batches, with a live progress bar and a one-click retry for any that failed.
+- **Stay under the radar** — randomized delays and cooldowns keep activity human-like; on rate-limits it automatically backs off and pauses instead of failing silently. (Keep the tab and browser open while it runs.)
+- **Tune the timing** — every delay and cooldown is configurable in settings, or reset to the conservative defaults.
+- **Comfortable UI** — drag the panel anywhere, resize it from any edge or corner, minimize it, and switch theme (light / dark / system) and language (EN / TR / DE / FR / ES). Your preferences are remembered.
+
 ## Privacy & security
 
 - **No data is stored.** There's no database; follower/following lists are fetched, compared, and returned for a single request — never logged or saved.
@@ -34,3 +45,7 @@ See who you follow that doesn't follow you back — across **GitHub**, **Bluesky
 This is a free, personal utility and is **not affiliated with, endorsed by, or connected to** GitHub, Bluesky, X (Twitter), or Instagram. Automated or bulk actions can run against a platform's terms of service and may lead to temporary limits or other account actions; the Instagram script in particular is an unofficial, third-party tool. Use these features on your own accounts, at your own discretion.
 
 Questions or reports: **emreerden@pm.me**
+
+## Credits
+
+Inspired by the workflows from [cobanov/instagram](https://github.com/cobanov/instagram) and [davidarroyo1234/InstagramUnfollowers](https://github.com/davidarroyo1234/InstagramUnfollowers).

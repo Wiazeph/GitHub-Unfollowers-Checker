@@ -19,18 +19,25 @@
     "x-requested-with": "XMLHttpRequest"
   };
 
+  // Conservative defaults: slower = safer against Instagram's rate limiting and
+  // action blocks. Users can still tune these in settings.
   const DEFAULT_TIMINGS = {
-    scanDelayMin: 700,
-    scanDelayMax: 1500,
+    scanDelayMin: 900,
+    scanDelayMax: 1800,
     scanPauseEveryPages: 5,
-    scanPauseMs: 8000,
-    unfollowDelayMin: 5000,
-    unfollowDelayMax: 9000,
-    unfollowPauseEvery: 5,
+    scanPauseMs: 10000,
+    unfollowDelayMin: 6000,
+    unfollowDelayMax: 12000,
+    unfollowPauseEvery: 4,
     unfollowPauseMs: 300000
   };
 
-  const PANEL_WIDTH = 380;
+  // Ordered list of supported languages; the header button cycles through them.
+  const LANGS = ["en", "tr", "de", "fr", "es"];
+
+  const PANEL_WIDTH = 500;
+  const PANEL_MIN_WIDTH = 320;
+  const PANEL_MIN_HEIGHT = 320;
   const PANEL_MARGIN = 18;
   const MAX_RETRIES = 3;
 
@@ -99,14 +106,24 @@
       restoreDefaults: "Restore defaults",
       save: "Save",
       saved: "Settings saved",
-      cookieMissing: "Could not read your login cookie. Make sure you are signed in.",
-      csrfMissing: "Could not read csrftoken cookie.",
+      cookieMissing: "Could not read your login cookie. Make sure you're signed in to Instagram.",
+      csrfMissing: "Could not read your session. Make sure you're signed in to Instagram.",
       requestFailed: "Request failed: {status}",
       tooManyRequests: "Instagram is rate-limiting requests. Try again later or increase delays in settings.",
+      rateLimitPaused: "Instagram is rate-limiting you. Paused automatically — wait a few minutes, then press Resume.",
+      keepTabOpen: "Keep this tab and browser open — closing it stops the process.",
       close: "Close",
       minimize: "Minimize",
       expand: "Expand",
-      langCode: "TR",
+      theme: "Theme",
+      themeSystem: "Theme: system",
+      themeLight: "Theme: light",
+      themeDark: "Theme: dark",
+      language: "Language",
+      selectVerified: "Select verified",
+      selectPrivate: "Select private",
+      selectNoPhoto: "Select no photo",
+      retryFailed: "Retry failed ({count})",
       pillScanning: "Scanning {current}/{total}",
       pillUnfollowing: "Unfollowing {current}/{total}",
       pillResults: "{count} non-followers",
@@ -176,18 +193,289 @@
       restoreDefaults: "Varsayılana dön",
       save: "Kaydet",
       saved: "Ayarlar kaydedildi",
-      cookieMissing: "Giriş çerezi okunamadı. Giriş yaptığından emin ol.",
-      csrfMissing: "csrftoken çerezi okunamadı.",
+      cookieMissing: "Giriş çerezi okunamadı. Instagram'a giriş yaptığından emin ol.",
+      csrfMissing: "Oturumun okunamadı. Instagram'a giriş yaptığından emin ol.",
       requestFailed: "İstek başarısız: {status}",
       tooManyRequests: "Instagram istekleri kısıtlıyor. Sonra dene veya ayarlardan gecikmeleri artır.",
+      rateLimitPaused: "Instagram seni kısıtlıyor. Otomatik duraklatıldı — birkaç dakika bekleyip Devam et'e bas.",
+      keepTabOpen: "Bu sekmeyi ve tarayıcıyı kapatma — kapatırsan işlem durur.",
       close: "Kapat",
       minimize: "Küçült",
       expand: "Aç",
-      langCode: "EN",
+      theme: "Tema",
+      themeSystem: "Tema: sistem",
+      themeLight: "Tema: açık",
+      themeDark: "Tema: koyu",
+      language: "Dil",
+      selectVerified: "Onaylıları seç",
+      selectPrivate: "Gizlileri seç",
+      selectNoPhoto: "Fotoğrafsızları seç",
+      retryFailed: "Başarısızları dene ({count})",
       pillScanning: "Taranıyor {current}/{total}",
       pillUnfollowing: "Bırakılıyor {current}/{total}",
       pillResults: "{count} takip etmeyen",
       pillIdle: "Aç"
+    },
+    de: {
+      title: "Instagram Unfollower",
+      subtitle: "Sieh, wer dir nicht zurückfolgt",
+      welcomeTitle: "Bereit, wenn du es bist",
+      welcomeBody: "Es werden nur die Personen gescannt, denen du folgst, und Instagrams Rückfolge-Status genutzt, damit der Scan schnell bleibt. Während des Scans wird an deinem Konto nichts geändert.",
+      scanBtn: "Jetzt scannen",
+      scanning: "Wird gescannt",
+      loadingFollowing: "Lade die Personen, denen du folgst",
+      loadingFollowers: "Prüfe den Rückfolge-Status",
+      paused: "Pausiert",
+      pause: "Pause",
+      resume: "Fortsetzen",
+      cancel: "Abbrechen",
+      ofTotal: "{current} von {total}",
+      ofUnknown: "Bisher {current}",
+      scanCompletedToast: "{count} Nicht-Follower gefunden",
+      scanFailed: "Scan fehlgeschlagen",
+      retry: "Erneut versuchen",
+      goBack: "Zurück zu den Ergebnissen",
+      search: "Nach Name oder Benutzername suchen",
+      filterVerified: "Verifiziert",
+      filterPrivate: "Privat",
+      filterNoAvatar: "Kein Profilbild",
+      filterShowHidden: "Ausgeblendete Nutzer",
+      foundCount: "{count} Nicht-Follower",
+      foundOne: "1 Nicht-Follower",
+      foundNone: "Super — alle, denen du folgst, folgen dir zurück.",
+      noMatches: "Keine Nutzer entsprechen deinen Filtern.",
+      hide: "Ausblenden",
+      unhide: "Einblenden",
+      hideTooltip: "Aus dieser Liste ausblenden",
+      unhideTooltip: "Wieder anzeigen",
+      openProfile: "Profil öffnen",
+      copy: "Kopieren",
+      copyAll: "Alle kopieren",
+      copiedToast: "{count} Benutzernamen kopiert",
+      selectAll: "Alle auswählen",
+      selectNone: "Leeren",
+      selectedCount: "{count} ausgewählt",
+      unfollow: "Entfolgen",
+      unfollowConfirmTitle: "{count} Nutzern entfolgen?",
+      unfollowConfirmBody: "Dies läuft langsam, um dein Konto vor Rate-Limits zu schützen. Du kannst jederzeit pausieren, aber bereits abgeschlossene Entfolgungen können mit diesem Tool nicht rückgängig gemacht werden.",
+      unfollowConfirmBtn: "Ja, {count} entfolgen",
+      unfollowing: "Wird entfolgt",
+      currently: "Aktuell",
+      nextActionIn: "Nächste Aktion in {seconds}s",
+      cooldownIn: "Abkühlung — {seconds}s",
+      idle: "Bereit",
+      unfollowDoneTitle: "Fertig",
+      unfollowDoneBody: "{ok} entfolgt, {fail} fehlgeschlagen",
+      settings: "Einstellungen",
+      settingsTitle: "Timing-Einstellungen",
+      settingsBody: "Niedrigere Verzögerungen erhöhen das Risiko, dass Instagram dein Konto drosselt oder sperrt. Halte sie konservativ.",
+      minScanDelay: "Min. Scan-Verzögerung (ms)",
+      maxScanDelay: "Max. Scan-Verzögerung (ms)",
+      scanPauseEvery: "Lange Pause alle N Seiten",
+      scanPauseLength: "Länge der langen Pause (ms)",
+      minUnfollowDelay: "Min. Entfolgen-Verzögerung (ms)",
+      maxUnfollowDelay: "Max. Entfolgen-Verzögerung (ms)",
+      unfollowPauseEvery: "Abkühlung alle N Entfolgungen",
+      unfollowPauseLength: "Abkühlungsdauer (ms)",
+      restoreDefaults: "Standard wiederherstellen",
+      save: "Speichern",
+      saved: "Einstellungen gespeichert",
+      cookieMissing: "Login-Cookie konnte nicht gelesen werden. Stelle sicher, dass du bei Instagram angemeldet bist.",
+      csrfMissing: "Deine Sitzung konnte nicht gelesen werden. Stelle sicher, dass du bei Instagram angemeldet bist.",
+      requestFailed: "Anfrage fehlgeschlagen: {status}",
+      tooManyRequests: "Instagram drosselt die Anfragen. Versuche es später oder erhöhe die Verzögerungen in den Einstellungen.",
+      rateLimitPaused: "Instagram drosselt dich. Automatisch pausiert — warte ein paar Minuten und drücke dann Fortsetzen.",
+      keepTabOpen: "Lass diesen Tab und den Browser offen — beim Schließen stoppt der Vorgang.",
+      close: "Schließen",
+      minimize: "Minimieren",
+      expand: "Öffnen",
+      theme: "Design",
+      themeSystem: "Design: System",
+      themeLight: "Design: Hell",
+      themeDark: "Design: Dunkel",
+      language: "Sprache",
+      selectVerified: "Verifizierte wählen",
+      selectPrivate: "Private wählen",
+      selectNoPhoto: "Ohne Bild wählen",
+      retryFailed: "Fehlgeschlagene erneut ({count})",
+      pillScanning: "Scannen {current}/{total}",
+      pillUnfollowing: "Entfolgen {current}/{total}",
+      pillResults: "{count} Nicht-Follower",
+      pillIdle: "Öffnen"
+    },
+    fr: {
+      title: "Instagram Unfollower",
+      subtitle: "Voyez qui ne vous suit pas en retour",
+      welcomeTitle: "Prêt quand vous l'êtes",
+      welcomeBody: "Nous analysons uniquement les personnes que vous suivez et utilisons le statut de suivi d'Instagram pour rester rapides. Rien n'est modifié sur votre compte pendant l'analyse.",
+      scanBtn: "Analyser maintenant",
+      scanning: "Analyse en cours",
+      loadingFollowing: "Chargement des personnes que vous suivez",
+      loadingFollowers: "Vérification du suivi en retour",
+      paused: "En pause",
+      pause: "Pause",
+      resume: "Reprendre",
+      cancel: "Annuler",
+      ofTotal: "{current} sur {total}",
+      ofUnknown: "{current} jusqu'à présent",
+      scanCompletedToast: "{count} non-abonnés trouvés",
+      scanFailed: "Échec de l'analyse",
+      retry: "Réessayer",
+      goBack: "Retour aux résultats",
+      search: "Rechercher par nom ou identifiant",
+      filterVerified: "Vérifié",
+      filterPrivate: "Privé",
+      filterNoAvatar: "Sans photo de profil",
+      filterShowHidden: "Utilisateurs masqués",
+      foundCount: "{count} non-abonnés",
+      foundOne: "1 non-abonné",
+      foundNone: "Parfait — tout le monde que vous suivez vous suit en retour.",
+      noMatches: "Aucun utilisateur ne correspond à vos filtres.",
+      hide: "Masquer",
+      unhide: "Afficher",
+      hideTooltip: "Masquer de cette liste",
+      unhideTooltip: "Afficher à nouveau",
+      openProfile: "Ouvrir le profil",
+      copy: "Copier",
+      copyAll: "Tout copier",
+      copiedToast: "{count} identifiants copiés",
+      selectAll: "Tout sélectionner",
+      selectNone: "Effacer",
+      selectedCount: "{count} sélectionné(s)",
+      unfollow: "Ne plus suivre",
+      unfollowConfirmTitle: "Ne plus suivre {count} utilisateurs ?",
+      unfollowConfirmBody: "L'opération est lente pour protéger votre compte des limitations. Vous pouvez mettre en pause à tout moment, mais les désabonnements déjà effectués ne peuvent pas être annulés depuis cet outil.",
+      unfollowConfirmBtn: "Oui, ne plus suivre {count}",
+      unfollowing: "Désabonnement",
+      currently: "Actuellement",
+      nextActionIn: "Prochaine action dans {seconds}s",
+      cooldownIn: "Pause — {seconds}s",
+      idle: "Prêt",
+      unfollowDoneTitle: "Terminé",
+      unfollowDoneBody: "{ok} désabonnés, {fail} échoués",
+      settings: "Paramètres",
+      settingsTitle: "Réglages de cadence",
+      settingsBody: "Des délais plus courts augmentent le risque qu'Instagram limite ou bloque votre compte. Restez prudent.",
+      minScanDelay: "Délai d'analyse min (ms)",
+      maxScanDelay: "Délai d'analyse max (ms)",
+      scanPauseEvery: "Longue pause toutes les N pages",
+      scanPauseLength: "Durée de la longue pause (ms)",
+      minUnfollowDelay: "Délai de désabonnement min (ms)",
+      maxUnfollowDelay: "Délai de désabonnement max (ms)",
+      unfollowPauseEvery: "Pause toutes les N désabonnements",
+      unfollowPauseLength: "Durée de la pause (ms)",
+      restoreDefaults: "Réinitialiser",
+      save: "Enregistrer",
+      saved: "Paramètres enregistrés",
+      cookieMissing: "Impossible de lire le cookie de connexion. Assurez-vous d'être connecté à Instagram.",
+      csrfMissing: "Impossible de lire votre session. Assurez-vous d'être connecté à Instagram.",
+      requestFailed: "Échec de la requête : {status}",
+      tooManyRequests: "Instagram limite les requêtes. Réessayez plus tard ou augmentez les délais dans les paramètres.",
+      rateLimitPaused: "Instagram vous limite. Mis en pause automatiquement — attendez quelques minutes puis appuyez sur Reprendre.",
+      keepTabOpen: "Gardez cet onglet et le navigateur ouverts — les fermer arrête le processus.",
+      close: "Fermer",
+      minimize: "Réduire",
+      expand: "Ouvrir",
+      theme: "Thème",
+      themeSystem: "Thème : système",
+      themeLight: "Thème : clair",
+      themeDark: "Thème : sombre",
+      language: "Langue",
+      selectVerified: "Sélectionner vérifiés",
+      selectPrivate: "Sélectionner privés",
+      selectNoPhoto: "Sélectionner sans photo",
+      retryFailed: "Réessayer les échecs ({count})",
+      pillScanning: "Analyse {current}/{total}",
+      pillUnfollowing: "Désabonnement {current}/{total}",
+      pillResults: "{count} non-abonnés",
+      pillIdle: "Ouvrir"
+    },
+    es: {
+      title: "Instagram Unfollower",
+      subtitle: "Mira quién no te sigue de vuelta",
+      welcomeTitle: "Listo cuando tú lo estés",
+      welcomeBody: "Solo analizamos a las personas que sigues y usamos el estado de seguimiento de Instagram para que el análisis sea rápido. No se cambia nada en tu cuenta durante el análisis.",
+      scanBtn: "Analizar ahora",
+      scanning: "Analizando",
+      loadingFollowing: "Cargando a las personas que sigues",
+      loadingFollowers: "Comprobando el seguimiento de vuelta",
+      paused: "En pausa",
+      pause: "Pausar",
+      resume: "Reanudar",
+      cancel: "Cancelar",
+      ofTotal: "{current} de {total}",
+      ofUnknown: "{current} hasta ahora",
+      scanCompletedToast: "{count} no seguidores encontrados",
+      scanFailed: "Error en el análisis",
+      retry: "Intentar de nuevo",
+      goBack: "Volver a los resultados",
+      search: "Buscar por nombre o usuario",
+      filterVerified: "Verificado",
+      filterPrivate: "Privado",
+      filterNoAvatar: "Sin foto de perfil",
+      filterShowHidden: "Usuarios ocultos",
+      foundCount: "{count} no seguidores",
+      foundOne: "1 no seguidor",
+      foundNone: "Genial — todos a los que sigues te siguen de vuelta.",
+      noMatches: "Ningún usuario coincide con tus filtros.",
+      hide: "Ocultar",
+      unhide: "Mostrar",
+      hideTooltip: "Ocultar de esta lista",
+      unhideTooltip: "Mostrar de nuevo",
+      openProfile: "Abrir perfil",
+      copy: "Copiar",
+      copyAll: "Copiar todo",
+      copiedToast: "{count} nombres de usuario copiados",
+      selectAll: "Seleccionar todo",
+      selectNone: "Limpiar",
+      selectedCount: "{count} seleccionados",
+      unfollow: "Dejar de seguir",
+      unfollowConfirmTitle: "¿Dejar de seguir a {count} usuarios?",
+      unfollowConfirmBody: "Esto se ejecuta lentamente para proteger tu cuenta de los límites de Instagram. Puedes pausar en cualquier momento, pero a quienes ya dejaste de seguir no se puede revertir desde esta herramienta.",
+      unfollowConfirmBtn: "Sí, dejar de seguir a {count}",
+      unfollowing: "Dejando de seguir",
+      currently: "Actualmente",
+      nextActionIn: "Próxima acción en {seconds}s",
+      cooldownIn: "Enfriamiento — {seconds}s",
+      idle: "Listo",
+      unfollowDoneTitle: "Hecho",
+      unfollowDoneBody: "{ok} dejados de seguir, {fail} fallidos",
+      settings: "Ajustes",
+      settingsTitle: "Ajustes de ritmo",
+      settingsBody: "Retrasos más cortos aumentan la probabilidad de que Instagram limite o bloquee tu cuenta. Mantenlos conservadores.",
+      minScanDelay: "Retraso mín. de análisis (ms)",
+      maxScanDelay: "Retraso máx. de análisis (ms)",
+      scanPauseEvery: "Pausa larga cada N páginas",
+      scanPauseLength: "Duración de la pausa larga (ms)",
+      minUnfollowDelay: "Retraso mín. al dejar de seguir (ms)",
+      maxUnfollowDelay: "Retraso máx. al dejar de seguir (ms)",
+      unfollowPauseEvery: "Enfriamiento cada N dejados de seguir",
+      unfollowPauseLength: "Duración del enfriamiento (ms)",
+      restoreDefaults: "Restaurar valores",
+      save: "Guardar",
+      saved: "Ajustes guardados",
+      cookieMissing: "No se pudo leer la cookie de inicio de sesión. Asegúrate de haber iniciado sesión en Instagram.",
+      csrfMissing: "No se pudo leer tu sesión. Asegúrate de haber iniciado sesión en Instagram.",
+      requestFailed: "La solicitud falló: {status}",
+      tooManyRequests: "Instagram está limitando las solicitudes. Inténtalo más tarde o aumenta los retrasos en los ajustes.",
+      rateLimitPaused: "Instagram te está limitando. Pausado automáticamente — espera unos minutos y pulsa Reanudar.",
+      keepTabOpen: "Mantén esta pestaña y el navegador abiertos — cerrarlos detiene el proceso.",
+      close: "Cerrar",
+      minimize: "Minimizar",
+      expand: "Abrir",
+      theme: "Tema",
+      themeSystem: "Tema: sistema",
+      themeLight: "Tema: claro",
+      themeDark: "Tema: oscuro",
+      language: "Idioma",
+      selectVerified: "Seleccionar verificados",
+      selectPrivate: "Seleccionar privados",
+      selectNoPhoto: "Seleccionar sin foto",
+      retryFailed: "Reintentar fallidos ({count})",
+      pillScanning: "Analizando {current}/{total}",
+      pillUnfollowing: "Dejando de seguir {current}/{total}",
+      pillResults: "{count} no seguidores",
+      pillIdle: "Abrir"
     }
   };
 
@@ -198,7 +486,10 @@
     open: '<svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M6 3h7v7M13 3L6.5 9.5M9 13H3V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>',
     sparkle: '<svg viewBox="0 0 24 24" width="36" height="36" aria-hidden="true"><path fill="currentColor" d="M12 2l1.8 5.4L19 9l-5.2 1.6L12 16l-1.8-5.4L5 9l5.2-1.6L12 2zm6 11l1 2.8L22 17l-3 .8L18 21l-1-3.2L14 17l3-1.2 1-2.8z"/></svg>',
     alert: '<svg viewBox="0 0 24 24" width="36" height="36" aria-hidden="true"><path fill="currentColor" d="M12 2 1 21h22L12 2zm0 6 7.5 13h-15L12 8zm-1 4v4h2v-4h-2zm0 5v2h2v-2h-2z"/></svg>',
-    check: '<svg viewBox="0 0 16 16" width="36" height="36" aria-hidden="true"><path fill="currentColor" d="M14 4.5L6 12.5l-4-4L3 7.5l3 3 7-7z"/></svg>'
+    check: '<svg viewBox="0 0 16 16" width="36" height="36" aria-hidden="true"><path fill="currentColor" d="M14 4.5L6 12.5l-4-4L3 7.5l3 3 7-7z"/></svg>',
+    sun: '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><circle cx="8" cy="8" r="3" fill="currentColor"/><g stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M8 1v1.6M8 13.4V15M1 8h1.6M13.4 8H15M3 3l1.1 1.1M11.9 11.9 13 13M13 3l-1.1 1.1M4.1 11.9 3 13"/></g></svg>',
+    moon: '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M6 1.4A6.6 6.6 0 1 0 14.6 10 5.2 5.2 0 0 1 6 1.4z"/></svg>',
+    auto: '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="1.5" y="2.5" width="13" height="9" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M5.5 14h5M8 11.5V14" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>'
   };
 
   const persisted = loadStored();
@@ -221,8 +512,16 @@
     filters: persisted.filters || { verified: true, private: true, noAvatar: true, showHidden: false },
     timings: { ...DEFAULT_TIMINGS, ...(persisted.timings || {}) },
     panelPos: persisted.panelPos || null,
+    // Persisted panel size (user can resize from any edge/corner). Null = default.
+    panelSize: (persisted.panelSize && Number.isFinite(persisted.panelSize.w) && Number.isFinite(persisted.panelSize.h)) ? persisted.panelSize : null,
     minimized: Boolean(persisted.minimized),
-    language: persisted.language === "tr" ? "tr" : "en",
+    language: LANGS.includes(persisted.language) ? persisted.language : "en",
+    // User preference: 'system' follows the OS; 'light'/'dark' force a theme.
+    theme: persisted.theme === "light" || persisted.theme === "dark" ? persisted.theme : "system",
+    // Transient (not persisted): ids that failed during the last unfollow run.
+    failed: new Set(),
+    // Set true once a permanent rate-limit auto-pauses the current operation.
+    rateLimited: false,
     error: ""
   };
 
@@ -245,8 +544,10 @@
         timings: state.timings,
         filters: state.filters,
         panelPos: state.panelPos,
+        panelSize: state.panelSize,
         minimized: state.minimized,
-        language: state.language
+        language: state.language,
+        theme: state.theme
       }));
     } catch {
       /* storage may be disabled; ignore */
@@ -280,15 +581,30 @@
     root.id = APP_ID;
     document.body.appendChild(root);
     window.__iuCleanup = unmount;
+    prefersDark.addEventListener("change", onSystemThemeChange);
+    window.addEventListener("beforeunload", onBeforeUnload);
     renderShell();
+    applyTheme();
   }
 
   function unmount() {
     stopCountdown();
     if (toastTimer) { clearTimeout(toastTimer); toastTimer = null; }
+    prefersDark.removeEventListener("change", onSystemThemeChange);
+    window.removeEventListener("beforeunload", onBeforeUnload);
     document.getElementById(APP_ID)?.remove();
     document.getElementById(STYLE_ID)?.remove();
     if (window.__iuCleanup === unmount) window.__iuCleanup = null;
+  }
+
+  // Warn before leaving while a scan/unfollow is running — closing the tab or
+  // browser stops the operation mid-way.
+  function onBeforeUnload(event) {
+    if (state.mode === "scanning" || state.mode === "unfollowing") {
+      event.preventDefault();
+      event.returnValue = "";
+      return "";
+    }
   }
 
   function renderShell() {
@@ -303,6 +619,7 @@
       `;
       root.querySelector("[data-action='expand']")?.addEventListener("click", () => setMinimized(false));
       applyPanelPosition();
+      applyTheme();
       return;
     }
     root.innerHTML = `
@@ -317,17 +634,28 @@
           </div>
           <div class="iu-header-actions">
             <button type="button" data-action="settings" aria-label="${escapeAttr(t("settings"))}" title="${escapeAttr(t("settings"))}">${SVG.gear}</button>
-            <button type="button" data-action="language" aria-label="${escapeAttr(t("langCode"))}" title="${escapeAttr(t("langCode"))}"><span data-lang>${escapeHTML(t("langCode"))}</span></button>
+            <button type="button" data-action="theme" aria-label="${escapeAttr(t("theme"))}" title="${escapeAttr(t(themeTitleKey()))}">${themeIcon()}</button>
+            <button type="button" data-action="language" aria-label="${escapeAttr(t("language"))}" title="${escapeAttr(t("language"))}"><span data-lang>${escapeHTML(state.language.toUpperCase())}</span></button>
             <button type="button" data-action="minimize" aria-label="${escapeAttr(t("minimize"))}" title="${escapeAttr(t("minimize"))}">${SVG.minimize}</button>
             <button type="button" data-action="close" aria-label="${escapeAttr(t("close"))}" title="${escapeAttr(t("close"))}">${SVG.close}</button>
           </div>
         </header>
         <div class="iu-body" data-body></div>
+        <div class="iu-resize iu-resize--n" data-resize="n"></div>
+        <div class="iu-resize iu-resize--s" data-resize="s"></div>
+        <div class="iu-resize iu-resize--e" data-resize="e"></div>
+        <div class="iu-resize iu-resize--w" data-resize="w"></div>
+        <div class="iu-resize iu-resize--ne" data-resize="ne"></div>
+        <div class="iu-resize iu-resize--nw" data-resize="nw"></div>
+        <div class="iu-resize iu-resize--se" data-resize="se"></div>
+        <div class="iu-resize iu-resize--sw" data-resize="sw"></div>
       </section>
     `;
     bindHeader(root);
     bindDrag(root.querySelector("[data-drag]"));
+    bindResize(root.querySelector(".iu-panel"));
     applyPanelPosition();
+    applyTheme();
     renderBody();
   }
 
@@ -335,7 +663,8 @@
     root.querySelector("[data-action='close']")?.addEventListener("click", () => unmount());
     root.querySelector("[data-action='minimize']")?.addEventListener("click", () => setMinimized(true));
     root.querySelector("[data-action='settings']")?.addEventListener("click", showSettings);
-    root.querySelector("[data-action='language']")?.addEventListener("click", toggleLanguage);
+    root.querySelector("[data-action='theme']")?.addEventListener("click", cycleTheme);
+    root.querySelector("[data-action='language']")?.addEventListener("click", cycleLanguage);
   }
 
   function applyPanelPosition() {
@@ -343,6 +672,13 @@
     if (!root) return;
     const node = root.querySelector(".iu-panel") || root.querySelector(".iu-pill");
     if (!node) return;
+    // Apply a persisted size to the full panel (not the minimized pill).
+    if (node.classList.contains("iu-panel") && state.panelSize) {
+      const maxW = Math.max(PANEL_MIN_WIDTH, window.innerWidth - 16);
+      const maxH = Math.max(PANEL_MIN_HEIGHT, window.innerHeight - 16);
+      node.style.width = clamp(state.panelSize.w, PANEL_MIN_WIDTH, maxW) + "px";
+      node.style.height = clamp(state.panelSize.h, PANEL_MIN_HEIGHT, maxH) + "px";
+    }
     const pos = state.panelPos;
     if (pos && Number.isFinite(pos.x) && Number.isFinite(pos.y)) {
       const max = panelBounds(node);
@@ -412,6 +748,73 @@
     };
     handle.addEventListener("pointerup", stop);
     handle.addEventListener("pointercancel", stop);
+  }
+
+  // Make the panel resizable from any edge or corner. Each handle adjusts width
+  // and/or height (and shifts left/top when dragging the top/left edges so the
+  // opposite edge stays put). The chosen size is clamped and persisted.
+  function bindResize(panel) {
+    if (!panel) return;
+    panel.querySelectorAll("[data-resize]").forEach((handle) => {
+      const dir = handle.getAttribute("data-resize");
+      let startX = 0, startY = 0, x0 = 0, y0 = 0, w0 = 0, h0 = 0, resizing = false;
+
+      handle.addEventListener("pointerdown", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        resizing = true;
+        const rect = panel.getBoundingClientRect();
+        x0 = rect.left; y0 = rect.top; w0 = rect.width; h0 = rect.height;
+        startX = event.clientX; startY = event.clientY;
+        // Pin the panel to explicit left/top so edge resizes can move it.
+        panel.style.left = x0 + "px";
+        panel.style.top = y0 + "px";
+        panel.style.right = "auto";
+        panel.style.bottom = "auto";
+        panel.style.maxWidth = "none";
+        panel.style.maxHeight = "none";
+        handle.setPointerCapture(event.pointerId);
+        panel.classList.add("iu-resizing");
+      });
+
+      handle.addEventListener("pointermove", (event) => {
+        if (!resizing) return;
+        const dx = event.clientX - startX;
+        const dy = event.clientY - startY;
+        const maxW = Math.max(PANEL_MIN_WIDTH, window.innerWidth - 8);
+        const maxH = Math.max(PANEL_MIN_HEIGHT, window.innerHeight - 8);
+        let w = w0, h = h0, left = x0, top = y0;
+
+        if (dir.includes("e")) w = clamp(w0 + dx, PANEL_MIN_WIDTH, maxW);
+        if (dir.includes("s")) h = clamp(h0 + dy, PANEL_MIN_HEIGHT, maxH);
+        if (dir.includes("w")) {
+          w = clamp(w0 - dx, PANEL_MIN_WIDTH, Math.min(maxW, x0 + w0));
+          left = x0 + (w0 - w);
+        }
+        if (dir.includes("n")) {
+          h = clamp(h0 - dy, PANEL_MIN_HEIGHT, Math.min(maxH, y0 + h0));
+          top = y0 + (h0 - h);
+        }
+
+        panel.style.width = w + "px";
+        panel.style.height = h + "px";
+        panel.style.left = Math.max(0, left) + "px";
+        panel.style.top = Math.max(0, top) + "px";
+      });
+
+      const stop = (event) => {
+        if (!resizing) return;
+        resizing = false;
+        handle.releasePointerCapture?.(event.pointerId);
+        panel.classList.remove("iu-resizing");
+        const rect = panel.getBoundingClientRect();
+        state.panelSize = { w: Math.round(rect.width), h: Math.round(rect.height) };
+        state.panelPos = { x: rect.left, y: rect.top };
+        persist();
+      };
+      handle.addEventListener("pointerup", stop);
+      handle.addEventListener("pointercancel", stop);
+    });
   }
 
   function setMinimized(value) {
@@ -499,6 +902,8 @@
           <span data-progress-counter>${escapeHTML(counter)}</span>
           <span data-countdown class="iu-muted"></span>
         </div>
+        ${state.rateLimited ? `<div class="iu-warn">${escapeHTML(t("rateLimitPaused"))}</div>` : ""}
+        <div class="iu-warn iu-warn--soft">${escapeHTML(t("keepTabOpen"))}</div>
         <div class="iu-progress-actions">
           <button type="button" class="iu-btn" data-action="pause-scan">${escapeHTML(t(state.scanPaused ? "resume" : "pause"))}</button>
           <button type="button" class="iu-btn iu-btn--ghost" data-action="cancel-scan">${escapeHTML(t("cancel"))}</button>
@@ -556,6 +961,9 @@
             <button type="button" class="iu-btn iu-btn--small" data-action="select-all" ${display.length ? "" : "disabled"}>
               ${escapeHTML(visibleSelected === display.length && display.length ? t("selectNone") : t("selectAll"))}
             </button>
+            ${display.some((u) => u.is_verified) ? `<button type="button" class="iu-btn iu-btn--small iu-btn--ghost" data-action="select-verified">${escapeHTML(t("selectVerified"))}</button>` : ""}
+            ${display.some((u) => u.is_private) ? `<button type="button" class="iu-btn iu-btn--small iu-btn--ghost" data-action="select-private">${escapeHTML(t("selectPrivate"))}</button>` : ""}
+            ${display.some((u) => isDefaultAvatar(u)) ? `<button type="button" class="iu-btn iu-btn--small iu-btn--ghost" data-action="select-no-photo">${escapeHTML(t("selectNoPhoto"))}</button>` : ""}
             <span class="iu-muted" data-selected-label>${escapeHTML(t("selectedCount", { count: state.selected.size }))}</span>
           </div>
           <div class="iu-actionbar-right">
@@ -589,7 +997,7 @@
     const hidden = state.hidden.has(user.id);
     const checked = state.selected.has(user.id);
     const tags = [];
-    if (user.is_verified) tags.push(`<span class="iu-tag iu-tag--blue">${escapeHTML(t("filterVerified"))}</span>`);
+    if (user.is_verified) tags.push(`<span class="iu-tag iu-tag--brand">${escapeHTML(t("filterVerified"))}</span>`);
     if (user.is_private) tags.push(`<span class="iu-tag">${escapeHTML(t("filterPrivate"))}</span>`);
     return `
       <div class="iu-row ${hidden ? "iu-row--hidden" : ""} ${checked ? "iu-row--selected" : ""}" data-row="${escapeAttr(user.id)}" role="button" tabindex="0">
@@ -688,6 +1096,16 @@
       renderBody();
     });
 
+    // Smart-select shortcuts: add the currently-visible accounts of a given kind
+    // to the selection (respecting active filters + search). They add, not replace.
+    const selectMatching = (pred) => {
+      getDisplayUsers().filter(pred).forEach((u) => state.selected.add(u.id));
+      renderBody();
+    };
+    body.querySelector("[data-action='select-verified']")?.addEventListener("click", () => selectMatching((u) => u.is_verified));
+    body.querySelector("[data-action='select-private']")?.addEventListener("click", () => selectMatching((u) => u.is_private));
+    body.querySelector("[data-action='select-no-photo']")?.addEventListener("click", () => selectMatching((u) => isDefaultAvatar(u)));
+
     body.querySelector("[data-action='copy']")?.addEventListener("click", copyUsernames);
     body.querySelector("[data-action='unfollow']")?.addEventListener("click", confirmUnfollow);
   }
@@ -720,7 +1138,7 @@
           <h2>${escapeHTML(state.mode === "unfollowDone" ? t("unfollowDoneTitle") : (state.unfollowPaused ? t("paused") : t("unfollowing")))}</h2>
           <p data-progress-note>${escapeHTML(state.progress.note || "")}</p>
         </div>
-        <div class="iu-bar"><span style="width:${percent}%"></span></div>
+        <div class="iu-bar"><span data-progress-bar style="width:${percent}%"></span></div>
         <div class="iu-progress-meta">
           <span>${escapeHTML(summary)}</span>
           <span data-countdown class="iu-muted"></span>
@@ -731,11 +1149,14 @@
             <strong>@${escapeHTML(last.user.username)}</strong>
             <span class="iu-tag ${last.ok ? "iu-tag--green" : "iu-tag--red"}">${last.ok ? "✓" : "✕"}</span>
           </div>` : ""}
+        ${state.mode === "unfollowing" && state.rateLimited ? `<div class="iu-warn">${escapeHTML(t("rateLimitPaused"))}</div>` : ""}
+        ${state.mode === "unfollowing" ? `<div class="iu-warn iu-warn--soft">${escapeHTML(t("keepTabOpen"))}</div>` : ""}
         <div class="iu-progress-actions">
           ${state.mode === "unfollowing" ? `
             <button type="button" class="iu-btn" data-action="pause-unfollow">${escapeHTML(t(state.unfollowPaused ? "resume" : "pause"))}</button>
             <button type="button" class="iu-btn iu-btn--ghost" data-action="cancel-unfollow">${escapeHTML(t("cancel"))}</button>
           ` : `
+            ${state.log.filter((e) => !e.ok).length ? `<button type="button" class="iu-btn iu-btn--danger" data-action="retry-failed">${escapeHTML(t("retryFailed", { count: state.log.filter((e) => !e.ok).length }))}</button>` : ""}
             <button type="button" class="iu-btn iu-btn--primary" data-action="back-results">${escapeHTML(t("goBack"))}</button>
           `}
         </div>
@@ -758,6 +1179,10 @@
       state.unfollowCancelled = false;
       renderBody();
     });
+    body.querySelector("[data-action='retry-failed']")?.addEventListener("click", () => {
+      const retryTargets = state.log.filter((e) => !e.ok).map((e) => e.user);
+      if (retryTargets.length) startUnfollow(retryTargets);
+    });
   }
 
   async function startScan() {
@@ -774,8 +1199,9 @@
     renderBody();
 
     try {
+      const sessErr = sessionError();
+      if (sessErr) throw new Error(t(sessErr));
       const viewerId = getCookie("ds_user_id");
-      if (!viewerId) throw new Error(t("cookieMissing"));
 
       const onPage = (results, totalGuess) => {
         state.progress = {
@@ -852,15 +1278,20 @@
     return dedupe(results);
   }
 
+  // Shared fetch with rate-limit resilience: retries on 429/5xx up to MAX_RETRIES
+  // with Retry-After / exponential backoff, surfacing a countdown. Pass
+  // { raw: true } to get the Response back (no JSON parse) — used by unfollow,
+  // which only cares whether the request succeeded.
   async function igFetch(url, init = {}) {
+    const { raw, headers, ...rest } = init;
     let attempt = 0;
     while (true) {
       const response = await fetch(url, {
         credentials: "include",
-        headers: { ...IG_HEADERS, ...(init.headers || {}) },
-        ...init
+        ...rest,
+        headers: { ...IG_HEADERS, ...(headers || {}) }
       });
-      if (response.ok) return response.json();
+      if (response.ok) return raw ? response : response.json();
       if (response.status === 429 || (response.status >= 500 && response.status < 600)) {
         if (attempt >= MAX_RETRIES) {
           if (response.status === 429) throw new Error(t("tooManyRequests"));
@@ -893,23 +1324,26 @@
       body: t("unfollowConfirmBody"),
       confirmLabel: t("unfollowConfirmBtn", { count }),
       destructive: true,
-      onConfirm: () => startUnfollow()
+      onConfirm: () => startUnfollow(state.users.filter((u) => state.selected.has(u.id)))
     });
   }
 
-  async function startUnfollow() {
-    const targets = state.users.filter((u) => state.selected.has(u.id));
+  async function startUnfollow(targets) {
+    targets = (targets || []).filter(Boolean);
     if (!targets.length) return;
-    const csrf = getCookie("csrftoken");
-    if (!csrf) {
-      toast(t("csrfMissing"));
+    const sessErr = sessionError();
+    if (sessErr) {
+      toast(t(sessErr));
       return;
     }
+    const csrf = getCookie("csrftoken");
 
     state.mode = "unfollowing";
     state.unfollowPaused = false;
     state.unfollowCancelled = false;
+    state.rateLimited = false;
     state.log = [];
+    state.failed.clear();
     state.progress = { current: 0, total: targets.length, label: "unfollowing", note: "" };
     renderBody();
 
@@ -920,16 +1354,35 @@
 
       const user = targets[i];
       let ok = false;
+      let rateLimited = false;
       try {
         ok = await unfollowUser(user.id, csrf);
       } catch (error) {
         console.error("[iu] unfollow failed for", user.username, error);
+        rateLimited = error && error.message === t("tooManyRequests");
       }
+
+      // Permanent rate-limit: auto-pause instead of silently failing, surface a
+      // clear warning, and re-try the SAME user once the user resumes.
+      if (rateLimited && !state.unfollowCancelled) {
+        state.rateLimited = true;
+        state.unfollowPaused = true;
+        renderBody();
+        await waitWhile(() => state.unfollowPaused && !state.unfollowCancelled);
+        if (state.unfollowCancelled) break;
+        state.rateLimited = false;
+        i -= 1; // retry this user
+        continue;
+      }
+
       state.log.push({ user, ok });
       if (ok) {
+        state.failed.delete(user.id);
         state.selected.delete(user.id);
         const userRef = state.users.find((u) => u.id === user.id);
         if (userRef) userRef.unfollowed = true;
+      } else {
+        state.failed.add(user.id);
       }
       processed += 1;
       state.progress = { current: processed, total: targets.length, label: "unfollowing", note: "" };
@@ -952,22 +1405,21 @@
   }
 
   async function unfollowUser(id, csrf) {
-    const headers = {
-      "content-type": "application/x-www-form-urlencoded",
-      "x-csrftoken": csrf
+    const init = {
+      method: "POST",
+      raw: true,
+      headers: {
+        "content-type": "application/x-www-form-urlencoded",
+        "x-csrftoken": csrf
+      }
     };
-    let response = await fetch(`/api/v1/friendships/destroy/${id}/`, {
-      method: "POST",
-      credentials: "include",
-      headers: { ...IG_HEADERS, ...headers }
-    });
-    if (response.ok) return true;
-    response = await fetch(`/web/friendships/${id}/unfollow/`, {
-      method: "POST",
-      credentials: "include",
-      headers: { ...IG_HEADERS, ...headers }
-    });
-    return response.ok;
+    // Both endpoints go through igFetch, so a 429/5xx auto-backs-off (and a
+    // permanent rate-limit throws, letting startUnfollow auto-pause). The first
+    // is the modern API; the second is a fallback for other failures.
+    const primary = await igFetch(`/api/v1/friendships/destroy/${id}/`, init);
+    if (primary.ok) return true;
+    const fallback = await igFetch(`/web/friendships/${id}/unfollow/`, init);
+    return fallback.ok;
   }
 
   async function copyUsernames() {
@@ -1066,10 +1518,44 @@
     }
   }
 
-  function toggleLanguage() {
-    state.language = state.language === "tr" ? "en" : "tr";
+  function cycleLanguage() {
+    const i = LANGS.indexOf(state.language);
+    state.language = LANGS[(i + 1) % LANGS.length];
     persist();
     renderShell();
+  }
+
+  // --- Theme (light / dark / system) -----------------------------------------
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
+
+  function resolvedTheme() {
+    if (state.theme === "light" || state.theme === "dark") return state.theme;
+    return prefersDark.matches ? "dark" : "light";
+  }
+
+  function applyTheme() {
+    document.getElementById(APP_ID)?.classList.toggle("iu-theme-light", resolvedTheme() === "light");
+  }
+
+  function cycleTheme() {
+    // system -> light -> dark -> system
+    state.theme = state.theme === "system" ? "light" : state.theme === "light" ? "dark" : "system";
+    persist();
+    renderShell();
+  }
+
+  function themeIcon() {
+    if (state.theme === "light") return SVG.sun;
+    if (state.theme === "dark") return SVG.moon;
+    return SVG.auto;
+  }
+
+  function themeTitleKey() {
+    return state.theme === "light" ? "themeLight" : state.theme === "dark" ? "themeDark" : "themeSystem";
+  }
+
+  function onSystemThemeChange() {
+    if (state.theme === "system") applyTheme();
   }
 
   function getDisplayUsers() {
@@ -1113,6 +1599,18 @@
   function getCookie(name) {
     const match = document.cookie.match(new RegExp("(^|; )" + name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "=([^;]*)"));
     return match ? decodeURIComponent(match[2]) : null;
+  }
+
+  // Verify the user is logged in before any network work. Distinguishes a
+  // missing/expired session from a rate-limit so we can guide the user correctly.
+  // NOTE: Instagram's `sessionid` cookie is HttpOnly, so it's never visible to
+  // document.cookie — we must NOT check it here or logged-in users always fail.
+  // `ds_user_id` (the viewer id) and `csrftoken` are readable and sufficient.
+  // Returns an i18n error key if something's wrong, else null.
+  function sessionError() {
+    if (!getCookie("ds_user_id")) return "cookieMissing";
+    if (!getCookie("csrftoken")) return "csrfMissing";
+    return null;
   }
 
   function sleep(ms) {
@@ -1224,24 +1722,42 @@
 
   const CSS = `
     #${APP_ID}, #${APP_ID} * { box-sizing: border-box; }
+    /* Dark palette (default) — mirrors the website's brand greens (oklch hue 150)
+       and surface tokens so the panel matches the site's design language. */
     #${APP_ID} {
-      --iu-bg: #15171d;
-      --iu-bg-2: #1c1f27;
-      --iu-bg-3: #232733;
-      --iu-line: rgba(255,255,255,0.08);
-      --iu-line-strong: rgba(255,255,255,0.16);
-      --iu-text: #f1f3f5;
-      --iu-muted: #8b94a3;
-      --iu-accent: #4f8cff;
-      --iu-accent-2: #6ea6ff;
+      --iu-bg: oklch(0.18 0.005 250);
+      --iu-bg-2: oklch(0.22 0.006 250);
+      --iu-bg-3: oklch(0.26 0.007 250);
+      --iu-line: oklch(0.30 0.008 250);
+      --iu-line-strong: oklch(0.38 0.009 250);
+      --iu-text: oklch(0.97 0 0);
+      --iu-muted: oklch(0.72 0.01 250);
+      --iu-accent: oklch(0.70 0.17 150);
+      --iu-accent-2: oklch(0.78 0.16 150);
+      --iu-accent-ink: oklch(0.18 0.005 250);
       --iu-danger: #ef4444;
-      --iu-success: #22c55e;
+      --iu-success: oklch(0.70 0.17 150);
       position: fixed;
       inset: 0;
       pointer-events: none;
       z-index: 2147483647;
       color: var(--iu-text);
-      font: 14px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif;
+      font: 14px/1.45 'Inter Variable', Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    }
+    /* Light palette — mirrors the site's light surface + brand tokens. */
+    #${APP_ID}.iu-theme-light {
+      --iu-bg: oklch(0.98 0.003 250);
+      --iu-bg-2: oklch(0.96 0.004 250);
+      --iu-bg-3: oklch(0.92 0.006 250);
+      --iu-line: oklch(0.87 0.008 250);
+      --iu-line-strong: oklch(0.80 0.010 250);
+      --iu-text: oklch(0.22 0.01 250);
+      --iu-muted: oklch(0.50 0.01 250);
+      --iu-accent: oklch(0.60 0.17 150);
+      --iu-accent-2: oklch(0.68 0.16 150);
+      --iu-accent-ink: #ffffff;
+      --iu-danger: #dc2626;
+      --iu-success: oklch(0.60 0.17 150);
     }
     #${APP_ID} > * { pointer-events: auto; }
     #${APP_ID} button, #${APP_ID} input, #${APP_ID} a { font: inherit; color: inherit; }
@@ -1257,11 +1773,22 @@
       flex-direction: column;
       background: var(--iu-bg);
       border: 1px solid var(--iu-line);
-      border-radius: 14px;
+      border-radius: 12px;
       box-shadow: 0 24px 60px rgba(0,0,0,0.45), 0 2px 6px rgba(0,0,0,0.3);
       overflow: hidden;
       animation: iu-pop 0.18s ease-out;
     }
+    #${APP_ID} .iu-panel.iu-resizing { user-select: none; }
+    /* Resize handles: thin strips on the 4 edges, small squares on the 4 corners. */
+    #${APP_ID} .iu-resize { position: absolute; z-index: 5; touch-action: none; }
+    #${APP_ID} .iu-resize--n { top: -3px; left: 8px; right: 8px; height: 8px; cursor: ns-resize; }
+    #${APP_ID} .iu-resize--s { bottom: -3px; left: 8px; right: 8px; height: 8px; cursor: ns-resize; }
+    #${APP_ID} .iu-resize--e { right: -3px; top: 8px; bottom: 8px; width: 8px; cursor: ew-resize; }
+    #${APP_ID} .iu-resize--w { left: -3px; top: 8px; bottom: 8px; width: 8px; cursor: ew-resize; }
+    #${APP_ID} .iu-resize--ne { top: -4px; right: -4px; width: 14px; height: 14px; cursor: nesw-resize; }
+    #${APP_ID} .iu-resize--nw { top: -4px; left: -4px; width: 14px; height: 14px; cursor: nwse-resize; }
+    #${APP_ID} .iu-resize--se { bottom: -4px; right: -4px; width: 14px; height: 14px; cursor: nwse-resize; }
+    #${APP_ID} .iu-resize--sw { bottom: -4px; left: -4px; width: 14px; height: 14px; cursor: nesw-resize; }
     @keyframes iu-pop {
       from { opacity: 0; transform: translateY(8px) scale(0.985); }
       to { opacity: 1; transform: translateY(0) scale(1); }
@@ -1276,7 +1803,7 @@
       border-bottom: 1px solid var(--iu-line);
       cursor: grab;
       user-select: none;
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+      background: linear-gradient(180deg, color-mix(in srgb, var(--iu-text) 3%, transparent), transparent);
     }
     #${APP_ID} .iu-header.iu-dragging { cursor: grabbing; }
     #${APP_ID} .iu-brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
@@ -1284,7 +1811,7 @@
       width: 10px;
       height: 10px;
       border-radius: 50%;
-      background: linear-gradient(135deg, var(--iu-accent), var(--iu-success));
+      background: var(--iu-accent);
       flex-shrink: 0;
     }
     #${APP_ID} .iu-brand-text { min-width: 0; }
@@ -1329,11 +1856,11 @@
       display: grid;
       place-items: center;
       border-radius: 50%;
-      background: rgba(79,140,255,0.15);
+      background: color-mix(in srgb, var(--iu-accent) 15%, transparent);
       color: var(--iu-accent);
       margin-bottom: 4px;
     }
-    #${APP_ID} .iu-welcome-icon--error { background: rgba(239,68,68,0.15); color: var(--iu-danger); }
+    #${APP_ID} .iu-welcome-icon--error { background: color-mix(in srgb, var(--iu-danger) 15%, transparent); color: var(--iu-danger); }
     #${APP_ID} .iu-welcome h2 { margin: 0; font-size: 17px; font-weight: 600; }
     #${APP_ID} .iu-welcome p { margin: 0; color: var(--iu-muted); font-size: 13px; max-width: 300px; }
 
@@ -1350,10 +1877,10 @@
     #${APP_ID} .iu-btn:hover:not(:disabled) { background: var(--iu-bg-3); border-color: var(--iu-line-strong); }
     #${APP_ID} .iu-btn:active:not(:disabled) { transform: scale(0.98); }
     #${APP_ID} .iu-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-    #${APP_ID} .iu-btn--primary { background: var(--iu-accent); border-color: var(--iu-accent); color: #061224; }
+    #${APP_ID} .iu-btn--primary { background: var(--iu-accent); border-color: var(--iu-accent); color: var(--iu-accent-ink); }
     #${APP_ID} .iu-btn--primary:hover:not(:disabled) { background: var(--iu-accent-2); border-color: var(--iu-accent-2); }
     #${APP_ID} .iu-btn--danger { background: var(--iu-danger); border-color: var(--iu-danger); color: #fff; }
-    #${APP_ID} .iu-btn--danger:hover:not(:disabled) { background: #f25555; border-color: #f25555; }
+    #${APP_ID} .iu-btn--danger:hover:not(:disabled) { background: color-mix(in srgb, var(--iu-danger) 85%, white); border-color: color-mix(in srgb, var(--iu-danger) 85%, white); }
     #${APP_ID} .iu-btn--ghost { background: transparent; }
     #${APP_ID} .iu-btn--lg { padding: 10px 20px; font-size: 14px; margin-top: 8px; }
     #${APP_ID} .iu-btn--small { padding: 6px 10px; font-size: 12px; }
@@ -1364,13 +1891,13 @@
     #${APP_ID} .iu-bar {
       height: 6px;
       border-radius: 3px;
-      background: rgba(255,255,255,0.06);
+      background: color-mix(in srgb, var(--iu-text) 8%, transparent);
       overflow: hidden;
     }
     #${APP_ID} .iu-bar > span {
       display: block;
       height: 100%;
-      background: linear-gradient(90deg, var(--iu-accent), var(--iu-success));
+      background: var(--iu-accent);
       transition: width 0.3s ease;
     }
     #${APP_ID} .iu-progress-meta {
@@ -1390,6 +1917,20 @@
       font-size: 12px;
     }
     #${APP_ID} .iu-current strong { font-weight: 600; }
+    #${APP_ID} .iu-warn {
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      line-height: 1.4;
+      background: color-mix(in srgb, var(--iu-danger) 14%, transparent);
+      border: 1px solid color-mix(in srgb, var(--iu-danger) 35%, transparent);
+      color: var(--iu-text);
+    }
+    #${APP_ID} .iu-warn--soft {
+      background: color-mix(in srgb, var(--iu-accent) 12%, transparent);
+      border-color: color-mix(in srgb, var(--iu-accent) 30%, transparent);
+      color: var(--iu-text);
+    }
 
     #${APP_ID} .iu-results {
       flex: 1 1 auto;
@@ -1418,6 +1959,7 @@
     }
     #${APP_ID} .iu-search:focus { border-color: var(--iu-accent); }
     #${APP_ID} .iu-search::-webkit-search-cancel-button { filter: invert(1) opacity(0.5); }
+    #${APP_ID}.iu-theme-light .iu-search::-webkit-search-cancel-button { filter: opacity(0.5); }
 
     #${APP_ID} .iu-filters {
       display: flex;
@@ -1438,14 +1980,13 @@
       transition: border-color 0.15s, color 0.15s, background 0.15s;
     }
     #${APP_ID} .iu-chip:hover { border-color: var(--iu-line-strong); color: var(--iu-text); }
-    #${APP_ID} .iu-chip--on { background: rgba(79,140,255,0.12); border-color: rgba(79,140,255,0.5); color: var(--iu-accent-2); }
+    #${APP_ID} .iu-chip--on { background: color-mix(in srgb, var(--iu-accent) 12%, transparent); border-color: color-mix(in srgb, var(--iu-accent) 50%, transparent); color: var(--iu-accent-2); }
     #${APP_ID} .iu-chip-tick { display: inline-grid; place-items: center; width: 12px; height: 12px; }
     #${APP_ID} .iu-chip-tick svg { width: 12px; height: 12px; }
 
     #${APP_ID} .iu-list {
       flex: 1 1 auto;
       min-height: 100px;
-      max-height: 50vh;
       overflow-y: auto;
       overscroll-behavior: contain;
       border-top: 1px solid var(--iu-line);
@@ -1464,13 +2005,13 @@
       padding: 8px 16px;
       align-items: center;
       cursor: pointer;
-      border-bottom: 1px solid rgba(255,255,255,0.04);
+      border-bottom: 1px solid var(--iu-line);
       transition: background 0.1s;
     }
-    #${APP_ID} .iu-row:hover { background: rgba(255,255,255,0.02); }
-    #${APP_ID} .iu-row:focus-visible { outline: none; background: rgba(79,140,255,0.06); }
-    #${APP_ID} .iu-row--selected { background: rgba(79,140,255,0.08); }
-    #${APP_ID} .iu-row--selected:hover { background: rgba(79,140,255,0.12); }
+    #${APP_ID} .iu-row:hover { background: color-mix(in srgb, var(--iu-text) 4%, transparent); }
+    #${APP_ID} .iu-row:focus-visible { outline: none; background: color-mix(in srgb, var(--iu-accent) 6%, transparent); }
+    #${APP_ID} .iu-row--selected { background: color-mix(in srgb, var(--iu-accent) 8%, transparent); }
+    #${APP_ID} .iu-row--selected:hover { background: color-mix(in srgb, var(--iu-accent) 12%, transparent); }
     #${APP_ID} .iu-row:last-child { border-bottom: none; }
     #${APP_ID} .iu-row--hidden { opacity: 0.55; }
     #${APP_ID} .iu-row-check {
@@ -1537,18 +2078,19 @@
       border-radius: 4px;
       font-size: 10px;
       font-weight: 600;
-      background: rgba(255,255,255,0.06);
+      background: color-mix(in srgb, var(--iu-text) 8%, transparent);
       color: var(--iu-muted);
       letter-spacing: 0.02em;
       text-transform: uppercase;
     }
-    #${APP_ID} .iu-tag--blue { background: rgba(79,140,255,0.15); color: var(--iu-accent-2); }
-    #${APP_ID} .iu-tag--green { background: rgba(34,197,94,0.15); color: var(--iu-success); }
-    #${APP_ID} .iu-tag--red { background: rgba(239,68,68,0.15); color: var(--iu-danger); }
+    #${APP_ID} .iu-tag--brand { background: color-mix(in srgb, var(--iu-accent) 12%, transparent); border: 1px solid color-mix(in srgb, var(--iu-accent) 30%, transparent); color: var(--iu-accent-2); }
+    #${APP_ID} .iu-tag--green { background: color-mix(in srgb, var(--iu-success) 15%, transparent); color: var(--iu-success); }
+    #${APP_ID} .iu-tag--red { background: color-mix(in srgb, var(--iu-danger) 15%, transparent); color: var(--iu-danger); }
 
     #${APP_ID} .iu-actionbar {
       flex-shrink: 0;
       display: flex;
+      flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
       gap: 8px;
@@ -1559,6 +2101,7 @@
     #${APP_ID} .iu-actionbar-left,
     #${APP_ID} .iu-actionbar-right {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       gap: 8px;
       min-width: 0;
@@ -1606,7 +2149,7 @@
       bottom: 12px;
       transform: translateX(-50%);
       padding: 8px 14px;
-      background: rgba(20,22,28,0.95);
+      background: var(--iu-bg-2);
       border: 1px solid var(--iu-line);
       border-radius: 999px;
       font-size: 12px;

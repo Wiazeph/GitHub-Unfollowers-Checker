@@ -203,6 +203,16 @@ export const fr: Translation = {
     riskTitle: 'À utiliser à votre discrétion',
     riskBody:
       'Le désabonnement en masse peut enfreindre les politiques d’Instagram sur les comportements automatisés et déclencher un blocage temporaire des actions. L’outil espace les requêtes avec des délais et des pauses aléatoires pour rester humain, mais l’utilisation se fait à vos risques. Encore une fois : rien ne quitte votre navigateur.',
+    featuresTitle: 'Ce que le panneau permet',
+    features: {
+      scan: 'Analyse uniquement les personnes que vous suivez et utilise le statut de suivi d’Instagram — il reste rapide même sur les grands comptes.',
+      manage: 'Recherchez et filtrez par vérifié / privé / sans photo de profil, avec des raccourcis « sélectionner tous les vérifiés / privés / sans photo ».',
+      unfollow: 'Sélectionnez des comptes et désabonnez-vous en masse, avec une barre de progression en direct et une nouvelle tentative en un clic pour les échecs.',
+      safety: 'Des délais et pauses aléatoires gardent un comportement humain ; en cas de limitation, l’outil ralentit et se met en pause au lieu d’échouer en silence.',
+      settings: 'Réglez chaque délai (analyse/désabonnement, pauses) dans les paramètres, ou rétablissez les valeurs prudentes par défaut.',
+      comfort: 'Déplacez le panneau où vous voulez, redimensionnez-le depuis n’importe quel bord, réduisez-le et changez de thème (clair/sombre/système) et de langue — vos choix sont mémorisés.',
+    },
+    inspiredBy: 'Inspiré des workflows de',
   },
 
   twitter: {

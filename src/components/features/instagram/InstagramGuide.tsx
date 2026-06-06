@@ -8,6 +8,7 @@ import {
   Terminal,
   Bookmark,
   Hand,
+  Sparkles,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
@@ -22,6 +23,25 @@ import { useTranslation } from 'react-i18next'
  */
 
 const SCRIPT_PATH = '/instagram-unfollower.js'
+
+// The capabilities listed in the "What the panel can do" section (i18n keys).
+const FEATURE_KEYS = [
+  'scan',
+  'manage',
+  'unfollow',
+  'safety',
+  'settings',
+  'comfort',
+] as const
+
+// Prior art whose workflows inspired the bundled console script.
+const INSPIRATION = [
+  { label: 'cobanov/instagram', url: 'https://github.com/cobanov/instagram' },
+  {
+    label: 'davidarroyo1234/InstagramUnfollowers',
+    url: 'https://github.com/davidarroyo1234/InstagramUnfollowers',
+  },
+]
 
 export const InstagramGuide = () => {
   const { t } = useTranslation()
@@ -123,6 +143,25 @@ export const InstagramGuide = () => {
       <div className="rounded-lg border border-border bg-surface px-4 py-3">
         <p className="text-sm text-fg">{t('instagram.introBody')}</p>
         <p className="mt-2 text-sm text-fg-muted">{t('instagram.introPrivacy')}</p>
+      </div>
+
+      {/* What the panel can do */}
+      <div className="rounded-lg border border-border bg-surface px-4 py-3">
+        <div className="flex items-center gap-2 text-sm font-medium text-fg">
+          <Sparkles className="h-4 w-4 text-brand-400" aria-hidden="true" />
+          {t('instagram.featuresTitle')}
+        </div>
+        <ul className="mt-2.5 flex flex-col gap-2">
+          {FEATURE_KEYS.map((key) => (
+            <li key={key} className="flex gap-2 text-sm text-fg-muted">
+              <Check
+                className="mt-0.5 h-4 w-4 shrink-0 text-brand-400"
+                aria-hidden="true"
+              />
+              <span>{t(`instagram.features.${key}`)}</span>
+            </li>
+          ))}
+        </ul>
       </div>
 
       {/* The script + copy button */}
@@ -244,6 +283,24 @@ export const InstagramGuide = () => {
           <p className="text-fg-muted">{t('instagram.riskBody')}</p>
         </div>
       </div>
+
+      {/* Attribution — prior art whose workflows inspired this script. */}
+      <p className="text-xs text-fg-muted">
+        {t('instagram.inspiredBy')}{' '}
+        {INSPIRATION.map((repo, index) => (
+          <span key={repo.url}>
+            {index > 0 && ' · '}
+            <a
+              href={repo.url}
+              target="_blank"
+              rel="noreferrer"
+              className="font-medium text-brand-400 underline-offset-2 hover:underline"
+            >
+              {repo.label}
+            </a>
+          </span>
+        ))}
+      </p>
     </div>
   )
 }
