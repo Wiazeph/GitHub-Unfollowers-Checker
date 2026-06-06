@@ -5,6 +5,7 @@ import {
   ShieldAlert,
   ExternalLink,
   LoaderCircle,
+  Terminal,
 } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -69,16 +70,17 @@ export const InstagramGuide = () => {
         </p>
       </div>
 
-      {/* Copy the code */}
-      <div className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <span className="text-sm font-medium text-fg">
-            Step 1 — copy the script
+      {/* The script + copy button */}
+      <div className="overflow-hidden rounded-lg border border-border bg-bg">
+        <div className="flex items-center justify-between gap-3 border-b border-border bg-surface px-3 py-2">
+          <span className="inline-flex items-center gap-2 font-mono text-xs text-fg-muted">
+            <Terminal className="h-3.5 w-3.5" aria-hidden="true" />
+            Paste into the DevTools console
           </span>
           <button
             onClick={copyCode}
             disabled={!code}
-            className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-bg outline-none transition-colors hover:bg-brand-600 focus-visible:ring-2 focus-visible:ring-brand-400 disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex cursor-pointer items-center gap-1.5 rounded-md bg-brand-500 px-3 py-1.5 text-sm font-medium text-bg outline-none transition-colors hover:bg-brand-600 focus-visible:ring-2 focus-visible:ring-brand-400 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {code === null ? (
               <>
@@ -104,16 +106,21 @@ export const InstagramGuide = () => {
             )}
           </button>
         </div>
-        <p className="text-xs text-fg-muted">
-          A one-time script you paste yourself — it isn&apos;t installed and
-          changes nothing until you run it.
-        </p>
+        <pre className="max-h-56 overflow-auto px-3 py-3 text-xs leading-relaxed text-fg-muted">
+          <code className="font-mono break-all whitespace-pre-wrap">
+            {code === null ? 'Loading the script…' : code}
+          </code>
+        </pre>
       </div>
+      <p className="-mt-2 text-xs text-fg-muted">
+        A one-time script you paste yourself — it isn&apos;t installed and
+        changes nothing until you run it.
+      </p>
 
       {/* Steps */}
       <ol className="flex flex-col gap-3">
         {[
-          <>Copy the script with the button above.</>,
+          <>Copy the script using the button above.</>,
           <>
             Open{' '}
             <a
@@ -127,13 +134,23 @@ export const InstagramGuide = () => {
             in this browser and make sure you&apos;re signed in.
           </>,
           <>
-            Open the developer console:{' '}
-            <span className="font-medium text-fg">F12</span> (or{' '}
-            <span className="font-medium text-fg">
-              {'Cmd+Option+J'}
-            </span>{' '}
-            on Mac), then click the{' '}
-            <span className="font-medium text-fg">Console</span> tab.
+            Open the developer console, then click the{' '}
+            <span className="font-medium text-fg">Console</span> tab:
+            <span className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1 text-xs text-fg-muted">
+              <span>
+                <span className="font-medium text-fg">Windows / Linux:</span>{' '}
+                <kbd className="rounded bg-surface px-1 font-mono">F12</kbd> or{' '}
+                <kbd className="rounded bg-surface px-1 font-mono">
+                  Ctrl+Shift+J
+                </kbd>
+              </span>
+              <span>
+                <span className="font-medium text-fg">Mac:</span>{' '}
+                <kbd className="rounded bg-surface px-1 font-mono">
+                  Cmd+Option+J
+                </kbd>
+              </span>
+            </span>
           </>,
           <>
             Paste the script and press{' '}
