@@ -84,6 +84,9 @@ export const de: Translation = {
     errorBody:
       'Wir konnten diese Prüfung nicht abschließen. Details findest du in der Benachrichtigung — versuch es erneut.',
     reportIssue: 'Tritt es weiterhin auf? Melde ein Problem',
+    prevPage: 'Zurück',
+    nextPage: 'Weiter',
+    pageOf: 'Seite {{page}} von {{total}}',
     loading: {
       following: 'Folgt-Liste wird abgerufen…',
       followers: 'Follower werden gesammelt…',

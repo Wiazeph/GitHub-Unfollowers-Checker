@@ -82,6 +82,9 @@ export const en = {
     errorBody:
       "We couldn't complete that check. See the notification for details and try again.",
     reportIssue: 'Keeps happening? Report an issue',
+    prevPage: 'Previous',
+    nextPage: 'Next',
+    pageOf: 'Page {{page}} of {{total}}',
     loading: {
       following: 'Fetching the following list…',
       followers: 'Gathering followers…',

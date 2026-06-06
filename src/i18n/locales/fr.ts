@@ -84,6 +84,9 @@ export const fr: Translation = {
     errorBody:
       'Nous n’avons pas pu terminer cette vérification. Consultez la notification pour les détails et réessayez.',
     reportIssue: 'Cela persiste ? Signalez un problème',
+    prevPage: 'Précédent',
+    nextPage: 'Suivant',
+    pageOf: 'Page {{page}} sur {{total}}',
     loading: {
       following: 'Récupération de la liste des abonnements…',
       followers: 'Collecte des abonnés…',

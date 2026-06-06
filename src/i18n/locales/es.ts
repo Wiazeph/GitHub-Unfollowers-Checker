@@ -84,6 +84,9 @@ export const es: Translation = {
     errorBody:
       'No pudimos completar esa comprobación. Mira la notificación para más detalles e inténtalo de nuevo.',
     reportIssue: '¿Sigue ocurriendo? Informa de un problema',
+    prevPage: 'Anterior',
+    nextPage: 'Siguiente',
+    pageOf: 'Página {{page}} de {{total}}',
     loading: {
       following: 'Obteniendo la lista de seguidos…',
       followers: 'Reuniendo seguidores…',

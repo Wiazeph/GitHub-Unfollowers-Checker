@@ -84,6 +84,9 @@ export const tr: Translation = {
     errorBody:
       'Bu kontrolü tamamlayamadık. Ayrıntılar için bildirime bak ve tekrar dene.',
     reportIssue: 'Sürekli mi oluyor? Bir sorun bildir',
+    prevPage: 'Önceki',
+    nextPage: 'Sonraki',
+    pageOf: 'Sayfa {{page}} / {{total}}',
     loading: {
       following: 'Takip edilenler listesi alınıyor…',
       followers: 'Takipçiler toplanıyor…',

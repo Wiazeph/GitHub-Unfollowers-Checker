@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import {
   UserSearch,
   PartyPopper,
@@ -8,11 +8,14 @@ import {
   Check,
   LoaderCircle,
   UserMinus,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { useTranslation, Trans } from 'react-i18next'
 import { ConfirmDialog } from '../../ui/ConfirmDialog'
 import { useUnfollow } from '../../../hooks/useUnfollow'
+import { usePageSize } from '../../../hooks/usePageSize'
 import { login, loginBluesky } from '../../../api/client'
 import { PLATFORMS, normalizeHandle } from '../../../platforms'
 import type { Account, PlatformId, UnfollowersResponse } from '../../../types/platform'
@@ -101,9 +104,15 @@ const ResultsState = ({
   // Local copy so we can drop users as they get unfollowed.
   const [users, setUsers] = useState(initialUnfollowers)
   // Selection is keyed by Account.id (stable across platforms; a DID on Bluesky).
+  // The Set spans the whole list, so selections persist across pages.
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [pendingTargets, setPendingTargets] = useState<string[]>([])
+
+  // Pagination — show a bounded number of cards per page (responsive).
+  const pageSize = usePageSize()
+  const [page, setPage] = useState(0)
+  const topRef = useRef<HTMLDivElement>(null)
 
   // The unfollow API identifies targets differently per platform: GitHub uses
   // the handle (login), Bluesky uses the account id (DID). Map selected ids to
@@ -139,6 +148,18 @@ const ResultsState = ({
   const count = users.length
   const allSelected = count > 0 && selected.size === count
 
+  const pageCount = Math.max(1, Math.ceil(count / pageSize))
+  // Clamp on read so a shrinking list (after unfollows) or a pageSize change
+  // never strands us on an out-of-range page — no effect/extra render needed.
+  const safePage = Math.min(page, pageCount - 1)
+  const pageStart = safePage * pageSize
+  const visibleUsers = users.slice(pageStart, pageStart + pageSize)
+
+  const goToPage = (next: number) => {
+    setPage(next)
+    topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
   const toggle = (id: string) => {
     setSelected((prev) => {
       const next = new Set(prev)
@@ -168,7 +189,7 @@ const ResultsState = ({
   )
 
   return (
-    <div className="flex flex-col gap-4">
+    <div ref={topRef} className="flex flex-col gap-4 scroll-mt-4">
       <OnboardingHint show={isOwnList} />
 
       {/* Context line */}
@@ -239,7 +260,7 @@ const ResultsState = ({
       )}
 
       <Grid>
-        {users.map((user) => (
+        {visibleUsers.map((user) => (
           <UnfollowerCard
             key={user.id}
             user={user}
@@ -250,6 +271,14 @@ const ResultsState = ({
           />
         ))}
       </Grid>
+
+      {pageCount > 1 && (
+        <Pagination
+          page={safePage}
+          pageCount={pageCount}
+          onChange={goToPage}
+        />
+      )}
 
       <ConfirmDialog
         open={confirmOpen}
@@ -264,6 +293,41 @@ const ResultsState = ({
           setPendingTargets([])
         }}
       />
+    </div>
+  )
+}
+
+const Pagination = ({
+  page,
+  pageCount,
+  onChange,
+}: {
+  page: number
+  pageCount: number
+  onChange: (page: number) => void
+}) => {
+  const { t } = useTranslation()
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <button
+        onClick={() => onChange(page - 1)}
+        disabled={page === 0}
+        className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-border bg-surface px-3 py-1.5 text-sm font-medium text-fg outline-none transition-colors hover:bg-surface-hover focus-visible:ring-2 focus-visible:ring-brand-400 disabled:cursor-not-allowed disabled:opacity-40"
+      >
+        <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+        {t('results.prevPage')}
+      </button>
+      <span className="text-sm text-fg-muted" aria-live="polite">
+        {t('results.pageOf', { page: page + 1, total: pageCount })}
+      </span>
+      <button
+        onClick={() => onChange(page + 1)}
+        disabled={page >= pageCount - 1}
+        className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-border bg-surface px-3 py-1.5 text-sm font-medium text-fg outline-none transition-colors hover:bg-surface-hover focus-visible:ring-2 focus-visible:ring-brand-400 disabled:cursor-not-allowed disabled:opacity-40"
+      >
+        {t('results.nextPage')}
+        <ChevronRight className="h-4 w-4" aria-hidden="true" />
+      </button>
     </div>
   )
 }
