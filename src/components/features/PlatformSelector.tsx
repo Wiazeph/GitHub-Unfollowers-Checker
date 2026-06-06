@@ -102,7 +102,7 @@ export const PlatformSelector = ({ value, onChange }: PlatformSelectorProps) => 
       </div>
 
       {/* Divider + pinned actions (theme, language). */}
-      <div className="h-6 w-px shrink-0 bg-border" aria-hidden="true" />
+      <div className="h-full w-px shrink-0 bg-border" aria-hidden="true" />
       <div className="flex shrink-0 items-center gap-1">
         <ThemeToggle />
         <LanguageToggle />
