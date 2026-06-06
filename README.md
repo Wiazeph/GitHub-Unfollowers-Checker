@@ -23,7 +23,14 @@ See who you follow that doesn't follow you back — across **GitHub**, **Bluesky
 
 ## Privacy & security
 
+- **No data is stored.** There's no database; follower/following lists are fetched, compared, and returned for a single request — never logged or saved.
 - Public follower data (GitHub, Bluesky) is read through serverless functions that hold the API credentials, so tokens never reach the browser.
-- Sign-in tokens are kept server-side (GitHub: signed http-only cookie; Bluesky: stored server-side, only the account id rides in the cookie).
+- Sign-in tokens are kept server-side (GitHub: signed http-only cookie; Bluesky: stored server-side, only the account id rides in the cookie) and are not persisted beyond the actions you take.
 - The X archive diff and the Instagram script run entirely client-side in your own browser — your files and session never leave your device.
 - Bulk unfollowing affects only your own account, and only after an explicit confirmation.
+
+## Disclaimer
+
+This is a free, personal utility and is **not affiliated with, endorsed by, or connected to** GitHub, Bluesky, X (Twitter), or Instagram. Automated or bulk actions can run against a platform's terms of service and may lead to temporary limits or other account actions; the Instagram script in particular is an unofficial, third-party tool. Use these features on your own accounts, at your own discretion.
+
+Questions or reports: **emreerden@pm.me**

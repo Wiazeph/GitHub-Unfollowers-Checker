@@ -1,4 +1,6 @@
-import { Globe } from 'lucide-react'
+import { useState } from 'react'
+import { Globe, ShieldCheck } from 'lucide-react'
+import { PrivacyDialog } from './PrivacyDialog'
 
 const REPO_URL = 'https://github.com/Wiazeph/GitHub-Unfollowers-Checker'
 const SITE_URL = 'https://emreerden.dev'
@@ -17,31 +19,54 @@ const GithubIcon = () => (
 )
 
 export const Footer = () => {
+  const [privacyOpen, setPrivacyOpen] = useState(false)
+
   return (
-    <footer className="mx-auto flex w-full max-w-3xl flex-wrap items-center justify-center gap-x-2 gap-y-1 px-4 py-8 text-sm text-fg-muted sm:px-6">
-      <a
-        href={REPO_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-flex items-center gap-2 rounded-md px-2 py-1 outline-none transition-colors hover:text-fg focus-visible:ring-2 focus-visible:ring-brand-400"
-      >
-        <GithubIcon />
-        <span>View source on GitHub</span>
-      </a>
+    <footer className="mx-auto flex w-full max-w-3xl flex-col items-center gap-2 px-4 py-8 text-sm text-fg-muted sm:px-6">
+      <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
+        <a
+          href={REPO_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 rounded-md px-2 py-1 outline-none transition-colors hover:text-fg focus-visible:ring-2 focus-visible:ring-brand-400"
+        >
+          <GithubIcon />
+          <span>View source on GitHub</span>
+        </a>
 
-      <span aria-hidden="true" className="text-border">
-        •
-      </span>
+        <span aria-hidden="true" className="text-border">
+          •
+        </span>
 
-      <a
-        href={SITE_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-flex items-center gap-2 rounded-md px-2 py-1 outline-none transition-colors hover:text-fg focus-visible:ring-2 focus-visible:ring-brand-400"
-      >
-        <Globe className="h-4 w-4" aria-hidden="true" />
-        <span>emreerden.dev</span>
-      </a>
+        <button
+          onClick={() => setPrivacyOpen(true)}
+          className="inline-flex cursor-pointer items-center gap-2 rounded-md px-2 py-1 outline-none transition-colors hover:text-fg focus-visible:ring-2 focus-visible:ring-brand-400"
+        >
+          <ShieldCheck className="h-4 w-4" aria-hidden="true" />
+          <span>Privacy</span>
+        </button>
+
+        <span aria-hidden="true" className="text-border">
+          •
+        </span>
+
+        <a
+          href={SITE_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 rounded-md px-2 py-1 outline-none transition-colors hover:text-fg focus-visible:ring-2 focus-visible:ring-brand-400"
+        >
+          <Globe className="h-4 w-4" aria-hidden="true" />
+          <span>emreerden.dev</span>
+        </a>
+      </div>
+
+      <p className="max-w-md text-center text-xs text-fg-muted/80">
+        Not affiliated with GitHub, Bluesky, X, or Instagram. Use on your own
+        accounts, at your own discretion.
+      </p>
+
+      <PrivacyDialog open={privacyOpen} onClose={() => setPrivacyOpen(false)} />
     </footer>
   )
 }
