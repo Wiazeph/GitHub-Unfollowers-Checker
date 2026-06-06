@@ -94,7 +94,7 @@ export const Unfollowers = () => {
           <UnfollowersResults
             platform={platform}
             handle={searchedHandle}
-            isPending={mutation.isPending || authLoading}
+            isPending={mutation.isPending}
             isError={mutation.isError}
             data={mutation.data}
             isAuthed={isAuthed}

@@ -201,26 +201,32 @@ const ResultsState = ({
       {/* Guest CTA (platform-aware) */}
       {!isAuthed && <GuestCta platform={platform} handle={handle} />}
 
-      {/* Bulk action bar (own list only) */}
+      {/* Bulk action bar (own list only). A sticky wrapper pinned to the bottom
+          keeps "Unfollow selected" reachable while scrolling. The wrapper has a
+          solid page-background so cards scrolling underneath are cleanly masked
+          rather than bleeding through. It returns to normal flow — never covering
+          the footer — once you reach the end. */}
       {isOwnList && (
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-surface px-3 py-2">
-          <label className="flex cursor-pointer items-center gap-2 text-sm text-fg-muted">
-            <input
-              type="checkbox"
-              checked={allSelected}
-              onChange={toggleAll}
-              className="h-4 w-4 cursor-pointer accent-brand-500"
-            />
-            {selected.size > 0 ? `${selected.size} selected` : 'Select all'}
-          </label>
-          <button
-            onClick={() => requestUnfollow([...selected])}
-            disabled={selected.size === 0 || unfollow.isPending}
-            className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-red-500 px-3 py-1.5 text-sm font-medium text-white outline-none transition-colors hover:bg-red-600 focus-visible:ring-2 focus-visible:ring-red-400 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <UserMinus className="h-4 w-4" aria-hidden="true" />
-            Unfollow selected
-          </button>
+        <div className="sticky bottom-0 z-10 order-last -mx-4 bg-bg px-4 py-3 sm:-mx-6 sm:px-6">
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-surface px-3 py-2 shadow-lg shadow-black/30">
+            <label className="flex cursor-pointer items-center gap-2 text-sm text-fg-muted">
+              <input
+                type="checkbox"
+                checked={allSelected}
+                onChange={toggleAll}
+                className="h-4 w-4 cursor-pointer accent-brand-500"
+              />
+              {selected.size > 0 ? `${selected.size} selected` : 'Select all'}
+            </label>
+            <button
+              onClick={() => requestUnfollow([...selected])}
+              disabled={selected.size === 0 || unfollow.isPending}
+              className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-red-500 px-3 py-1.5 text-sm font-medium text-white outline-none transition-colors hover:bg-red-600 focus-visible:ring-2 focus-visible:ring-red-400 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <UserMinus className="h-4 w-4" aria-hidden="true" />
+              Unfollow selected
+            </button>
+          </div>
         </div>
       )}
 
