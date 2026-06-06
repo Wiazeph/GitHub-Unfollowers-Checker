@@ -204,8 +204,9 @@ const ResultsState = ({
     <div ref={topRef} className="flex flex-col gap-4 scroll-mt-4">
       <OnboardingHint show={isOwnList} />
 
-      {/* Context line */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      {/* Context line — stacks on mobile so the copy button never crowds the
+          summary text as it reflows; side-by-side from sm up. */}
+      <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
         <p className="text-sm text-fg-muted">
           {isOwnList ? (
             <Trans

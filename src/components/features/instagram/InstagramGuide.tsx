@@ -127,15 +127,22 @@ export const InstagramGuide = () => {
 
       {/* The script + copy button */}
       <div className="overflow-hidden rounded-lg border border-border bg-bg">
-        <div className="flex items-center justify-between gap-3 border-b border-border bg-surface px-3 py-2">
-          <span className="inline-flex items-center gap-2 font-mono text-xs text-fg-muted">
-            <Terminal className="h-3.5 w-3.5" aria-hidden="true" />
+        <div className="flex items-center gap-2 border-b border-border bg-surface px-3 py-2">
+          <Terminal
+            className="h-3.5 w-3.5 shrink-0 text-fg-muted"
+            aria-hidden="true"
+          />
+          <span className="truncate font-mono text-xs text-fg-muted">
             {t('instagram.consoleLabel')}
           </span>
+        </div>
+        {/* The copy button floats in the code block's top-right corner so the
+            header label always fits on one line, even on mobile. */}
+        <div className="relative">
           <button
             onClick={copyCode}
             disabled={!code}
-            className="inline-flex cursor-pointer items-center gap-1.5 rounded-md bg-brand-500 px-3 py-1.5 text-sm font-medium text-bg outline-none transition-colors hover:bg-brand-600 focus-visible:ring-2 focus-visible:ring-brand-400 disabled:cursor-not-allowed disabled:opacity-60"
+            className="absolute top-2 right-2 z-10 inline-flex cursor-pointer items-center gap-1.5 rounded-md bg-brand-500 px-2.5 py-1.5 text-sm font-medium text-bg shadow-sm outline-none transition-colors hover:bg-brand-600 focus-visible:ring-2 focus-visible:ring-brand-400 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {code === null ? (
               <>
@@ -160,12 +167,12 @@ export const InstagramGuide = () => {
               </>
             )}
           </button>
+          <pre className="max-h-56 overflow-auto p-3 text-xs leading-relaxed text-fg-muted">
+            <code className="font-mono break-all whitespace-pre-wrap">
+              {code === null ? t('instagram.loadingScript') : code}
+            </code>
+          </pre>
         </div>
-        <pre className="max-h-56 overflow-auto px-3 py-3 text-xs leading-relaxed text-fg-muted">
-          <code className="font-mono break-all whitespace-pre-wrap">
-            {code === null ? t('instagram.loadingScript') : code}
-          </code>
-        </pre>
       </div>
       <p className="-mt-2 text-xs text-fg-muted">{t('instagram.tip_intro')}</p>
 
