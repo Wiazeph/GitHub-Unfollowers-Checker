@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { Agent } from '@atproto/api'
-import { getSession } from './_lib/auth.js'
+import { getPlatformSession, type Platform } from './_lib/auth.js'
 import { getOAuthClient } from './_lib/bluesky-oauth.js'
 import { isDid, unfollow as blueskyUnfollow } from './_lib/bluesky.js'
 
@@ -57,23 +57,17 @@ export default async function handler(
     return
   }
 
-  const session = getSession(req)
-  if (!session) {
-    res.status(401).json({ error: 'You must sign in first', code: 'UNAUTHORIZED' })
-    return
-  }
-
   const body = (req.body ?? {}) as {
     platform?: unknown
     targets?: unknown
     usernames?: unknown
   }
-  const platform = typeof body.platform === 'string' ? body.platform : 'github'
+  const platform: Platform =
+    body.platform === 'bluesky' ? 'bluesky' : 'github'
 
-  if (platform !== session.platform) {
-    res
-      .status(400)
-      .json({ error: 'Platform does not match your session', code: 'BAD_REQUEST' })
+  const sessionValue = getPlatformSession(req, platform)
+  if (!sessionValue) {
+    res.status(401).json({ error: 'You must sign in first', code: 'UNAUTHORIZED' })
     return
   }
 
@@ -89,7 +83,7 @@ export default async function handler(
     return
   }
 
-  if (session.platform === 'bluesky') {
+  if (platform === 'bluesky') {
     const dids = targets.filter(isDid)
     if (dids.length === 0) {
       res.status(400).json({ error: 'No valid targets provided', code: 'BAD_REQUEST' })
@@ -97,9 +91,9 @@ export default async function handler(
     }
     try {
       const client = await getOAuthClient()
-      const oauthSession = await client.restore(session.value)
+      const oauthSession = await client.restore(sessionValue)
       const agent = new Agent(oauthSession)
-      const result = await blueskyUnfollow(agent, session.value, dids)
+      const result = await blueskyUnfollow(agent, sessionValue, dids)
       res.status(200).json(result)
     } catch {
       res.status(502).json({ error: 'Could not unfollow on Bluesky', code: 'UPSTREAM' })
@@ -122,7 +116,7 @@ export default async function handler(
     const results = await Promise.all(
       batch.map(async (username) => ({
         username,
-        ok: await githubUnfollowOne(username, session.value),
+        ok: await githubUnfollowOne(username, sessionValue),
       })),
     )
     for (const { username, ok } of results) {

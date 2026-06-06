@@ -38,11 +38,12 @@ export const fetchUnfollowers = async (
   return (await response.json()) as UnfollowersResponse
 }
 
-/** Fetch the current authentication state. */
+/** Fetch the current per-platform authentication state. */
 export const fetchMe = async (): Promise<AuthState> => {
+  const empty: AuthState = { github: null, bluesky: null }
   const response = await fetch('/api/auth/me')
-  if (!response.ok) return { authenticated: false }
-  return (await response.json()) as AuthState
+  if (!response.ok) return empty
+  return { ...empty, ...((await response.json()) as Partial<AuthState>) }
 }
 
 /** Redirect the browser into the GitHub OAuth flow. */
@@ -55,9 +56,10 @@ export const loginBluesky = (handle: string): void => {
   window.location.href = `/api/auth/bluesky/login?handle=${encodeURIComponent(handle)}`
 }
 
-/** Clear the session and reload. */
-export const logout = async (): Promise<void> => {
-  await fetch('/api/auth/logout', { method: 'POST' })
+/** Sign out of one platform (or all if omitted) and reload. */
+export const logout = async (platform?: PlatformId): Promise<void> => {
+  const query = platform ? `?platform=${platform}` : ''
+  await fetch(`/api/auth/logout${query}`, { method: 'POST' })
   window.location.reload()
 }
 

@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { getOAuthClient } from '../../_lib/bluesky-oauth.js'
-import { setSession } from '../../_lib/auth.js'
+import { setPlatformSession } from '../../_lib/auth.js'
 
 /**
  * Finish the Bluesky OAuth flow. The library validates state/PKCE/DPoP and
@@ -20,7 +20,7 @@ export default async function handler(
   try {
     const client = await getOAuthClient()
     const { session } = await client.callback(url.searchParams)
-    setSession(res, { platform: 'bluesky', value: session.did })
+    setPlatformSession(res, 'bluesky', session.did)
     res.redirect(302, '/')
   } catch {
     fail('bluesky_exchange_failed')

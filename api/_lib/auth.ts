@@ -8,7 +8,13 @@
 import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto'
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 
-export const SESSION_COOKIE = 'gh_session'
+export type Platform = 'github' | 'bluesky'
+
+/** One cookie per platform, so the user can stay signed in to both at once. */
+const SESSION_COOKIES: Record<Platform, string> = {
+  github: 'gh_session',
+  bluesky: 'bsky_session',
+}
 export const STATE_COOKIE = 'oauth_state'
 
 const SESSION_MAX_AGE = 60 * 60 * 24 * 7 // 7 days
@@ -91,14 +97,6 @@ const appendCookie = (res: VercelResponse, cookie: string): void => {
   }
 }
 
-export const setSessionCookie = (res: VercelResponse, token: string): void => {
-  appendCookie(res, serializeCookie(SESSION_COOKIE, sign(token), { maxAge: SESSION_MAX_AGE }))
-}
-
-export const clearSessionCookie = (res: VercelResponse): void => {
-  appendCookie(res, serializeCookie(SESSION_COOKIE, '', { maxAge: 0 }))
-}
-
 export const setStateCookie = (res: VercelResponse, state: string): void => {
   appendCookie(res, serializeCookie(STATE_COOKIE, sign(state), { maxAge: STATE_MAX_AGE }))
 }
@@ -107,26 +105,66 @@ export const clearStateCookie = (res: VercelResponse): void => {
   appendCookie(res, serializeCookie(STATE_COOKIE, '', { maxAge: 0 }))
 }
 
-/** Return the verified GitHub access token from the session cookie, or null. */
-export const getSessionToken = (req: VercelRequest): string | null => {
-  const value = unsign(parseCookies(req)[SESSION_COOKIE])
-  if (!value) return null
-  // New sessions are JSON {platform, value}; old ones are a bare token.
-  const session = parseSession(value)
-  if (session) return session.platform === 'github' ? session.value : null
-  return value
+/**
+ * Read the verified session value for one platform.
+ * GitHub: the access token. Bluesky: the user's DID (tokens live in Redis).
+ * Returns null if not signed in to that platform.
+ *
+ * Back-compat: an older single-cookie format stored JSON {platform, value} in
+ * gh_session; if we find that, we honor it for its tagged platform.
+ */
+export const getPlatformSession = (
+  req: VercelRequest,
+  platform: Platform,
+): string | null => {
+  const cookies = parseCookies(req)
+  const value = unsign(cookies[SESSION_COOKIES[platform]])
+  if (value) {
+    const legacy = parseLegacySession(value)
+    // A legacy JSON blob landed in gh_session; use it only for its platform.
+    if (legacy) return legacy.platform === platform ? legacy.value : null
+    return value
+  }
+
+  // Legacy: the old gh_session held a JSON {platform, value} for either side.
+  if (platform === 'bluesky') {
+    const legacyValue = unsign(cookies[SESSION_COOKIES.github])
+    const legacy = legacyValue ? parseLegacySession(legacyValue) : null
+    if (legacy?.platform === 'bluesky') return legacy.value
+  }
+  return null
 }
 
-/** A platform-tagged session: GitHub stores its token, Bluesky stores the DID. */
-export interface Session {
-  platform: 'github' | 'bluesky'
-  /** GitHub: access token. Bluesky: the user's DID (tokens live in Redis). */
+/** Store the session value in that platform's signed, httpOnly cookie. */
+export const setPlatformSession = (
+  res: VercelResponse,
+  platform: Platform,
+  value: string,
+): void => {
+  appendCookie(
+    res,
+    serializeCookie(SESSION_COOKIES[platform], sign(value), {
+      maxAge: SESSION_MAX_AGE,
+    }),
+  )
+}
+
+/** Clear one platform's session cookie. */
+export const clearPlatformSession = (
+  res: VercelResponse,
+  platform: Platform,
+): void => {
+  appendCookie(res, serializeCookie(SESSION_COOKIES[platform], '', { maxAge: 0 }))
+}
+
+interface LegacySession {
+  platform: Platform
   value: string
 }
 
-const parseSession = (value: string): Session | null => {
+const parseLegacySession = (value: string): LegacySession | null => {
   try {
-    const parsed = JSON.parse(value) as Partial<Session>
+    const parsed = JSON.parse(value) as Partial<LegacySession>
     if (
       (parsed.platform === 'github' || parsed.platform === 'bluesky') &&
       typeof parsed.value === 'string'
@@ -134,21 +172,7 @@ const parseSession = (value: string): Session | null => {
       return { platform: parsed.platform, value: parsed.value }
     }
   } catch {
-    // Not JSON — a legacy bare-token cookie.
+    // Not JSON — a plain per-platform value.
   }
   return null
-}
-
-/** Return the verified platform-tagged session, or null. */
-export const getSession = (req: VercelRequest): Session | null => {
-  const value = unsign(parseCookies(req)[SESSION_COOKIE])
-  if (!value) return null
-  const session = parseSession(value)
-  // Legacy bare token → treat as a GitHub session.
-  return session ?? { platform: 'github', value }
-}
-
-/** Store a platform-tagged session in the signed cookie. */
-export const setSession = (res: VercelResponse, session: Session): void => {
-  setSessionCookie(res, JSON.stringify(session))
 }

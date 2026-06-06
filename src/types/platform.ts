@@ -25,10 +25,11 @@ export type ApiErrorCode =
   | 'CONFIG'
   | 'UNAUTHORIZED'
 
-/** Current authentication state, from `/api/auth/me`. */
-export type AuthState =
-  | { authenticated: false }
-  | { authenticated: true; platform: PlatformId; handle: string }
+/** Per-platform sign-in state from `/api/auth/me`. A user can be signed in to
+ *  several platforms at once, so each is reported independently. */
+export type PlatformSession = { handle: string } | null
+
+export type AuthState = Record<PlatformId, PlatformSession>
 
 /** Result of an unfollow request from `/api/unfollow`. */
 export interface UnfollowResult {
