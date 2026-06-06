@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import {
   INSTAGRAM_TAB,
   TWITTER_TAB,
@@ -5,12 +6,14 @@ import {
   type SelectorTab,
 } from '../../platforms'
 import { ThemeToggle } from '../ui/ThemeToggle'
+import { LanguageToggle } from '../ui/LanguageToggle'
 
 interface PlatformSelectorProps {
   value: SelectorTab
   onChange: (tab: SelectorTab) => void
 }
 
+// Platform names are proper nouns — they stay the same across languages.
 const TABS = [
   ...PLATFORM_LIST.map((p) => ({ id: p.id as SelectorTab, label: p.label, icon: p.icon })),
   { id: TWITTER_TAB.id as SelectorTab, label: TWITTER_TAB.label, icon: TWITTER_TAB.icon },
@@ -18,12 +21,14 @@ const TABS = [
 ]
 
 /**
- * Top bar: platform tabs on the left, global actions (theme, later language) on
- * the right. The actions area is separated so more controls can slot in.
+ * Top bar: platform tabs on the left, global actions (theme + language) on the
+ * right. The actions area is separated so more controls can slot in.
  */
-export const PlatformSelector = ({ value, onChange }: PlatformSelectorProps) => (
+export const PlatformSelector = ({ value, onChange }: PlatformSelectorProps) => {
+  const { t } = useTranslation()
+  return (
   <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-border bg-surface p-1">
-    <div role="tablist" aria-label="Platform" className="flex flex-wrap gap-1">
+    <div role="tablist" aria-label={t('selector.label')} className="flex flex-wrap gap-1">
       {TABS.map(({ id, label, icon: Icon }) => {
         const active = value === id
         return (
@@ -45,9 +50,11 @@ export const PlatformSelector = ({ value, onChange }: PlatformSelectorProps) => 
       })}
     </div>
 
-    {/* Right-side actions (theme now; language slots in here next). */}
+    {/* Right-side actions: theme + language. */}
     <div className="flex items-center gap-1 pr-0.5">
       <ThemeToggle />
+      <LanguageToggle />
     </div>
   </div>
-)
+  )
+}

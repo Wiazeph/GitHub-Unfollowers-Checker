@@ -12,15 +12,19 @@ type AuthKind = 'oauth' | 'none'
 
 export interface PlatformConfig {
   id: PlatformId
+  /** Proper noun — the same in every language. */
   label: string
   icon: BrandIcon
   /** Validates a handle before we bother hitting the API. */
   handlePattern: RegExp
-  placeholder: (authed: boolean) => string
-  validationMessage: string
+  /** i18n keys for the input placeholder (resolved in the component). */
+  placeholderKey: string
+  placeholderAuthedKey: string
+  /** i18n key for the invalid-handle toast. */
+  validationKey: string
   /** 'oauth' → show a sign-in button; 'none' → read-only (no unfollow yet). */
   authKind: AuthKind
-  /** Noun used in "Open on {noun}" links. */
+  /** Noun used in "Open on {noun}" links — a proper noun, not translated. */
   profileNoun: string
 }
 
@@ -35,9 +39,9 @@ export const PLATFORMS: Record<PlatformId, PlatformConfig> = {
     label: 'GitHub',
     icon: GithubIcon,
     handlePattern: GITHUB_HANDLE,
-    placeholder: (authed) =>
-      authed ? 'Look up another user…' : 'Enter a GitHub username',
-    validationMessage: 'Please enter a valid GitHub username',
+    placeholderKey: 'search.placeholderGithub',
+    placeholderAuthedKey: 'search.placeholderGithubAuthed',
+    validationKey: 'search.invalidGithub',
     authKind: 'oauth',
     profileNoun: 'GitHub',
   },
@@ -46,9 +50,9 @@ export const PLATFORMS: Record<PlatformId, PlatformConfig> = {
     label: 'Bluesky',
     icon: BlueskyIcon,
     handlePattern: BLUESKY_HANDLE,
-    placeholder: (authed) =>
-      authed ? 'Look up another handle…' : 'Enter a Bluesky handle (name.bsky.social)',
-    validationMessage: 'Please enter a valid Bluesky handle (e.g. name.bsky.social)',
+    placeholderKey: 'search.placeholderBluesky',
+    placeholderAuthedKey: 'search.placeholderBlueskyAuthed',
+    validationKey: 'search.invalidBluesky',
     authKind: 'oauth',
     profileNoun: 'Bluesky',
   },

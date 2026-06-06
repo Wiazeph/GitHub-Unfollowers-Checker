@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import '@fontsource-variable/inter'
 import App from './App.tsx'
 import { ThemeProvider } from './components/ThemeProvider.tsx'
+import './i18n'
 import './index.css'
 
 const queryClient = new QueryClient({

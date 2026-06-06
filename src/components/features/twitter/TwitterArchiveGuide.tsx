@@ -10,6 +10,7 @@ import {
   X as XMark,
 } from 'lucide-react'
 import { toast } from 'sonner'
+import { useTranslation, Trans } from 'react-i18next'
 import {
   classifyArchiveFile,
   computeArchiveUnfollowers,
@@ -25,7 +26,10 @@ import type { Account } from '../../../types/platform'
 const ARCHIVE_HELP =
   'https://help.x.com/en/managing-your-account/how-to-download-your-x-archive'
 
+const bold = <span className="font-medium text-fg" />
+
 export const TwitterArchiveGuide = () => {
+  const { t } = useTranslation()
   const [result, setResult] = useState<Account[] | null>(null)
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
@@ -53,23 +57,17 @@ export const TwitterArchiveGuide = () => {
 
       if (followingTexts.length === 0 || followerTexts.length === 0) {
         setBusy(false)
-        setError(
-          'Please add both files: following.js and follower.js (from your archive’s data/ folder).',
-        )
+        setError(t('twitter.bothFilesError'))
         return
       }
 
       const unfollowers = computeArchiveUnfollowers(followingTexts, followerTexts)
       setResult(unfollowers)
       if (skipped.length > 0) {
-        toast.message(`Ignored ${skipped.length} unrelated file(s).`)
+        toast.message(t('twitter.ignoredFiles', { count: skipped.length }))
       }
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : 'Could not read those files. Make sure they are from your X archive.',
-      )
+    } catch {
+      setError(t('twitter.readError'))
     } finally {
       setBusy(false)
     }
@@ -83,11 +81,7 @@ export const TwitterArchiveGuide = () => {
   return (
     <div className="flex flex-col gap-6">
       {result === null ? (
-        <UploadView
-          busy={busy}
-          error={error}
-          onFiles={handleFiles}
-        />
+        <UploadView busy={busy} error={error} onFiles={handleFiles} />
       ) : (
         <ResultsView accounts={result} onReset={reset} />
       )}
@@ -104,52 +98,53 @@ const UploadView = ({
   error: string
   onFiles: (files: FileList | null) => void
 }) => {
+  const { t } = useTranslation()
   const inputRef = useRef<HTMLInputElement>(null)
   const [dragOver, setDragOver] = useState(false)
+
+  const steps = [
+    <>
+      {t('twitter.step1_pre')}{' '}
+      <span className="font-medium text-fg">{t('twitter.step1_path')}</span>
+      {t('twitter.step1_post')}{' '}
+      <a
+        href={ARCHIVE_HELP}
+        target="_blank"
+        rel="noreferrer"
+        className="inline-flex items-center gap-0.5 font-medium text-brand-400 underline-offset-2 hover:underline"
+      >
+        {t('twitter.step1_guide')}{' '}
+        <ArrowUpRight className="h-3 w-3" aria-hidden="true" />
+      </a>
+    </>,
+    <>{t('twitter.step2')}</>,
+    <>
+      {t('twitter.step3_pre')}{' '}
+      <span className="font-medium text-fg">{t('twitter.step3_dataWord')}</span>{' '}
+      {t('twitter.step3_mid')}{' '}
+      <span className="font-medium text-fg">following.js</span>{' '}
+      {t('twitter.step3_and')}{' '}
+      <span className="font-medium text-fg">follower.js</span>{' '}
+      {t('twitter.step3_ifSplit')}{' '}
+      <span className="font-medium text-fg">{t('twitter.step3_part')}</span>{' '}
+      {t('twitter.step3_post')}
+    </>,
+  ]
 
   return (
     <>
       {/* Intro */}
       <div className="rounded-lg border border-border bg-surface px-4 py-3">
-        <p className="text-sm text-fg">
-          X doesn&apos;t offer a free way to read follower lists, so this works
-          from your <span className="font-medium">data archive</span>: upload two
-          files from it and we&apos;ll compare them right here in your browser.
-        </p>
+        <p className="text-sm text-fg">{t('twitter.introBody')}</p>
         <p className="mt-2 inline-flex items-center gap-1.5 text-sm text-fg-muted">
           <ShieldCheck className="h-4 w-4 text-brand-400" aria-hidden="true" />
-          Nothing is uploaded — the files never leave your device.
+          {t('twitter.introPrivacy')}
         </p>
       </div>
 
       {/* Steps */}
       <ol className="flex flex-col gap-3">
-        {[
-          <>
-            On X, go to <span className="font-medium text-fg">Settings → Your
-            account → Download an archive of your data</span>, confirm your
-            password, and request the archive.{' '}
-            <a
-              href={ARCHIVE_HELP}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-0.5 font-medium text-brand-400 underline-offset-2 hover:underline"
-            >
-              Guide <ArrowUpRight className="h-3 w-3" aria-hidden="true" />
-            </a>
-          </>,
-          <>
-            X emails you when it&apos;s ready (can take hours to a day). Download
-            and unzip it.
-          </>,
-          <>
-            Open the <span className="font-medium text-fg">data</span> folder and
-            upload <span className="font-medium text-fg">following.js</span> and{' '}
-            <span className="font-medium text-fg">follower.js</span> below (if
-            they&apos;re split into <span className="font-medium text-fg">part</span>{' '}
-            files, add all of them).
-          </>,
-        ].map((content, index) => (
+        {steps.map((content, index) => (
           <li key={index} className="flex gap-3">
             <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-500/15 text-sm font-semibold text-brand-400">
               {index + 1}
@@ -179,8 +174,11 @@ const UploadView = ({
       >
         <FileDown className="h-7 w-7 text-fg-muted" aria-hidden="true" />
         <p className="text-sm text-fg-muted">
-          Drag <span className="font-medium text-fg">following.js</span> and{' '}
-          <span className="font-medium text-fg">follower.js</span> here, or
+          {t('twitter.dropzone_pre')}{' '}
+          <span className="font-medium text-fg">following.js</span>{' '}
+          {t('twitter.dropzone_and')}{' '}
+          <span className="font-medium text-fg">follower.js</span>{' '}
+          {t('twitter.dropzone_post')}
         </p>
         <button
           onClick={() => inputRef.current?.click()}
@@ -188,7 +186,7 @@ const UploadView = ({
           className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-bg outline-none transition-colors hover:bg-brand-600 focus-visible:ring-2 focus-visible:ring-brand-400 disabled:cursor-not-allowed disabled:opacity-60"
         >
           <Upload className="h-4 w-4" aria-hidden="true" />
-          {busy ? 'Reading…' : 'Choose files'}
+          {busy ? t('twitter.reading') : t('twitter.chooseFiles')}
         </button>
         <input
           ref={inputRef}
@@ -216,8 +214,8 @@ const ResultsView = ({
   accounts: Account[]
   onReset: () => void
 }) => {
+  const { t } = useTranslation()
   const count = accounts.length
-  const label = count === 1 ? '1 account' : `${count} accounts`
 
   if (count === 0) {
     return (
@@ -226,10 +224,8 @@ const ResultsView = ({
           <PartyPopper className="h-6 w-6" aria-hidden="true" />
         </div>
         <div className="space-y-1">
-          <p className="font-medium text-fg">Everyone follows back!</p>
-          <p className="max-w-sm text-sm text-fg-muted">
-            Based on your archive, everyone you follow follows you back.
-          </p>
+          <p className="font-medium text-fg">{t('twitter.zeroTitle')}</p>
+          <p className="max-w-sm text-sm text-fg-muted">{t('twitter.zeroBody')}</p>
         </div>
         <BackButton onReset={onReset} />
       </div>
@@ -240,8 +236,7 @@ const ResultsView = ({
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-fg-muted">
-          <span className="font-medium text-fg">{label}</span> you follow
-          don&apos;t follow you back.
+          <Trans i18nKey="twitter.resultSummary" count={count} components={[bold]} />
         </p>
         <div className="flex items-center gap-1">
           <CopyButton accounts={accounts} />
@@ -250,8 +245,7 @@ const ResultsView = ({
       </div>
 
       <p className="rounded-lg border border-border bg-surface px-4 py-2.5 text-xs text-fg-muted">
-        X archives only contain numeric account IDs, so handles can&apos;t be
-        shown. Each link opens the real profile on X.
+        {t('twitter.idLimitNote')}
       </p>
 
       <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -271,10 +265,10 @@ const ResultsView = ({
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-sm font-medium">
-                  ID {account.id}
+                  {t('twitter.idLabel', { id: account.id })}
                 </span>
                 <span className="block text-xs text-fg-muted">
-                  Open profile
+                  {t('twitter.openProfile')}
                 </span>
               </span>
               <ArrowUpRight
@@ -295,24 +289,27 @@ const BackButton = ({
 }: {
   onReset: () => void
   subtle?: boolean
-}) =>
-  subtle ? (
+}) => {
+  const { t } = useTranslation()
+  return subtle ? (
     <button
       onClick={onReset}
       className="inline-flex cursor-pointer items-center gap-1.5 rounded-md px-2 py-1 text-sm text-fg-muted outline-none transition-colors hover:text-fg focus-visible:ring-2 focus-visible:ring-brand-400"
     >
-      Start over
+      {t('twitter.startOver')}
     </button>
   ) : (
     <button
       onClick={onReset}
       className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-border bg-surface px-3 py-1.5 text-sm font-medium text-fg outline-none transition-colors hover:bg-surface-hover focus-visible:ring-2 focus-visible:ring-brand-400"
     >
-      Start over
+      {t('twitter.startOver')}
     </button>
   )
+}
 
 const CopyButton = ({ accounts }: { accounts: Account[] }) => {
+  const { t } = useTranslation()
   const [copied, setCopied] = useState(false)
   const links = useMemo(
     () => accounts.map((a) => a.profileUrl).join('\n'),
@@ -329,9 +326,9 @@ const CopyButton = ({ accounts }: { accounts: Account[] }) => {
     try {
       await navigator.clipboard.writeText(links)
       setCopied(true)
-      toast.success('Profile links copied to clipboard')
+      toast.success(t('twitter.copiedToast'))
     } catch {
-      toast.error('Could not copy to clipboard')
+      toast.error(t('twitter.copyFailed'))
     }
   }
 
@@ -347,7 +344,7 @@ const CopyButton = ({ accounts }: { accounts: Account[] }) => {
       ) : (
         <Copy className="h-4 w-4" aria-hidden="true" />
       )}
-      {copied ? 'Copied!' : 'Copy links'}
+      {copied ? t('twitter.copied') : t('twitter.copyLinks')}
     </button>
   )
 }

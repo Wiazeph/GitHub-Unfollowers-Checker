@@ -1,6 +1,7 @@
 import { type FormEvent } from 'react'
 import { Search, LoaderCircle } from 'lucide-react'
 import { toast } from 'sonner'
+import { useTranslation } from 'react-i18next'
 import { Button } from '../../ui/Button'
 import { PLATFORMS, normalizeHandle } from '../../../platforms'
 import type { PlatformId } from '../../../types/platform'
@@ -22,6 +23,7 @@ export const UnfollowersSearch = ({
   isPending,
   isAuthed,
 }: UnfollowersSearchProps) => {
+  const { t } = useTranslation()
   const config = PLATFORMS[platform]
 
   const handleSubmit = (event: FormEvent) => {
@@ -30,7 +32,7 @@ export const UnfollowersSearch = ({
 
     const normalized = normalizeHandle(platform, value)
     if (!config.handlePattern.test(normalized)) {
-      toast.error(config.validationMessage)
+      toast.error(t(config.validationKey))
       return
     }
     onSearch(normalized)
@@ -50,8 +52,10 @@ export const UnfollowersSearch = ({
           type="text"
           value={value}
           onChange={(event) => onChange(event.target.value)}
-          placeholder={config.placeholder(isAuthed)}
-          aria-label={`${config.label} handle`}
+          placeholder={t(
+            isAuthed ? config.placeholderAuthedKey : config.placeholderKey,
+          )}
+          aria-label={t('search.handleAriaLabel', { platform: config.label })}
           autoComplete="off"
           autoCapitalize="off"
           autoCorrect="off"
@@ -68,10 +72,10 @@ export const UnfollowersSearch = ({
               className="h-5 w-5 motion-safe:animate-spin"
               aria-hidden="true"
             />
-            <span>Checking…</span>
+            <span>{t('search.checking')}</span>
           </>
         ) : (
-          'Check'
+          t('search.check')
         )}
       </Button>
     </form>

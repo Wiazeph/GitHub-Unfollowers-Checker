@@ -1,3 +1,4 @@
+import i18n from '../i18n'
 import {
   ApiError,
   type ApiErrorBody,
@@ -19,7 +20,7 @@ export const fetchUnfollowers = async (
     )
   } catch {
     throw new ApiError(
-      { error: 'Network error. Check your connection and try again.', code: 'UPSTREAM' },
+      { error: i18n.t('errors.network'), code: 'UPSTREAM' },
       0,
     )
   }
@@ -29,12 +30,8 @@ export const fetchUnfollowers = async (
     // Vercel returns no JSON body on a function timeout (504).
     const fallback: ApiErrorBody =
       response.status === 504
-        ? {
-            error:
-              'This account is very large and timed out. Try again, or a smaller account.',
-            code: 'UPSTREAM',
-          }
-        : { error: 'Something went wrong. Please try again.', code: 'UPSTREAM' }
+        ? { error: i18n.t('errors.timeout'), code: 'UPSTREAM' }
+        : { error: i18n.t('errors.generic'), code: 'UPSTREAM' }
     throw new ApiError(body ?? fallback, response.status)
   }
 
@@ -78,7 +75,7 @@ export const unfollowAccounts = async (
     })
   } catch {
     throw new ApiError(
-      { error: 'Network error. Check your connection and try again.', code: 'UPSTREAM' },
+      { error: i18n.t('errors.network'), code: 'UPSTREAM' },
       0,
     )
   }
@@ -86,7 +83,7 @@ export const unfollowAccounts = async (
   if (!response.ok) {
     const body = (await response.json().catch(() => null)) as ApiErrorBody | null
     throw new ApiError(
-      body ?? { error: 'Could not unfollow. Please try again.', code: 'UPSTREAM' },
+      body ?? { error: i18n.t('errors.unfollowGeneric'), code: 'UPSTREAM' },
       response.status,
     )
   }

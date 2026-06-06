@@ -10,6 +10,7 @@ import {
   UserMinus,
 } from 'lucide-react'
 import { toast } from 'sonner'
+import { useTranslation, Trans } from 'react-i18next'
 import { ConfirmDialog } from '../../ui/ConfirmDialog'
 import { useUnfollow } from '../../../hooks/useUnfollow'
 import { login, loginBluesky } from '../../../api/client'
@@ -31,12 +32,12 @@ const SKELETON_COUNT = 9
 const ISSUES_URL =
   'https://github.com/Wiazeph/GitHub-Unfollowers-Checker/issues'
 
-const LOADING_MESSAGES = [
-  'Fetching the following list…',
-  'Gathering followers…',
-  'This can take a moment for popular accounts…',
-  'Comparing who follows back…',
-  'Almost there…',
+const LOADING_KEYS = [
+  'results.loading.following',
+  'results.loading.followers',
+  'results.loading.popular',
+  'results.loading.comparing',
+  'results.loading.almost',
 ]
 
 export const UnfollowersResults = ({
@@ -95,6 +96,8 @@ const ResultsState = ({
   isOwnList: boolean
   onBackToMyList: () => void
 }) => {
+  const { t } = useTranslation()
+
   // Local copy so we can drop users as they get unfollowed.
   const [users, setUsers] = useState(initialUnfollowers)
   // Selection is keyed by Account.id (stable across platforms; a DID on Bluesky).
@@ -134,7 +137,6 @@ const ResultsState = ({
   })
 
   const count = users.length
-  const label = count === 1 ? '1 user' : `${count} users`
   const allSelected = count > 0 && selected.size === count
 
   const toggle = (id: string) => {
@@ -160,6 +162,11 @@ const ResultsState = ({
     setConfirmOpen(true)
   }
 
+  const highlight = <span className="font-medium text-fg" />
+  const badge = (
+    <span className="rounded-full bg-brand-500/15 px-2.5 py-0.5 font-medium text-brand-400" />
+  )
+
   return (
     <div className="flex flex-col gap-4">
       <OnboardingHint show={isOwnList} />
@@ -168,18 +175,17 @@ const ResultsState = ({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-fg-muted">
           {isOwnList ? (
-            <>
-              <span className="font-medium text-fg">{label}</span> don&apos;t
-              follow you back — select to remove.
-            </>
+            <Trans
+              i18nKey="results.ownSummary"
+              count={count}
+              components={[highlight]}
+            />
           ) : (
-            <>
-              <span className="font-medium text-fg">@{handle}</span> is not
-              followed back by{' '}
-              <span className="rounded-full bg-brand-500/15 px-2.5 py-0.5 font-medium text-brand-400">
-                {label}
-              </span>
-            </>
+            <Trans
+              i18nKey="results.otherSummary"
+              values={{ handle, label: t('results.countLabel', { count }) }}
+              components={[highlight, badge]}
+            />
           )}
         </p>
         <CopyButton handles={users.map((u) => u.handle)} />
@@ -188,12 +194,12 @@ const ResultsState = ({
       {/* Viewing someone else while signed in → unfollow tools don't apply */}
       {isAuthed && !isOwnList && (
         <p className="text-sm text-fg-muted">
-          You can only remove people from your own account.{' '}
+          {t('results.onlyOwnAccount')}{' '}
           <button
             onClick={onBackToMyList}
             className="cursor-pointer font-medium text-brand-400 underline-offset-2 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-brand-400"
           >
-            Back to my list
+            {t('results.backToMyList')}
           </button>
         </p>
       )}
@@ -216,7 +222,9 @@ const ResultsState = ({
                 onChange={toggleAll}
                 className="h-4 w-4 cursor-pointer accent-brand-500"
               />
-              {selected.size > 0 ? `${selected.size} selected` : 'Select all'}
+              {selected.size > 0
+                ? t('results.selectedCount', { count: selected.size })
+                : t('results.selectAll')}
             </label>
             <button
               onClick={() => requestUnfollow([...selected])}
@@ -224,7 +232,7 @@ const ResultsState = ({
               className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-red-500 px-3 py-1.5 text-sm font-medium text-white outline-none transition-colors hover:bg-red-600 focus-visible:ring-2 focus-visible:ring-red-400 disabled:cursor-not-allowed disabled:opacity-50"
             >
               <UserMinus className="h-4 w-4" aria-hidden="true" />
-              Unfollow selected
+              {t('results.unfollowSelected')}
             </button>
           </div>
         </div>
@@ -245,11 +253,9 @@ const ResultsState = ({
 
       <ConfirmDialog
         open={confirmOpen}
-        title="Unfollow users?"
-        description={`You're about to unfollow ${pendingTargets.length} ${
-          pendingTargets.length === 1 ? 'user' : 'users'
-        }. This can't be undone here.`}
-        confirmLabel="Unfollow"
+        title={t('results.confirmTitle')}
+        description={t('results.confirmBody', { count: pendingTargets.length })}
+        confirmLabel={t('results.confirmLabel')}
         isPending={unfollow.isPending}
         onConfirm={() => unfollow.mutate({ platform, targets: pendingTargets })}
         onCancel={() => {
@@ -269,6 +275,7 @@ const GuestCta = ({
   platform: PlatformId
   handle: string
 }) => {
+  const { t } = useTranslation()
   const config = PLATFORMS[platform]
 
   // Read-only platform: no sign-in, so just explain it.
@@ -276,8 +283,7 @@ const GuestCta = ({
     return (
       <div className="rounded-lg border border-border bg-surface px-4 py-3">
         <p className="text-sm text-fg-muted">
-          Removing people on {config.profileNoun} isn&apos;t available yet —
-          this is a read-only view for now.
+          {t('results.readOnly', { platform: config.profileNoun })}
         </p>
       </div>
     )
@@ -291,20 +297,19 @@ const GuestCta = ({
   // GitHub: one-click redirect.
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-brand-500/30 bg-brand-500/10 px-4 py-3">
-      <p className="text-sm text-fg">
-        Sign in to remove the people who don&apos;t follow you back.
-      </p>
+      <p className="text-sm text-fg">{t('results.signInCta')}</p>
       <button
         onClick={login}
         className="inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg bg-brand-500 px-3 py-1.5 text-sm font-medium text-bg outline-none transition-colors hover:bg-brand-600 focus-visible:ring-2 focus-visible:ring-brand-400"
       >
-        Sign in with {config.profileNoun}
+        {t('results.signInWith', { platform: config.profileNoun })}
       </button>
     </div>
   )
 }
 
 const BlueskySignIn = ({ defaultHandle }: { defaultHandle: string }) => {
+  const { t } = useTranslation()
   const [handle, setHandle] = useState(defaultHandle)
   const normalized = normalizeHandle('bluesky', handle)
   const valid = PLATFORMS.bluesky.handlePattern.test(normalized)
@@ -317,17 +322,14 @@ const BlueskySignIn = ({ defaultHandle }: { defaultHandle: string }) => {
       }}
       className="flex flex-col gap-2 rounded-lg border border-brand-500/30 bg-brand-500/10 px-4 py-3"
     >
-      <p className="text-sm text-fg">
-        Sign in with Bluesky to remove the people who don&apos;t follow you
-        back.
-      </p>
+      <p className="text-sm text-fg">{t('results.blueskySignInCta')}</p>
       <div className="flex flex-col gap-2 sm:flex-row">
         <input
           type="text"
           value={handle}
           onChange={(event) => setHandle(event.target.value)}
-          placeholder="your-handle.bsky.social"
-          aria-label="Your Bluesky handle"
+          placeholder={t('results.blueskyHandlePlaceholder')}
+          aria-label={t('results.blueskyHandleAriaLabel')}
           autoComplete="off"
           autoCapitalize="off"
           autoCorrect="off"
@@ -339,7 +341,7 @@ const BlueskySignIn = ({ defaultHandle }: { defaultHandle: string }) => {
           disabled={!valid}
           className="inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3 py-1.5 text-sm font-medium text-bg outline-none transition-colors hover:bg-brand-600 focus-visible:ring-2 focus-visible:ring-brand-400 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          Sign in with Bluesky
+          {t('results.signInWith', { platform: 'Bluesky' })}
         </button>
       </div>
     </form>
@@ -349,6 +351,7 @@ const BlueskySignIn = ({ defaultHandle }: { defaultHandle: string }) => {
 const ONBOARDING_KEY = 'guc.onboarding.dismissed'
 
 const OnboardingHint = ({ show }: { show: boolean }) => {
+  const { t } = useTranslation()
   const [dismissed, setDismissed] = useState(
     () => localStorage.getItem(ONBOARDING_KEY) === '1',
   )
@@ -362,15 +365,11 @@ const OnboardingHint = ({ show }: { show: boolean }) => {
 
   return (
     <div className="flex items-start justify-between gap-3 rounded-lg border border-border bg-surface px-4 py-3 text-sm text-fg-muted">
-      <p>
-        You&apos;re signed in. Select the cards you want, then use
-        &ldquo;Unfollow selected&rdquo;. Unfollowing only affects your own
-        account.
-      </p>
+      <p>{t('results.onboarding')}</p>
       <button
         onClick={dismiss}
         className="shrink-0 cursor-pointer rounded-md px-2 py-0.5 text-fg-muted outline-none transition-colors hover:text-fg focus-visible:ring-2 focus-visible:ring-brand-400"
-        aria-label="Dismiss"
+        aria-label={t('results.dismiss')}
       >
         ✕
       </button>
@@ -379,6 +378,7 @@ const OnboardingHint = ({ show }: { show: boolean }) => {
 }
 
 const CopyButton = ({ handles }: { handles: string[] }) => {
+  const { t } = useTranslation()
   const [copied, setCopied] = useState(false)
 
   useEffect(() => {
@@ -391,9 +391,9 @@ const CopyButton = ({ handles }: { handles: string[] }) => {
     try {
       await navigator.clipboard.writeText(handles.join('\n'))
       setCopied(true)
-      toast.success('Usernames copied to clipboard')
+      toast.success(t('results.copiedToast'))
     } catch {
-      toast.error('Could not copy to clipboard')
+      toast.error(t('results.copyFailed'))
     }
   }
 
@@ -409,7 +409,7 @@ const CopyButton = ({ handles }: { handles: string[] }) => {
       ) : (
         <Copy className="h-4 w-4" aria-hidden="true" />
       )}
-      {copied ? 'Copied!' : 'Copy usernames'}
+      {copied ? t('results.copied') : t('results.copyUsernames')}
     </button>
   )
 }
@@ -440,6 +440,7 @@ const UnfollowerCard = ({
   selected: boolean
   onToggle: () => void
 }) => {
+  const { t } = useTranslation()
   const profileNoun = PLATFORMS[platform].profileNoun
 
   // Guest / viewing someone else: the whole card is a profile link (unchanged).
@@ -454,7 +455,7 @@ const UnfollowerCard = ({
         >
           <img
             src={user.avatarUrl}
-            alt={`${user.handle} avatar`}
+            alt={t('results.avatarAlt', { handle: user.handle })}
             loading="lazy"
             className="h-10 w-10 rounded-full ring-1 ring-border"
           />
@@ -500,7 +501,7 @@ const UnfollowerCard = ({
         </span>
         <img
           src={user.avatarUrl}
-          alt={`${user.handle} avatar`}
+          alt={t('results.avatarAlt', { handle: user.handle })}
           loading="lazy"
           className="h-10 w-10 rounded-full ring-1 ring-border"
         />
@@ -511,7 +512,10 @@ const UnfollowerCard = ({
           target="_blank"
           rel="noreferrer"
           onClick={(event) => event.stopPropagation()}
-          aria-label={`Open ${user.handle} on ${profileNoun}`}
+          aria-label={t('results.openOn', {
+            handle: user.handle,
+            platform: profileNoun,
+          })}
           className="ml-auto shrink-0 rounded-md p-1 text-fg-muted outline-none transition-colors hover:text-fg focus-visible:ring-2 focus-visible:ring-brand-400"
         >
           <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
@@ -522,13 +526,12 @@ const UnfollowerCard = ({
 }
 
 const LoadingState = () => {
+  const { t } = useTranslation()
   const [messageIndex, setMessageIndex] = useState(0)
 
   useEffect(() => {
     const id = setInterval(() => {
-      setMessageIndex((index) =>
-        Math.min(index + 1, LOADING_MESSAGES.length - 1),
-      )
+      setMessageIndex((index) => Math.min(index + 1, LOADING_KEYS.length - 1))
     }, 2500)
     return () => clearInterval(id)
   }, [])
@@ -540,7 +543,7 @@ const LoadingState = () => {
           className="h-4 w-4 motion-safe:animate-spin"
           aria-hidden="true"
         />
-        <span>{LOADING_MESSAGES[messageIndex]}</span>
+        <span>{t(LOADING_KEYS[messageIndex])}</span>
       </div>
       <Grid>
         {Array.from({ length: SKELETON_COUNT }, (_, index) => (
@@ -594,41 +597,52 @@ const IdleState = ({
 }: {
   platform: PlatformId
   isAuthed: boolean
-}) => (
-  <CenteredState
-    icon={<UserSearch className="h-6 w-6" aria-hidden="true" />}
-    title="Ready when you are"
-    description={
-      isAuthed
-        ? 'Loading your list… or search for another user above.'
-        : `Enter a ${PLATFORMS[platform].profileNoun} handle above to see who doesn't follow them back.`
-    }
-  />
-)
+}) => {
+  const { t } = useTranslation()
+  return (
+    <CenteredState
+      icon={<UserSearch className="h-6 w-6" aria-hidden="true" />}
+      title={t('results.idleTitle')}
+      description={
+        isAuthed
+          ? t('results.idleAuthed')
+          : t('results.idleGuest', {
+              platform: PLATFORMS[platform].profileNoun,
+            })
+      }
+    />
+  )
+}
 
-const ZeroState = () => (
-  <CenteredState
-    tone="brand"
-    icon={<PartyPopper className="h-6 w-6" aria-hidden="true" />}
-    title="Everyone follows back!"
-    description="There's no one here that isn't following back. Nice and tidy."
-  />
-)
+const ZeroState = () => {
+  const { t } = useTranslation()
+  return (
+    <CenteredState
+      tone="brand"
+      icon={<PartyPopper className="h-6 w-6" aria-hidden="true" />}
+      title={t('results.zeroTitle')}
+      description={t('results.zeroBody')}
+    />
+  )
+}
 
-const ErrorState = () => (
-  <CenteredState
-    icon={<AlertCircle className="h-6 w-6" aria-hidden="true" />}
-    title="Something went wrong"
-    description="We couldn't complete that check. See the notification for details and try again."
-    footer={
-      <a
-        href={`${ISSUES_URL}/new`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-sm font-medium text-brand-400 underline-offset-2 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-brand-400"
-      >
-        Keeps happening? Report an issue
-      </a>
-    }
-  />
-)
+const ErrorState = () => {
+  const { t } = useTranslation()
+  return (
+    <CenteredState
+      icon={<AlertCircle className="h-6 w-6" aria-hidden="true" />}
+      title={t('results.errorTitle')}
+      description={t('results.errorBody')}
+      footer={
+        <a
+          href={`${ISSUES_URL}/new`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-sm font-medium text-brand-400 underline-offset-2 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-brand-400"
+        >
+          {t('results.reportIssue')}
+        </a>
+      }
+    />
+  )
+}

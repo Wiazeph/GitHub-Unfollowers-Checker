@@ -1,10 +1,12 @@
 import { LogOut } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../hooks/useAuth'
 import { logout } from '../../api/client'
 import { PLATFORMS } from '../../platforms'
 
 /** Top-right session indicator: "@handle · Sign out" when authenticated. */
 export const AuthStatus = () => {
+  const { t } = useTranslation()
   const { data: auth, isLoading } = useAuth()
 
   // Sign-in is offered contextually per platform (see GuestCta); the header only
@@ -25,7 +27,7 @@ export const AuthStatus = () => {
         className="inline-flex cursor-pointer items-center gap-1.5 rounded-md px-1.5 py-1 text-fg-muted outline-none transition-colors hover:text-fg focus-visible:ring-2 focus-visible:ring-brand-400"
       >
         <LogOut className="h-4 w-4" aria-hidden="true" />
-        Sign out
+        {t('auth.signOut')}
       </button>
     </div>
   )

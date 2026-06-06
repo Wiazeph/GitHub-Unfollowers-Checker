@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Globe, ShieldCheck } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { PrivacyDialog } from './PrivacyDialog'
 
 const REPO_URL = 'https://github.com/Wiazeph/GitHub-Unfollowers-Checker'
@@ -19,6 +20,7 @@ const GithubIcon = () => (
 )
 
 export const Footer = () => {
+  const { t } = useTranslation()
   const [privacyOpen, setPrivacyOpen] = useState(false)
 
   return (
@@ -31,7 +33,7 @@ export const Footer = () => {
           className="inline-flex items-center gap-2 rounded-md px-2 py-1 outline-none transition-colors hover:text-fg focus-visible:ring-2 focus-visible:ring-brand-400"
         >
           <GithubIcon />
-          <span>View source on GitHub</span>
+          <span>{t('footer.viewSource')}</span>
         </a>
 
         <span aria-hidden="true" className="text-border">
@@ -43,7 +45,7 @@ export const Footer = () => {
           className="inline-flex cursor-pointer items-center gap-2 rounded-md px-2 py-1 outline-none transition-colors hover:text-fg focus-visible:ring-2 focus-visible:ring-brand-400"
         >
           <ShieldCheck className="h-4 w-4" aria-hidden="true" />
-          <span>Privacy</span>
+          <span>{t('footer.privacy')}</span>
         </button>
 
         <span aria-hidden="true" className="text-border">
@@ -62,8 +64,7 @@ export const Footer = () => {
       </div>
 
       <p className="max-w-md text-center text-xs text-fg-muted/80">
-        Not affiliated with GitHub, Bluesky, X, or Instagram. Use on your own
-        accounts, at your own discretion.
+        {t('footer.disclaimer')}
       </p>
 
       <PrivacyDialog open={privacyOpen} onClose={() => setPrivacyOpen(false)} />
