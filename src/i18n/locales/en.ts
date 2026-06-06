@@ -49,6 +49,7 @@ export const en = {
       "Removing people on {{platform}} isn't available yet — this is a read-only view for now.",
     signInCta: "Sign in to remove the people who don't follow you back.",
     signInWith: 'Sign in with {{platform}}',
+    signingIn: 'Redirecting…',
     blueskySignInCta:
       "Sign in with Bluesky to remove the people who don't follow you back.",
     blueskyHandlePlaceholder: 'your-handle.bsky.social',

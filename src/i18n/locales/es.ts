@@ -51,6 +51,7 @@ export const es: Translation = {
       'Quitar en {{platform}} aún no está disponible — por ahora es solo una vista de lectura.',
     signInCta: 'Inicia sesión para quitar a quienes no te siguen de vuelta.',
     signInWith: 'Iniciar sesión con {{platform}}',
+    signingIn: 'Redirigiendo…',
     blueskySignInCta:
       'Inicia sesión con Bluesky para quitar a quienes no te siguen de vuelta.',
     blueskyHandlePlaceholder: 'tu-identificador.bsky.social',

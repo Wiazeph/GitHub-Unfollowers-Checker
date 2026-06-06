@@ -295,14 +295,35 @@ const GuestCta = ({
   }
 
   // GitHub: one-click redirect.
+  return <GithubSignIn />
+}
+
+const GithubSignIn = () => {
+  const { t } = useTranslation()
+  const [redirecting, setRedirecting] = useState(false)
+
+  const start = () => {
+    setRedirecting(true)
+    login()
+  }
+
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-brand-500/30 bg-brand-500/10 px-4 py-3">
       <p className="text-sm text-fg">{t('results.signInCta')}</p>
       <button
-        onClick={login}
-        className="inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg bg-brand-500 px-3 py-1.5 text-sm font-medium text-bg outline-none transition-colors hover:bg-brand-600 focus-visible:ring-2 focus-visible:ring-brand-400"
+        onClick={start}
+        disabled={redirecting}
+        className="inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg bg-brand-500 px-3 py-1.5 text-sm font-medium text-bg outline-none transition-colors hover:bg-brand-600 focus-visible:ring-2 focus-visible:ring-brand-400 disabled:cursor-not-allowed disabled:opacity-70"
       >
-        {t('results.signInWith', { platform: config.profileNoun })}
+        {redirecting && (
+          <LoaderCircle
+            className="h-4 w-4 motion-safe:animate-spin"
+            aria-hidden="true"
+          />
+        )}
+        {redirecting
+          ? t('results.signingIn')
+          : t('results.signInWith', { platform: 'GitHub' })}
       </button>
     </div>
   )
@@ -311,6 +332,7 @@ const GuestCta = ({
 const BlueskySignIn = ({ defaultHandle }: { defaultHandle: string }) => {
   const { t } = useTranslation()
   const [handle, setHandle] = useState(defaultHandle)
+  const [redirecting, setRedirecting] = useState(false)
   const normalized = normalizeHandle('bluesky', handle)
   const valid = PLATFORMS.bluesky.handlePattern.test(normalized)
 
@@ -318,7 +340,9 @@ const BlueskySignIn = ({ defaultHandle }: { defaultHandle: string }) => {
     <form
       onSubmit={(event) => {
         event.preventDefault()
-        if (valid) loginBluesky(normalized)
+        if (!valid || redirecting) return
+        setRedirecting(true)
+        loginBluesky(normalized)
       }}
       className="flex flex-col gap-2 rounded-lg border border-brand-500/30 bg-brand-500/10 px-4 py-3"
     >
@@ -334,14 +358,23 @@ const BlueskySignIn = ({ defaultHandle }: { defaultHandle: string }) => {
           autoCapitalize="off"
           autoCorrect="off"
           spellCheck={false}
-          className="flex-1 rounded-lg border border-border bg-surface px-3 py-1.5 text-sm text-fg placeholder:text-fg-muted outline-none focus-visible:border-brand-500 focus-visible:ring-2 focus-visible:ring-brand-400/40"
+          disabled={redirecting}
+          className="flex-1 rounded-lg border border-border bg-surface px-3 py-1.5 text-sm text-fg placeholder:text-fg-muted outline-none focus-visible:border-brand-500 focus-visible:ring-2 focus-visible:ring-brand-400/40 disabled:opacity-60"
         />
         <button
           type="submit"
-          disabled={!valid}
+          disabled={!valid || redirecting}
           className="inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3 py-1.5 text-sm font-medium text-bg outline-none transition-colors hover:bg-brand-600 focus-visible:ring-2 focus-visible:ring-brand-400 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {t('results.signInWith', { platform: 'Bluesky' })}
+          {redirecting && (
+            <LoaderCircle
+              className="h-4 w-4 motion-safe:animate-spin"
+              aria-hidden="true"
+            />
+          )}
+          {redirecting
+            ? t('results.signingIn')
+            : t('results.signInWith', { platform: 'Bluesky' })}
         </button>
       </div>
     </form>

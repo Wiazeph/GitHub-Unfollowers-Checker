@@ -51,6 +51,7 @@ export const tr: Translation = {
       '{{platform}} üzerinde kaldırma henüz mümkün değil — şimdilik bu yalnızca görüntüleme.',
     signInCta: 'Seni geri takip etmeyenleri kaldırmak için giriş yap.',
     signInWith: '{{platform}} ile giriş yap',
+    signingIn: 'Yönlendiriliyor…',
     blueskySignInCta:
       'Seni geri takip etmeyenleri kaldırmak için Bluesky ile giriş yap.',
     blueskyHandlePlaceholder: 'senin-handle.bsky.social',

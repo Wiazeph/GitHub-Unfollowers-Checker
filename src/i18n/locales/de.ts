@@ -51,6 +51,7 @@ export const de: Translation = {
       'Das Entfernen auf {{platform}} ist noch nicht verfügbar — dies ist vorerst eine reine Ansicht.',
     signInCta: 'Melde dich an, um Personen zu entfernen, die dir nicht zurückfolgen.',
     signInWith: 'Mit {{platform}} anmelden',
+    signingIn: 'Weiterleitung…',
     blueskySignInCta:
       'Melde dich mit Bluesky an, um Personen zu entfernen, die dir nicht zurückfolgen.',
     blueskyHandlePlaceholder: 'dein-handle.bsky.social',

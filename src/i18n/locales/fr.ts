@@ -51,6 +51,7 @@ export const fr: Translation = {
       'Le retrait sur {{platform}} n’est pas encore disponible — c’est une vue en lecture seule pour l’instant.',
     signInCta: 'Connectez-vous pour retirer les personnes qui ne vous suivent pas en retour.',
     signInWith: 'Se connecter avec {{platform}}',
+    signingIn: 'Redirection…',
     blueskySignInCta:
       'Connectez-vous avec Bluesky pour retirer les personnes qui ne vous suivent pas en retour.',
     blueskyHandlePlaceholder: 'votre-identifiant.bsky.social',
