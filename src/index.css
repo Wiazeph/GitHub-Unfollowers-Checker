@@ -1,21 +1,9 @@
 @import 'tailwindcss';
 
+/* Toggle dark mode via a `.dark` class on <html> (set by the theme script). */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
-  /* Brand / accent — GitHub-flavoured green */
-  --color-brand-400: oklch(0.78 0.16 150);
-  --color-brand-500: oklch(0.7 0.17 150);
-  --color-brand-600: oklch(0.62 0.16 150);
-
-  /* Dark surfaces */
-  --color-bg: oklch(0.18 0.005 250);
-  --color-surface: oklch(0.22 0.006 250);
-  --color-surface-hover: oklch(0.26 0.007 250);
-  --color-border: oklch(0.3 0.008 250);
-
-  /* Text */
-  --color-fg: oklch(0.97 0 0);
-  --color-fg-muted: oklch(0.72 0.01 250);
-
   --radius-card: 0.75rem;
   --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
 
@@ -35,6 +23,51 @@
       opacity: 1;
     }
   }
+}
+
+/* Colour tokens resolve to CSS variables so they can swap per theme. */
+@theme inline {
+  --color-brand-400: var(--brand-400);
+  --color-brand-500: var(--brand-500);
+  --color-brand-600: var(--brand-600);
+
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
+  --color-border: var(--border);
+
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+}
+
+/* Light theme (default for new visitors with a light OS preference). */
+:root {
+  --brand-400: oklch(0.68 0.16 150);
+  --brand-500: oklch(0.6 0.17 150);
+  --brand-600: oklch(0.52 0.16 150);
+
+  --bg: oklch(0.98 0.003 250);
+  --surface: oklch(0.96 0.004 250);
+  --surface-hover: oklch(0.92 0.006 250);
+  --border: oklch(0.87 0.008 250);
+
+  --fg: oklch(0.22 0.01 250);
+  --fg-muted: oklch(0.5 0.01 250);
+}
+
+/* Dark theme — the original palette. */
+.dark {
+  --brand-400: oklch(0.78 0.16 150);
+  --brand-500: oklch(0.7 0.17 150);
+  --brand-600: oklch(0.62 0.16 150);
+
+  --bg: oklch(0.18 0.005 250);
+  --surface: oklch(0.22 0.006 250);
+  --surface-hover: oklch(0.26 0.007 250);
+  --border: oklch(0.3 0.008 250);
+
+  --fg: oklch(0.97 0 0);
+  --fg-muted: oklch(0.72 0.01 250);
 }
 
 @layer base {

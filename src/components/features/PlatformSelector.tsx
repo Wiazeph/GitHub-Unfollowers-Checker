@@ -4,6 +4,7 @@ import {
   PLATFORM_LIST,
   type SelectorTab,
 } from '../../platforms'
+import { ThemeToggle } from '../ui/ThemeToggle'
 
 interface PlatformSelectorProps {
   value: SelectorTab
@@ -16,31 +17,37 @@ const TABS = [
   { id: INSTAGRAM_TAB.id as SelectorTab, label: INSTAGRAM_TAB.label, icon: INSTAGRAM_TAB.icon },
 ]
 
-/** Segmented control to switch between GitHub / Bluesky / X / Instagram. */
+/**
+ * Top bar: platform tabs on the left, global actions (theme, later language) on
+ * the right. The actions area is separated so more controls can slot in.
+ */
 export const PlatformSelector = ({ value, onChange }: PlatformSelectorProps) => (
-  <div
-    role="tablist"
-    aria-label="Platform"
-    className="inline-flex flex-wrap gap-1 rounded-lg border border-border bg-surface p-1"
-  >
-    {TABS.map(({ id, label, icon: Icon }) => {
-      const active = value === id
-      return (
-        <button
-          key={id}
-          role="tab"
-          aria-selected={active}
-          onClick={() => onChange(id)}
-          className={`inline-flex cursor-pointer items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-brand-400 ${
-            active
-              ? 'bg-brand-500 text-bg'
-              : 'text-fg-muted hover:bg-surface-hover hover:text-fg'
-          }`}
-        >
-          <Icon className="h-4 w-4" aria-hidden="true" />
-          {label}
-        </button>
-      )
-    })}
+  <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-border bg-surface p-1">
+    <div role="tablist" aria-label="Platform" className="flex flex-wrap gap-1">
+      {TABS.map(({ id, label, icon: Icon }) => {
+        const active = value === id
+        return (
+          <button
+            key={id}
+            role="tab"
+            aria-selected={active}
+            onClick={() => onChange(id)}
+            className={`inline-flex cursor-pointer items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-brand-400 ${
+              active
+                ? 'bg-brand-500 text-bg'
+                : 'text-fg-muted hover:bg-surface-hover hover:text-fg'
+            }`}
+          >
+            <Icon className="h-4 w-4" aria-hidden="true" />
+            {label}
+          </button>
+        )
+      })}
+    </div>
+
+    {/* Right-side actions (theme now; language slots in here next). */}
+    <div className="flex items-center gap-1 pr-0.5">
+      <ThemeToggle />
+    </div>
   </div>
 )
