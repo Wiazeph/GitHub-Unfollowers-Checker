@@ -139,7 +139,7 @@ export const fr: Translation = {
   },
 
   privacy: {
-    title: 'Confidentialité et avertissement',
+    title: 'Confidentialité et Avertissement',
     close: 'Fermer',
     whatTitle: 'Ce que fait cet outil',
     whatBody:
@@ -251,7 +251,7 @@ export const fr: Translation = {
     viewOnlyNote:
       'Liste en lecture seule — le désabonnement sur X n’est pas disponible ici. Ouvrez un profil pour vous désabonner sur X.',
     idLabel: 'ID {{id}}',
-    openProfile: 'Ouvrir le profil',
+    openProfile: 'Voir le profil sur X →',
     copyLinks: 'Copier les liens',
     copied: 'Copié !',
     copiedToast: 'Liens de profil copiés dans le presse-papiers',

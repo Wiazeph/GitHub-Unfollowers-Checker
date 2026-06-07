@@ -13,10 +13,11 @@ interface PlatformSelectorProps {
 }
 
 // Platform names are proper nouns — they stay the same across languages.
+// Order: GitHub, Bluesky, Instagram, X.
 const TABS = [
   ...PLATFORM_LIST.map((p) => ({ id: p.id as SelectorTab, label: p.label, icon: p.icon })),
-  { id: TWITTER_TAB.id as SelectorTab, label: TWITTER_TAB.label, icon: TWITTER_TAB.icon },
   { id: INSTAGRAM_TAB.id as SelectorTab, label: INSTAGRAM_TAB.label, icon: INSTAGRAM_TAB.icon },
+  { id: TWITTER_TAB.id as SelectorTab, label: TWITTER_TAB.label, icon: TWITTER_TAB.icon },
 ]
 
 /** Build a horizontal mask that fades whichever edges can still be scrolled.

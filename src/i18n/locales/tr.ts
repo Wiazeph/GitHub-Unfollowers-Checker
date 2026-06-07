@@ -139,7 +139,7 @@ export const tr: Translation = {
   },
 
   privacy: {
-    title: 'Gizlilik ve sorumluluk reddi',
+    title: 'Gizlilik ve Sorumluluk Reddi',
     close: 'Kapat',
     whatTitle: 'Bu araç ne yapar',
     whatBody:
@@ -251,7 +251,7 @@ export const tr: Translation = {
     viewOnlyNote:
       'Bu yalnızca görüntüleme listesi — burada X’te takibi bırakma yok. Bırakmak için profili aç.',
     idLabel: 'ID {{id}}',
-    openProfile: 'Profili aç',
+    openProfile: 'X’te profili aç →',
     copyLinks: 'Bağlantıları kopyala',
     copied: 'Kopyalandı!',
     copiedToast: 'Profil bağlantıları panoya kopyalandı',

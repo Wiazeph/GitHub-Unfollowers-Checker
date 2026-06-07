@@ -252,7 +252,7 @@ export const de: Translation = {
     viewOnlyNote:
       'Dies ist eine reine Ansichtsliste — Entfolgen auf X ist hier nicht möglich. Öffne ein Profil, um auf X zu entfolgen.',
     idLabel: 'ID {{id}}',
-    openProfile: 'Profil öffnen',
+    openProfile: 'Profil auf X öffnen →',
     copyLinks: 'Links kopieren',
     copied: 'Kopiert!',
     copiedToast: 'Profil-Links in die Zwischenablage kopiert',

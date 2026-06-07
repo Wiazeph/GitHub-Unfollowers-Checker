@@ -139,7 +139,7 @@ export const es: Translation = {
   },
 
   privacy: {
-    title: 'Privacidad y aviso legal',
+    title: 'Privacidad y Aviso Legal',
     close: 'Cerrar',
     whatTitle: 'Qué hace esta herramienta',
     whatBody:
@@ -251,7 +251,7 @@ export const es: Translation = {
     viewOnlyNote:
       'Esta es una lista de solo lectura — dejar de seguir en X no está disponible aquí. Abre un perfil para dejar de seguir en X.',
     idLabel: 'ID {{id}}',
-    openProfile: 'Abrir perfil',
+    openProfile: 'Ver perfil en X →',
     copyLinks: 'Copiar enlaces',
     copied: '¡Copiado!',
     copiedToast: 'Enlaces de perfil copiados al portapapeles',

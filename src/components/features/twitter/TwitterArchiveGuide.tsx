@@ -7,7 +7,9 @@ import {
   PartyPopper,
   ShieldCheck,
   FileDown,
-  X as XMark,
+  ChevronLeft,
+  ChevronRight,
+  User,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { useTranslation, Trans } from 'react-i18next'
@@ -15,6 +17,7 @@ import {
   classifyArchiveFile,
   computeArchiveUnfollowers,
 } from '../../../lib/twitterArchive'
+import { usePageSize } from '../../../hooks/usePageSize'
 import type { Account } from '../../../types/platform'
 
 /**
@@ -217,6 +220,31 @@ const ResultsView = ({
   const { t } = useTranslation()
   const count = accounts.length
 
+  // Pagination — show a bounded number of cards per page (responsive), matching
+  // the GitHub/Bluesky results. Keeps very large lists (1000s of ids) light.
+  const pageSize = usePageSize()
+  const [page, setPage] = useState(0)
+  const topRef = useRef<HTMLDivElement>(null)
+  const pageChangedRef = useRef(false)
+
+  const pageCount = Math.max(1, Math.ceil(count / pageSize))
+  const safePage = Math.min(page, pageCount - 1)
+  const pageStart = safePage * pageSize
+  const visible = accounts.slice(pageStart, pageStart + pageSize)
+
+  // Scroll back to the top after a page change has rendered (only on real
+  // prev/next clicks, not the initial render).
+  useEffect(() => {
+    if (!pageChangedRef.current) return
+    pageChangedRef.current = false
+    topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, [safePage])
+
+  const goToPage = (next: number) => {
+    pageChangedRef.current = true
+    setPage(next)
+  }
+
   if (count === 0) {
     return (
       <div className="flex flex-col items-center gap-4 py-12 text-center">
@@ -233,14 +261,14 @@ const ResultsView = ({
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div ref={topRef} className="flex flex-col gap-4 scroll-mt-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-fg-muted">
           <Trans i18nKey="twitter.resultSummary" count={count} components={[bold]} />
         </p>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-2">
           <CopyButton accounts={accounts} />
-          <BackButton onReset={onReset} subtle />
+          <BackButton onReset={onReset} />
         </div>
       </div>
 
@@ -250,7 +278,7 @@ const ResultsView = ({
       </div>
 
       <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {accounts.map((account) => (
+        {visible.map((account) => (
           <li key={account.id}>
             <a
               href={account.profileUrl}
@@ -262,7 +290,7 @@ const ResultsView = ({
                 className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-surface-hover text-fg-muted ring-1 ring-border"
                 aria-hidden="true"
               >
-                <XMark className="h-4 w-4" />
+                <User className="h-5 w-5" />
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-sm font-medium">
@@ -280,26 +308,37 @@ const ResultsView = ({
           </li>
         ))}
       </ul>
+
+      {pageCount > 1 && (
+        <div className="flex items-center justify-between gap-3">
+          <button
+            onClick={() => goToPage(safePage - 1)}
+            disabled={safePage === 0}
+            className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-border bg-surface px-3 py-1.5 text-sm font-medium text-fg outline-none transition-colors hover:bg-surface-hover focus-visible:ring-2 focus-visible:ring-brand-400 disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+            {t('results.prevPage')}
+          </button>
+          <span className="text-sm text-fg-muted" aria-live="polite">
+            {t('results.pageOf', { page: safePage + 1, total: pageCount })}
+          </span>
+          <button
+            onClick={() => goToPage(safePage + 1)}
+            disabled={safePage >= pageCount - 1}
+            className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-border bg-surface px-3 py-1.5 text-sm font-medium text-fg outline-none transition-colors hover:bg-surface-hover focus-visible:ring-2 focus-visible:ring-brand-400 disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            {t('results.nextPage')}
+            <ChevronRight className="h-4 w-4" aria-hidden="true" />
+          </button>
+        </div>
+      )}
     </div>
   )
 }
 
-const BackButton = ({
-  onReset,
-  subtle = false,
-}: {
-  onReset: () => void
-  subtle?: boolean
-}) => {
+const BackButton = ({ onReset }: { onReset: () => void }) => {
   const { t } = useTranslation()
-  return subtle ? (
-    <button
-      onClick={onReset}
-      className="inline-flex cursor-pointer items-center gap-1.5 rounded-md px-2 py-1 text-sm text-fg-muted outline-none transition-colors hover:text-fg focus-visible:ring-2 focus-visible:ring-brand-400"
-    >
-      {t('twitter.startOver')}
-    </button>
-  ) : (
+  return (
     <button
       onClick={onReset}
       className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-border bg-surface px-3 py-1.5 text-sm font-medium text-fg outline-none transition-colors hover:bg-surface-hover focus-visible:ring-2 focus-visible:ring-brand-400"

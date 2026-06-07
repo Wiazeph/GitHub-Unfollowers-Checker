@@ -137,7 +137,7 @@ export const en = {
   },
 
   privacy: {
-    title: 'Privacy & disclaimer',
+    title: 'Privacy & Disclaimer',
     close: 'Close',
     whatTitle: 'What this tool does',
     whatBody:
@@ -249,7 +249,7 @@ export const en = {
     viewOnlyNote:
       'This is a view-only list — unfollowing on X isn’t available here. Open a profile to unfollow on X.',
     idLabel: 'ID {{id}}',
-    openProfile: 'Open profile',
+    openProfile: 'View profile on X →',
     copyLinks: 'Copy links',
     copied: 'Copied!',
     copiedToast: 'Profile links copied to clipboard',
