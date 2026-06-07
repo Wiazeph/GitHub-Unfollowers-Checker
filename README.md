@@ -2,7 +2,7 @@
 
 See who you follow that doesn't follow you back — across **GitHub**, **Bluesky**, **X (Twitter)**, and **Instagram**, in one place. Pick a platform, and get the list of accounts you follow who don't follow you back. On GitHub and Bluesky you can sign in and clean it up with one click.
 
-![Unfollowers Checker](./thumbnail/GitHub-Unfollowers-Checker.png)
+![Unfollowers Checker](./thumbnail/Unfollowers-Checker.png)
 
 ## Platforms
 
@@ -10,8 +10,8 @@ See who you follow that doesn't follow you back — across **GitHub**, **Bluesky
 | --- | :---: | :---: | --- |
 | **GitHub** | ✅ | ✅ | Public API, no sign-in needed to view any user. Sign in with GitHub to bulk-unfollow your own list. |
 | **Bluesky** | ✅ | ✅ | Public AT Protocol API to view any handle. Sign in with Bluesky to bulk-unfollow your own list. |
-| **X (Twitter)** | ✅ | — | X has no free follower API, so you upload `following.js` / `follower.js` from your official data archive and the diff runs entirely in your browser. Links open each profile so you can unfollow there. |
 | **Instagram** | ✅ | ✅ | A small script you paste into your browser console on instagram.com. It runs in your own session — Instagram has no public follower API, so nothing touches our servers. |
+| **X (Twitter)** | ✅ | — | X has no free follower API, so you upload `following.js` / `follower.js` from your official data archive and the diff runs entirely in your browser. Links open each profile so you can unfollow there. |
 
 > Reading X's or Instagram's follower lists isn't possible through a free official API, so those two run fully client-side instead (X via your data archive, Instagram via a console script). LinkedIn has no usable follower-list API at all, so it's out of scope.
 
@@ -49,6 +49,10 @@ This is a free, personal utility and is **not affiliated with, endorsed by, or c
 
 - **Found a bug or have a request?** [Open an issue](https://github.com/Wiazeph/GitHub-Unfollowers-Checker/issues) on GitHub.
 - **Anything else?** Email **emreerden@pm.me** or visit [emreerden.dev](https://emreerden.dev).
+
+## Support
+
+This is a free, ad-free utility maintained in spare time. If it saved you some, you can [**❤️ Sponsor the project**](https://github.com/sponsors/Wiazeph) on GitHub Sponsors — any support helps keep it running and improving.
 
 ## Credits
 
