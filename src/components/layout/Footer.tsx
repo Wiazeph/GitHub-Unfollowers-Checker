@@ -1,11 +1,20 @@
 import { useState } from 'react'
-import { Globe, ShieldCheck, Heart } from 'lucide-react'
+import { Globe, ShieldCheck, Heart, Mail, CircleDot } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { PrivacyDialog } from './PrivacyDialog'
 
 const REPO_URL = 'https://github.com/Wiazeph/GitHub-Unfollowers-Checker'
+const ISSUES_URL =
+  'https://github.com/Wiazeph/GitHub-Unfollowers-Checker/issues'
 const SITE_URL = 'https://emreerden.dev'
 const SPONSOR_URL = 'https://github.com/sponsors/Wiazeph'
+const CONTACT_EMAIL = 'emreerden@pm.me'
+
+const Dot = () => (
+  <span aria-hidden="true" className="text-border">
+    •
+  </span>
+)
 
 /** Lucide 1.x dropped the GitHub brand mark, so the logo stays as inline SVG. */
 const GithubIcon = () => (
@@ -24,34 +33,51 @@ export const Footer = () => {
   const { t } = useTranslation()
   const [privacyOpen, setPrivacyOpen] = useState(false)
 
+  const linkClass =
+    'inline-flex items-center gap-2 rounded-md px-2 py-1 outline-none transition-colors hover:text-fg focus-visible:ring-2 focus-visible:ring-brand-400'
+
   return (
     <footer className="mx-auto flex w-full max-w-3xl flex-col items-center gap-2 px-4 py-8 text-sm text-fg-muted sm:px-6">
+      {/* Row 1 — how to reach the author (contact + personal site). */}
       <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
-        <a
-          href={REPO_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 rounded-md px-2 py-1 outline-none transition-colors hover:text-fg focus-visible:ring-2 focus-visible:ring-brand-400"
-        >
+        <a href={`mailto:${CONTACT_EMAIL}`} className={linkClass}>
+          <Mail className="h-4 w-4" aria-hidden="true" />
+          <span>{t('footer.contact', { email: CONTACT_EMAIL })}</span>
+        </a>
+
+        <Dot />
+
+        <a href={SITE_URL} target="_blank" rel="noopener noreferrer" className={linkClass}>
+          <Globe className="h-4 w-4" aria-hidden="true" />
+          <span>emreerden.dev</span>
+        </a>
+      </div>
+
+      {/* Row 2 — project links: source, privacy, issue tracker, sponsor. */}
+      <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
+        <a href={REPO_URL} target="_blank" rel="noopener noreferrer" className={linkClass}>
           <GithubIcon />
           <span>{t('footer.viewSource')}</span>
         </a>
 
-        <span aria-hidden="true" className="text-border">
-          •
-        </span>
+        <Dot />
 
         <button
           onClick={() => setPrivacyOpen(true)}
-          className="inline-flex cursor-pointer items-center gap-2 rounded-md px-2 py-1 outline-none transition-colors hover:text-fg focus-visible:ring-2 focus-visible:ring-brand-400"
+          className={`cursor-pointer ${linkClass}`}
         >
           <ShieldCheck className="h-4 w-4" aria-hidden="true" />
           <span>{t('footer.privacy')}</span>
         </button>
 
-        <span aria-hidden="true" className="text-border">
-          •
-        </span>
+        <Dot />
+
+        <a href={ISSUES_URL} target="_blank" rel="noopener noreferrer" className={linkClass}>
+          <CircleDot className="h-4 w-4" aria-hidden="true" />
+          <span>{t('footer.reportIssue')}</span>
+        </a>
+
+        <Dot />
 
         {/* Sponsor is the one link we want to stand out — a brand-colored badge,
             while the others stay muted so the emphasis lands in a single place. */}
@@ -63,20 +89,6 @@ export const Footer = () => {
         >
           <Heart className="h-4 w-4 fill-current" aria-hidden="true" />
           <span>{t('footer.sponsor')}</span>
-        </a>
-
-        <span aria-hidden="true" className="text-border">
-          •
-        </span>
-
-        <a
-          href={SITE_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 rounded-md px-2 py-1 outline-none transition-colors hover:text-fg focus-visible:ring-2 focus-visible:ring-brand-400"
-        >
-          <Globe className="h-4 w-4" aria-hidden="true" />
-          <span>emreerden.dev</span>
         </a>
       </div>
 

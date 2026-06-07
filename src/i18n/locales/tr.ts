@@ -132,6 +132,8 @@ export const tr: Translation = {
     viewSource: 'Kaynak kodu',
     sponsor: 'Destek ol',
     privacy: 'Gizlilik',
+    contact: 'İletişim: {{email}}',
+    reportIssue: 'Sorun bildir',
     disclaimer:
       'GitHub, Bluesky, X veya Instagram ile bağlantılı değildir. Kendi hesaplarında, kendi sorumluluğunda kullan.',
   },
@@ -144,7 +146,7 @@ export const tr: Translation = {
       'Takip Etmeyenler; GitHub, Bluesky, X (Twitter) ve Instagram’da takip ettiğin ama seni geri takip etmeyen hesapları bulmana yardım eder. Ücretsiz, kişisel bir araçtır ve bu platformların hiçbiriyle bağlantılı, onaylı ya da ilişkili değildir.',
     storeTitle: 'Neyi saklıyoruz',
     storeBody:
-      'Hiçbir şeyi. Veritabanı çalıştırmıyoruz ve verilerini saklamıyoruz. Takipçi ve takip listeleri yalnızca o tek istek için alınır, karşılaştırılır ve döndürülür — asla kaydedilmez veya loglanmaz.',
+      'Sunucularımızda hiçbir şey. Veritabanı çalıştırmıyoruz ve verilerini saklamıyoruz. Takipçi ve takip listeleri yalnızca o tek istek için alınır, karşılaştırılır ve döndürülür — asla kaydedilmez veya loglanmaz. Tercihlerin (tema, dil ve Instagram panelinin ayarları/yerleşimi) yalnızca kendi tarayıcının yerel deposunda tutulur ve hiçbir yere gönderilmez.',
     howTitle: 'Her platform nasıl çalışır',
     howGithubLabel: 'GitHub ve Bluesky:',
     howGithubBody:

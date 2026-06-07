@@ -132,6 +132,8 @@ export const fr: Translation = {
     viewSource: 'Code source',
     sponsor: 'Faire un don',
     privacy: 'Confidentialité',
+    contact: 'Contact : {{email}}',
+    reportIssue: 'Signaler un problème',
     disclaimer:
       'Sans affiliation avec GitHub, Bluesky, X ou Instagram. À utiliser sur vos propres comptes, à votre discrétion.',
   },
@@ -144,7 +146,7 @@ export const fr: Translation = {
       'Le Vérificateur d’abonnements vous aide à trouver les comptes que vous suivez sans être suivi en retour, sur GitHub, Bluesky, X (Twitter) et Instagram. C’est un outil gratuit et personnel, sans affiliation, approbation ni lien avec ces plateformes.',
     storeTitle: 'Ce que nous stockons',
     storeBody:
-      'Rien. Nous n’avons pas de base de données et ne conservons pas vos données. Les listes d’abonnés et d’abonnements sont récupérées, comparées et renvoyées pour cette seule requête — jamais enregistrées ni journalisées.',
+      'Rien sur nos serveurs. Nous n’avons pas de base de données et ne conservons pas vos données. Les listes d’abonnés et d’abonnements sont récupérées, comparées et renvoyées pour cette seule requête — jamais enregistrées ni journalisées. Vos préférences (thème, langue et les réglages/disposition du panneau Instagram) sont enregistrées uniquement dans le stockage local de votre navigateur et ne sont envoyées nulle part.',
     howTitle: 'Comment fonctionne chaque plateforme',
     howGithubLabel: 'GitHub et Bluesky :',
     howGithubBody:

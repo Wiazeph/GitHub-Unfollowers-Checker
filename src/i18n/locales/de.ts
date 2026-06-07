@@ -133,6 +133,8 @@ export const de: Translation = {
     viewSource: 'Quellcode',
     sponsor: 'Unterstützen',
     privacy: 'Datenschutz',
+    contact: 'Kontakt: {{email}}',
+    reportIssue: 'Problem melden',
     disclaimer:
       'Nicht verbunden mit GitHub, Bluesky, X oder Instagram. Nutzung mit eigenen Konten, auf eigene Verantwortung.',
   },
@@ -145,7 +147,7 @@ export const de: Translation = {
       'Der Unfollower-Checker hilft dir, Konten zu finden, denen du folgst, die dir aber nicht zurückfolgen — auf GitHub, Bluesky, X (Twitter) und Instagram. Es ist ein kostenloses, persönliches Tool und steht in keiner Verbindung zu diesen Plattformen, wird von ihnen nicht unterstützt oder befürwortet.',
     storeTitle: 'Was wir speichern',
     storeBody:
-      'Nichts. Wir betreiben keine Datenbank und speichern deine Daten nicht. Follower- und Folgt-Listen werden für diese eine Anfrage abgerufen, verglichen und zurückgegeben — niemals protokolliert oder gespeichert.',
+      'Nichts auf unseren Servern. Wir betreiben keine Datenbank und speichern deine Daten nicht. Follower- und Folgt-Listen werden für diese eine Anfrage abgerufen, verglichen und zurückgegeben — niemals protokolliert oder gespeichert. Deine Einstellungen (Design, Sprache und die Einstellungen/Anordnung des Instagram-Panels) werden nur im lokalen Speicher deines eigenen Browsers abgelegt und nirgendwohin gesendet.',
     howTitle: 'Wie jede Plattform funktioniert',
     howGithubLabel: 'GitHub & Bluesky:',
     howGithubBody:

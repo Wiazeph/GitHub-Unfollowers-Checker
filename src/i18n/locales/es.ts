@@ -132,6 +132,8 @@ export const es: Translation = {
     viewSource: 'Código fuente',
     sponsor: 'Apóyame',
     privacy: 'Privacidad',
+    contact: 'Contacto: {{email}}',
+    reportIssue: 'Informar de un problema',
     disclaimer:
       'Sin afiliación con GitHub, Bluesky, X o Instagram. Úsalo en tus propias cuentas, bajo tu propia responsabilidad.',
   },
@@ -144,7 +146,7 @@ export const es: Translation = {
       'El Comprobador de seguidores te ayuda a encontrar cuentas que sigues y que no te siguen de vuelta, en GitHub, Bluesky, X (Twitter) e Instagram. Es una herramienta gratuita y personal, sin afiliación, respaldo ni conexión con ninguna de esas plataformas.',
     storeTitle: 'Qué almacenamos',
     storeBody:
-      'Nada. No tenemos base de datos ni guardamos tus datos. Las listas de seguidores y seguidos se obtienen, comparan y devuelven para esa única solicitud — nunca se registran ni se guardan.',
+      'Nada en nuestros servidores. No tenemos base de datos ni guardamos tus datos. Las listas de seguidores y seguidos se obtienen, comparan y devuelven para esa única solicitud — nunca se registran ni se guardan. Tus preferencias (tema, idioma y los ajustes/diseño del panel de Instagram) se guardan solo en el almacenamiento local de tu propio navegador y nunca se envían a ningún sitio.',
     howTitle: 'Cómo funciona cada plataforma',
     howGithubLabel: 'GitHub y Bluesky:',
     howGithubBody:

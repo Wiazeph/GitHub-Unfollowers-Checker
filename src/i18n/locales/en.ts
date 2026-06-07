@@ -130,6 +130,8 @@ export const en = {
     viewSource: 'Source code',
     sponsor: 'Sponsor',
     privacy: 'Privacy',
+    contact: 'Contact: {{email}}',
+    reportIssue: 'Report an issue',
     disclaimer:
       'Not affiliated with GitHub, Bluesky, X, or Instagram. Use on your own accounts, at your own discretion.',
   },
@@ -142,7 +144,7 @@ export const en = {
       "Unfollowers Checker helps you find accounts you follow that don't follow you back, across GitHub, Bluesky, X (Twitter), and Instagram. It's a free, personal utility and is not affiliated with, endorsed by, or connected to any of those platforms.",
     storeTitle: 'What we store',
     storeBody:
-      "Nothing. We don't run a database and we don't keep your data. Follower and following lists are fetched, compared, and returned for that one request — never logged or saved.",
+      "Nothing on our servers. We don't run a database and we don't keep your data. Follower and following lists are fetched, compared, and returned for that one request — never logged or saved. Your preferences (theme, language, and the Instagram panel's settings/layout) are saved only in your own browser's local storage and never sent anywhere.",
     howTitle: 'How each platform works',
     howGithubLabel: 'GitHub & Bluesky:',
     howGithubBody:
