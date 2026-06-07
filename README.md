@@ -28,6 +28,7 @@ The pasted script injects a small, self-contained panel into instagram.com. It c
 - **Scan smart** — only checks the people you follow and reads Instagram's follow-back status, so it stays fast even on large accounts.
 - **Search & filter** — find by name/username and filter by verified / private / no profile picture, with one-tap "select all verified / private / no-photo" shortcuts.
 - **Bulk unfollow** — select accounts and unfollow them in batches, with a live progress bar and a one-click retry for any that failed.
+- **Review the outcome** — when it finishes, it lists exactly who was unfollowed (and anyone that failed) so you can see the result.
 - **Stay under the radar** — randomized delays and cooldowns keep activity human-like; on rate-limits it automatically backs off and pauses instead of failing silently. (Keep the tab and browser open while it runs.)
 - **Tune the timing** — every delay and cooldown is configurable in settings, or reset to the conservative defaults.
 - **Comfortable UI** — drag the panel anywhere, resize it from any edge or corner, minimize it, and switch theme (light / dark / system) and language (EN / TR / DE / FR / ES). Your preferences are remembered.
