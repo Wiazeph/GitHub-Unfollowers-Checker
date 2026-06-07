@@ -209,6 +209,7 @@ export const de: Translation = {
       scan: 'Scannt nur die Personen, denen du folgst, und nutzt Instagrams Rückfolge-Status — so bleibt es auch bei großen Konten schnell.',
       manage: 'Suche und filtere nach verifiziert / privat / kein Profilbild, mit Schnellbefehlen „alle verifizierten / privaten / ohne Bild auswählen“.',
       unfollow: 'Konten auswählen und massenhaft entfolgen, mit Live-Fortschrittsbalken und Ein-Klick-Wiederholung für fehlgeschlagene.',
+      summary: 'Am Ende listet es genau auf, wem entfolgt wurde (und was fehlschlug), damit du das Ergebnis prüfen kannst.',
       safety: 'Zufällige Verzögerungen und Pausen wirken menschlich; bei Rate-Limits wird automatisch gedrosselt und pausiert, statt still zu scheitern.',
       settings: 'Stelle jedes Timing (Scan-/Entfolgen-Verzögerungen, Pausen) in den Einstellungen ein oder setze die konservativen Standardwerte zurück.',
       comfort: 'Ziehe das Panel überallhin, ändere die Größe an jeder Kante, minimiere es und wechsle Design (hell/dunkel/System) und Sprache — deine Auswahl wird gespeichert.',

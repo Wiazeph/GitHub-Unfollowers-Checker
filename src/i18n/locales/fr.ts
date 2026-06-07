@@ -208,6 +208,7 @@ export const fr: Translation = {
       scan: 'Analyse uniquement les personnes que vous suivez et utilise le statut de suivi d’Instagram — il reste rapide même sur les grands comptes.',
       manage: 'Recherchez et filtrez par vérifié / privé / sans photo de profil, avec des raccourcis « sélectionner tous les vérifiés / privés / sans photo ».',
       unfollow: 'Sélectionnez des comptes et désabonnez-vous en masse, avec une barre de progression en direct et une nouvelle tentative en un clic pour les échecs.',
+      summary: 'À la fin, il liste précisément qui a été désabonné (et les échecs éventuels), pour que vous puissiez vérifier le résultat.',
       safety: 'Des délais et pauses aléatoires gardent un comportement humain ; en cas de limitation, l’outil ralentit et se met en pause au lieu d’échouer en silence.',
       settings: 'Réglez chaque délai (analyse/désabonnement, pauses) dans les paramètres, ou rétablissez les valeurs prudentes par défaut.',
       comfort: 'Déplacez le panneau où vous voulez, redimensionnez-le depuis n’importe quel bord, réduisez-le et changez de thème (clair/sombre/système) et de langue — vos choix sont mémorisés.',

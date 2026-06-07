@@ -208,6 +208,7 @@ export const tr: Translation = {
       scan: 'Yalnızca takip ettiklerini tarar ve Instagram’ın geri takip durumunu kullanır; büyük hesaplarda bile hızlı kalır.',
       manage: 'Ara ve onaylı / gizli / profil fotoğrafı olmayan filtrele; “tüm onaylıları / gizlileri / fotoğrafsızları seç” kısayollarıyla hızlıca seç.',
       unfollow: 'Hesapları seçip toplu takip bırak; canlı ilerleme çubuğu ve başarısız olanlar için tek tıkla tekrar deneme.',
+      summary: 'İşlem bitince kimlerin takipten çıkarıldığını (ve başarısız olanları) tek tek listeler, sonucu gözden geçirebilirsin.',
       safety: 'Rastgele gecikme ve molalar insansı tutar; kısıtlamada sessizce başarısız olmak yerine otomatik geri çekilip duraklar.',
       settings: 'Her zamanlamayı (tarama/bırakma gecikmeleri, molalar) ayarlardan değiştir ya da muhafazakar varsayılanlara dön.',
       comfort: 'Paneli istediğin yere sürükle, her kenardan boyutlandır, küçült; temayı (açık/koyu/sistem) ve dili değiştir — seçimlerin hatırlanır.',

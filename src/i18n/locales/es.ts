@@ -208,6 +208,7 @@ export const es: Translation = {
       scan: 'Analiza solo a las personas que sigues y usa el estado de seguimiento de Instagram, por lo que es rápido incluso en cuentas grandes.',
       manage: 'Busca y filtra por verificado / privado / sin foto de perfil, con atajos para “seleccionar todos los verificados / privados / sin foto”.',
       unfollow: 'Selecciona cuentas y deja de seguir en masa, con una barra de progreso en vivo y un reintento con un clic para las que fallen.',
+      summary: 'Al terminar, muestra exactamente a quién dejaste de seguir (y los que fallaron), para que revises el resultado.',
       safety: 'Los retrasos y pausas aleatorias lo mantienen humano; ante límites de uso, se ralentiza y pausa automáticamente en vez de fallar en silencio.',
       settings: 'Ajusta cada tiempo (retrasos de análisis/dejar de seguir, pausas) en los ajustes, o restaura los valores prudentes por defecto.',
       comfort: 'Arrastra el panel a donde quieras, cambia su tamaño desde cualquier borde, minimízalo y cambia el tema (claro/oscuro/sistema) y el idioma — se recuerdan tus elecciones.',

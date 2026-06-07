@@ -92,6 +92,8 @@
       idle: "Ready",
       unfollowDoneTitle: "Done",
       unfollowDoneBody: "{ok} unfollowed, {fail} failed",
+      doneRemoved: "Unfollowed ({count})",
+      doneFailed: "Failed ({count})",
       settings: "Settings",
       settingsTitle: "Timing settings",
       settingsBody: "Lower delays make Instagram more likely to throttle or block your account. Keep these conservative.",
@@ -179,6 +181,8 @@
       idle: "Hazır",
       unfollowDoneTitle: "Tamamlandı",
       unfollowDoneBody: "{ok} başarılı, {fail} başarısız",
+      doneRemoved: "Takibi bırakıldı ({count})",
+      doneFailed: "Başarısız ({count})",
       settings: "Ayarlar",
       settingsTitle: "Hız ayarları",
       settingsBody: "Düşük gecikmeler Instagram'ın hesabını kısıtlamasına neden olabilir. Yavaş tut.",
@@ -266,6 +270,8 @@
       idle: "Bereit",
       unfollowDoneTitle: "Fertig",
       unfollowDoneBody: "{ok} entfolgt, {fail} fehlgeschlagen",
+      doneRemoved: "Entfolgt ({count})",
+      doneFailed: "Fehlgeschlagen ({count})",
       settings: "Einstellungen",
       settingsTitle: "Timing-Einstellungen",
       settingsBody: "Niedrigere Verzögerungen erhöhen das Risiko, dass Instagram dein Konto drosselt oder sperrt. Halte sie konservativ.",
@@ -353,6 +359,8 @@
       idle: "Prêt",
       unfollowDoneTitle: "Terminé",
       unfollowDoneBody: "{ok} désabonnés, {fail} échoués",
+      doneRemoved: "Désabonnés ({count})",
+      doneFailed: "Échoués ({count})",
       settings: "Paramètres",
       settingsTitle: "Réglages de cadence",
       settingsBody: "Des délais plus courts augmentent le risque qu'Instagram limite ou bloque votre compte. Restez prudent.",
@@ -440,6 +448,8 @@
       idle: "Listo",
       unfollowDoneTitle: "Hecho",
       unfollowDoneBody: "{ok} dejados de seguir, {fail} fallidos",
+      doneRemoved: "Dejados de seguir ({count})",
+      doneFailed: "Fallidos ({count})",
       settings: "Ajustes",
       settingsTitle: "Ajustes de ritmo",
       settingsBody: "Retrasos más cortos aumentan la probabilidad de que Instagram limite o bloquee tu cuenta. Mantenlos conservadores.",
@@ -520,6 +530,9 @@
     theme: persisted.theme === "light" || persisted.theme === "dark" ? persisted.theme : "system",
     // Transient (not persisted): ids that failed during the last unfollow run.
     failed: new Set(),
+    // Transient: which quick-select shortcut is active ('all'|'verified'|'private'|'no-photo'|null).
+    // While one is active, the others are disabled and it acts as a "clear" toggle.
+    selectMode: null,
     // Set true once a permanent rate-limit auto-pauses the current operation.
     rateLimited: false,
     error: ""
@@ -667,18 +680,38 @@
     root.querySelector("[data-action='language']")?.addEventListener("click", cycleLanguage);
   }
 
+  // Only the results list justifies a fixed (resizable) height. Every other view
+  // — idle, scan/unfollow progress, AND the unfollow-done summary — hugs its
+  // content so there's no large empty area below. The done list scrolls within
+  // its own max-height when it's long.
+  function modeUsesFixedHeight() {
+    return state.mode === "results";
+  }
+
+  // Apply the persisted panel size: width always, height only for list views.
+  function applyPanelSize() {
+    const node = document.querySelector(`#${APP_ID} .iu-panel`);
+    if (!node) return;
+    if (state.panelSize) {
+      const maxW = Math.max(PANEL_MIN_WIDTH, window.innerWidth - 16);
+      node.style.width = clamp(state.panelSize.w, PANEL_MIN_WIDTH, maxW) + "px";
+      if (modeUsesFixedHeight()) {
+        const maxH = Math.max(PANEL_MIN_HEIGHT, window.innerHeight - 16);
+        node.style.height = clamp(state.panelSize.h, PANEL_MIN_HEIGHT, maxH) + "px";
+      } else {
+        node.style.height = "auto";
+      }
+    } else {
+      node.style.height = "auto";
+    }
+  }
+
   function applyPanelPosition() {
     const root = document.getElementById(APP_ID);
     if (!root) return;
     const node = root.querySelector(".iu-panel") || root.querySelector(".iu-pill");
     if (!node) return;
-    // Apply a persisted size to the full panel (not the minimized pill).
-    if (node.classList.contains("iu-panel") && state.panelSize) {
-      const maxW = Math.max(PANEL_MIN_WIDTH, window.innerWidth - 16);
-      const maxH = Math.max(PANEL_MIN_HEIGHT, window.innerHeight - 16);
-      node.style.width = clamp(state.panelSize.w, PANEL_MIN_WIDTH, maxW) + "px";
-      node.style.height = clamp(state.panelSize.h, PANEL_MIN_HEIGHT, maxH) + "px";
-    }
+    if (node.classList.contains("iu-panel")) applyPanelSize();
     const pos = state.panelPos;
     if (pos && Number.isFinite(pos.x) && Number.isFinite(pos.y)) {
       const max = panelBounds(node);
@@ -858,6 +891,8 @@
       body.innerHTML = renderIdleView();
       bindIdle(body);
     }
+    // Re-evaluate the panel height: fixed for list views, auto for short ones.
+    applyPanelSize();
     if (state.mode === "scanning" || state.mode === "unfollowing") startCountdown();
     else stopCountdown();
   }
@@ -929,11 +964,14 @@
   function renderResultsView() {
     const display = getDisplayUsers();
     const totalNonFollowers = state.users.filter((u) => !u.follows_viewer && !state.hidden.has(u.id)).length;
-    const visibleSelected = display.filter((u) => state.selected.has(u.id)).length;
     let summary;
     if (totalNonFollowers === 0) summary = t("foundNone");
     else if (totalNonFollowers === 1) summary = t("foundOne");
     else summary = t("foundCount", { count: totalNonFollowers });
+
+    // Chip visibility is based on the whole pool (not the active filters/search),
+    // so a category's chip is shown only when that category exists at all.
+    const pool = getPool();
 
     return `
       <div class="iu-results">
@@ -950,20 +988,15 @@
           >
         </div>
         <div class="iu-filters">
-          ${filterChip("verified", t("filterVerified"))}
-          ${filterChip("private", t("filterPrivate"))}
-          ${filterChip("noAvatar", t("filterNoAvatar"))}
+          ${filterChip("verified", t("filterVerified"), pool.some((u) => u.is_verified))}
+          ${filterChip("private", t("filterPrivate"), pool.some((u) => u.is_private))}
+          ${filterChip("noAvatar", t("filterNoAvatar"), pool.some((u) => isDefaultAvatar(u)))}
           ${filterChip("showHidden", t("filterShowHidden"), state.hidden.size > 0 || state.filters.showHidden)}
         </div>
         <div class="iu-list" data-list>${renderUserList(display)}</div>
         <div class="iu-actionbar">
           <div class="iu-actionbar-left">
-            <button type="button" class="iu-btn iu-btn--small" data-action="select-all" ${display.length ? "" : "disabled"}>
-              ${escapeHTML(visibleSelected === display.length && display.length ? t("selectNone") : t("selectAll"))}
-            </button>
-            ${display.some((u) => u.is_verified) ? `<button type="button" class="iu-btn iu-btn--small iu-btn--ghost" data-action="select-verified">${escapeHTML(t("selectVerified"))}</button>` : ""}
-            ${display.some((u) => u.is_private) ? `<button type="button" class="iu-btn iu-btn--small iu-btn--ghost" data-action="select-private">${escapeHTML(t("selectPrivate"))}</button>` : ""}
-            ${display.some((u) => isDefaultAvatar(u)) ? `<button type="button" class="iu-btn iu-btn--small iu-btn--ghost" data-action="select-no-photo">${escapeHTML(t("selectNoPhoto"))}</button>` : ""}
+            <span class="iu-select-group" data-select-group>${renderSelectButtons()}</span>
             <span class="iu-muted" data-selected-label>${escapeHTML(t("selectedCount", { count: state.selected.size }))}</span>
           </div>
           <div class="iu-actionbar-right">
@@ -975,8 +1008,72 @@
     `;
   }
 
+  // The quick-select buttons (Select all / verified / private / no-photo). They
+  // behave as one exclusive group: activating one selects exactly its matches,
+  // turns that button into a "Clear" toggle, and disables the others until
+  // cleared. Visibility is based on the filtered set WITHOUT search, so typing a
+  // non-matching query never makes the buttons vanish. A button is shown only
+  // when its category has at least one (filter-respecting) match.
+  function renderSelectButtons() {
+    const display = getDisplayNoSearch();
+    const defs = [
+      { mode: "all", action: "select-all", label: "selectAll", show: display.length > 0 },
+      { mode: "verified", action: "select-verified", label: "selectVerified", show: display.some((u) => u.is_verified) },
+      { mode: "private", action: "select-private", label: "selectPrivate", show: display.some((u) => u.is_private) },
+      { mode: "no-photo", action: "select-no-photo", label: "selectNoPhoto", show: display.some((u) => isDefaultAvatar(u)) },
+    ];
+    const active = state.selectMode;
+    return defs
+      .filter((d) => d.show)
+      .map((d) => {
+        const isActive = active === d.mode;
+        const disabled = active && !isActive;
+        const ghost = d.mode === "all" ? "" : " iu-btn--ghost";
+        return `<button type="button" class="iu-btn iu-btn--small${ghost}" data-action="${d.action}"${disabled ? " disabled" : ""}>${escapeHTML(isActive ? t("selectNone") : t(d.label))}</button>`;
+      })
+      .join("");
+  }
+
+  // Quick-select group behaviour: activating one selects exactly its matches in
+  // the filtered list (ignoring the search box, to match the buttons' own
+  // visibility) and turns it into a "Clear" toggle; the others disable until
+  // cleared. Clicking the active one again clears the selection.
+  const SELECT_PREDS = {
+    all: () => true,
+    verified: (u) => u.is_verified,
+    private: (u) => u.is_private,
+    "no-photo": (u) => isDefaultAvatar(u),
+  };
+
+  function bindSelectButtons(body) {
+    const apply = (mode) => {
+      if (state.selectMode === mode) {
+        state.selected.clear();
+        state.selectMode = null;
+      } else {
+        state.selected = new Set(getDisplayNoSearch().filter(SELECT_PREDS[mode]).map((u) => u.id));
+        state.selectMode = mode;
+      }
+      renderBody();
+    };
+    body.querySelector("[data-action='select-all']")?.addEventListener("click", () => apply("all"));
+    body.querySelector("[data-action='select-verified']")?.addEventListener("click", () => apply("verified"));
+    body.querySelector("[data-action='select-private']")?.addEventListener("click", () => apply("private"));
+    body.querySelector("[data-action='select-no-photo']")?.addEventListener("click", () => apply("no-photo"));
+  }
+
+  // Re-render just the quick-select buttons in place (used after a search edit,
+  // so the search input keeps focus instead of a full re-render).
+  function refreshSelectButtons(body) {
+    const group = body.querySelector("[data-select-group]");
+    if (!group) return;
+    group.innerHTML = renderSelectButtons();
+    bindSelectButtons(body);
+  }
+
   function filterChip(key, label, visible = true) {
-    if (!visible && key === "showHidden") return "";
+    // Hide a chip when its category doesn't exist in the current pool.
+    if (!visible) return "";
     const active = state.filters[key];
     return `
       <button type="button" class="iu-chip ${active ? "iu-chip--on" : ""}" data-filter="${escapeAttr(key)}" aria-pressed="${active ? "true" : "false"}">
@@ -1025,6 +1122,13 @@
         state.search = event.target.value;
         const list = body.querySelector("[data-list]");
         if (list) list.innerHTML = renderUserList(getDisplayUsers());
+        // If a quick-select was active, searching changes the visible set, so the
+        // grouping is stale: drop the mode and re-enable the buttons in place
+        // (without a full re-render, to keep the search input focused).
+        if (state.selectMode) {
+          state.selectMode = null;
+          refreshSelectButtons(body);
+        }
       });
     }
 
@@ -1032,6 +1136,8 @@
       el.addEventListener("click", () => {
         const key = el.getAttribute("data-filter");
         state.filters[key] = !state.filters[key];
+        // Changing what's visible invalidates an active quick-select grouping.
+        state.selectMode = null;
         persist();
         renderBody();
       });
@@ -1043,6 +1149,9 @@
       const id = checkbox.getAttribute("data-select");
       if (checkbox.checked) state.selected.add(id);
       else state.selected.delete(id);
+      // A manual tweak breaks the quick-select grouping → drop the mode and
+      // re-render so the disabled buttons come back.
+      if (state.selectMode) { state.selectMode = null; renderBody(); return; }
       const row = checkbox.closest("[data-row]");
       if (row) row.classList.toggle("iu-row--selected", checkbox.checked);
       updateSelectedLabel(body);
@@ -1056,6 +1165,7 @@
         const id = hideBtn.getAttribute("data-hide");
         if (state.hidden.has(id)) state.hidden.delete(id);
         else { state.hidden.add(id); state.selected.delete(id); }
+        state.selectMode = null;
         persist();
         renderBody();
         return;
@@ -1076,6 +1186,7 @@
         state.selected.add(id);
         checkbox.checked = true;
       }
+      if (state.selectMode) { state.selectMode = null; renderBody(); return; }
       row.classList.toggle("iu-row--selected", checkbox.checked);
       updateSelectedLabel(body);
     });
@@ -1088,23 +1199,7 @@
       row.click();
     });
 
-    body.querySelector("[data-action='select-all']")?.addEventListener("click", () => {
-      const display = getDisplayUsers();
-      const allSelected = display.length && display.every((u) => state.selected.has(u.id));
-      if (allSelected) display.forEach((u) => state.selected.delete(u.id));
-      else display.forEach((u) => state.selected.add(u.id));
-      renderBody();
-    });
-
-    // Smart-select shortcuts: add the currently-visible accounts of a given kind
-    // to the selection (respecting active filters + search). They add, not replace.
-    const selectMatching = (pred) => {
-      getDisplayUsers().filter(pred).forEach((u) => state.selected.add(u.id));
-      renderBody();
-    };
-    body.querySelector("[data-action='select-verified']")?.addEventListener("click", () => selectMatching((u) => u.is_verified));
-    body.querySelector("[data-action='select-private']")?.addEventListener("click", () => selectMatching((u) => u.is_private));
-    body.querySelector("[data-action='select-no-photo']")?.addEventListener("click", () => selectMatching((u) => isDefaultAvatar(u)));
+    bindSelectButtons(body);
 
     body.querySelector("[data-action='copy']")?.addEventListener("click", copyUsernames);
     body.querySelector("[data-action='unfollow']")?.addEventListener("click", confirmUnfollow);
@@ -1128,14 +1223,40 @@
     const total = state.progress.total;
     const done = state.progress.current;
     const percent = total ? Math.round((done / total) * 100) : 0;
+    const isDone = state.mode === "unfollowDone";
+    const removed = state.log.filter((e) => e.ok).map((e) => e.user);
+    const failed = state.log.filter((e) => !e.ok).map((e) => e.user);
     const last = state.log[state.log.length - 1];
-    const summary = state.mode === "unfollowDone"
-      ? t("unfollowDoneBody", { ok: state.log.filter((e) => e.ok).length, fail: state.log.filter((e) => !e.ok).length })
+    const summary = isDone
+      ? t("unfollowDoneBody", { ok: removed.length, fail: failed.length })
       : t("ofTotal", { current: done, total });
+
+    // The done state lists exactly who was unfollowed (and who failed) in a
+    // scrollable area that fills the panel, so there's no dead space and the
+    // user can review the outcome. The in-progress state shows the live row.
+    const resultList = isDone
+      ? `
+        <div class="iu-done-list">
+          ${removed.length ? `
+            <div class="iu-done-section">${escapeHTML(t("doneRemoved", { count: removed.length }))}</div>
+            ${removed.map((u) => doneRow(u, true)).join("")}
+          ` : ""}
+          ${failed.length ? `
+            <div class="iu-done-section">${escapeHTML(t("doneFailed", { count: failed.length }))}</div>
+            ${failed.map((u) => doneRow(u, false)).join("")}
+          ` : ""}
+        </div>`
+      : (last ? `
+          <div class="iu-current">
+            <span class="iu-muted">${escapeHTML(t("currently"))}</span>
+            <strong>@${escapeHTML(last.user.username)}</strong>
+            <span class="iu-tag ${last.ok ? "iu-tag--green" : "iu-tag--red"}">${last.ok ? "✓" : "✕"}</span>
+          </div>` : "");
+
     return `
-      <div class="iu-progress">
+      <div class="iu-progress ${isDone ? "iu-progress--done" : ""}">
         <div class="iu-progress-head">
-          <h2>${escapeHTML(state.mode === "unfollowDone" ? t("unfollowDoneTitle") : (state.unfollowPaused ? t("paused") : t("unfollowing")))}</h2>
+          <h2>${escapeHTML(isDone ? t("unfollowDoneTitle") : (state.unfollowPaused ? t("paused") : t("unfollowing")))}</h2>
           <p data-progress-note>${escapeHTML(state.progress.note || "")}</p>
         </div>
         <div class="iu-bar"><span data-progress-bar style="width:${percent}%"></span></div>
@@ -1143,12 +1264,7 @@
           <span>${escapeHTML(summary)}</span>
           <span data-countdown class="iu-muted"></span>
         </div>
-        ${last ? `
-          <div class="iu-current">
-            <span class="iu-muted">${escapeHTML(t("currently"))}</span>
-            <strong>@${escapeHTML(last.user.username)}</strong>
-            <span class="iu-tag ${last.ok ? "iu-tag--green" : "iu-tag--red"}">${last.ok ? "✓" : "✕"}</span>
-          </div>` : ""}
+        ${resultList}
         ${state.mode === "unfollowing" && state.rateLimited ? `<div class="iu-warn">${escapeHTML(t("rateLimitPaused"))}</div>` : ""}
         ${state.mode === "unfollowing" ? `<div class="iu-warn iu-warn--soft">${escapeHTML(t("keepTabOpen"))}</div>` : ""}
         <div class="iu-progress-actions">
@@ -1156,12 +1272,22 @@
             <button type="button" class="iu-btn" data-action="pause-unfollow">${escapeHTML(t(state.unfollowPaused ? "resume" : "pause"))}</button>
             <button type="button" class="iu-btn iu-btn--ghost" data-action="cancel-unfollow">${escapeHTML(t("cancel"))}</button>
           ` : `
-            ${state.log.filter((e) => !e.ok).length ? `<button type="button" class="iu-btn iu-btn--danger" data-action="retry-failed">${escapeHTML(t("retryFailed", { count: state.log.filter((e) => !e.ok).length }))}</button>` : ""}
+            ${failed.length ? `<button type="button" class="iu-btn iu-btn--danger" data-action="retry-failed">${escapeHTML(t("retryFailed", { count: failed.length }))}</button>` : ""}
             <button type="button" class="iu-btn iu-btn--primary" data-action="back-results">${escapeHTML(t("goBack"))}</button>
           `}
         </div>
       </div>
     `;
+  }
+
+  // A compact, non-interactive row for the unfollow-done summary list.
+  function doneRow(user, ok) {
+    return `
+      <div class="iu-done-row">
+        <img class="iu-avatar iu-avatar--sm" src="${escapeAttr(user.profile_pic_url || "")}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">
+        <a class="iu-done-name" href="/${encodeURIComponent(user.username)}/" target="_blank" rel="noopener noreferrer">@${escapeHTML(user.username)}</a>
+        <span class="iu-tag ${ok ? "iu-tag--green" : "iu-tag--red"}">${ok ? "✓" : "✕"}</span>
+      </div>`;
   }
 
   function bindUnfollow(body) {
@@ -1194,6 +1320,7 @@
     state.followingCount = 0;
     state.followersCount = 0;
     state.selected.clear();
+    state.selectMode = null;
     state.log = [];
     state.progress = { current: 0, total: 0, label: "loadingFollowing", note: "" };
     renderBody();
@@ -1560,14 +1687,29 @@
 
   function getDisplayUsers() {
     const query = state.search.trim().toLowerCase();
-    return state.users
-      .filter((u) => !u.follows_viewer)
-      .filter((u) => state.filters.showHidden ? state.hidden.has(u.id) : !state.hidden.has(u.id))
+    return getDisplayNoSearch()
+      .filter((u) => !query || (u.username + " " + (u.full_name || "")).toLowerCase().includes(query));
+  }
+
+  // The non-followers visible after the hidden/showHidden + category filters,
+  // but WITHOUT the search query. Used to decide which quick-select buttons to
+  // show, so typing a non-matching search never makes the buttons disappear.
+  function getDisplayNoSearch() {
+    return getPool()
       .filter((u) => state.filters.verified || !u.is_verified)
       .filter((u) => state.filters.private || !u.is_private)
       .filter((u) => state.filters.noAvatar || !isDefaultAvatar(u))
-      .filter((u) => !query || (u.username + " " + (u.full_name || "")).toLowerCase().includes(query))
       .sort((a, b) => a.username.localeCompare(b.username));
+  }
+
+  // The base population: people you follow who don't follow back, respecting only
+  // the hidden/showHidden toggle. Used to decide which filter chips are relevant
+  // (a chip is shown only if that category exists at all), independent of the
+  // category filters or search.
+  function getPool() {
+    return state.users
+      .filter((u) => !u.follows_viewer)
+      .filter((u) => state.filters.showHidden ? state.hidden.has(u.id) : !state.hidden.has(u.id));
   }
 
   function normalizeUser(raw) {
@@ -1917,6 +2059,48 @@
       font-size: 12px;
     }
     #${APP_ID} .iu-current strong { font-weight: 600; }
+    /* Done state hugs its content (no fixed panel height), so the panel shrinks to
+       fit the summary. A long list scrolls within its own max-height instead of
+       growing the panel past the screen. */
+    #${APP_ID} .iu-progress--done { flex: 0 1 auto; min-height: 0; }
+    #${APP_ID} .iu-done-list {
+      flex: 0 1 auto;
+      max-height: 50vh;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      margin: 0 -20px;
+      border-top: 1px solid var(--iu-line);
+      border-bottom: 1px solid var(--iu-line);
+    }
+    #${APP_ID} .iu-done-section {
+      position: sticky;
+      top: 0;
+      padding: 8px 20px 4px;
+      background: var(--iu-bg);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--iu-muted);
+    }
+    #${APP_ID} .iu-done-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 20px;
+    }
+    #${APP_ID} .iu-avatar--sm { width: 28px; height: 28px; }
+    #${APP_ID} .iu-done-name {
+      flex: 1 1 auto;
+      min-width: 0;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--iu-text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    #${APP_ID} .iu-done-name:hover { color: var(--iu-accent-2); }
     #${APP_ID} .iu-warn {
       padding: 8px 10px;
       border-radius: 8px;
@@ -1958,8 +2142,20 @@
       transition: border-color 0.15s;
     }
     #${APP_ID} .iu-search:focus { border-color: var(--iu-accent); }
-    #${APP_ID} .iu-search::-webkit-search-cancel-button { filter: invert(1) opacity(0.5); }
-    #${APP_ID}.iu-theme-light .iu-search::-webkit-search-cancel-button { filter: opacity(0.5); }
+    /* Replace the faint native clear (×) with a clearly-visible themed glyph that
+       shows a pointer cursor and brightens on hover. */
+    #${APP_ID} .iu-search::-webkit-search-cancel-button {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      background-color: var(--iu-muted);
+      -webkit-mask: no-repeat center / 12px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 4l8 8M12 4l-8 8' stroke='black' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E");
+      mask: no-repeat center / 12px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 4l8 8M12 4l-8 8' stroke='black' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E");
+      transition: background-color 0.15s;
+    }
+    #${APP_ID} .iu-search::-webkit-search-cancel-button:hover { background-color: var(--iu-text); }
 
     #${APP_ID} .iu-filters {
       display: flex;
@@ -2106,6 +2302,7 @@
       gap: 8px;
       min-width: 0;
     }
+    #${APP_ID} .iu-select-group { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
     #${APP_ID} .iu-muted { color: var(--iu-muted); font-size: 12px; }
 
     #${APP_ID} .iu-overlay {
