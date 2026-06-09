@@ -129,10 +129,10 @@ export const fr: Translation = {
   },
 
   footer: {
-    viewSource: 'Code source',
+    viewSource: 'Ajouter une étoile sur GitHub',
     sponsor: 'Faire un don',
     privacy: 'Confidentialité',
-    contact: 'Contact : {{email}}',
+    contact: '{{email}}',
     reportIssue: 'Signaler un problème',
     disclaimer:
       'Sans affiliation avec GitHub, Bluesky, X ou Instagram. À utiliser sur vos propres comptes, à votre discrétion.',

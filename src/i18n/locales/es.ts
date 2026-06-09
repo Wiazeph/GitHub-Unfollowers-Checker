@@ -129,10 +129,10 @@ export const es: Translation = {
   },
 
   footer: {
-    viewSource: 'Código fuente',
+    viewSource: 'Dale una estrella en GitHub',
     sponsor: 'Apóyame',
     privacy: 'Privacidad',
-    contact: 'Contacto: {{email}}',
+    contact: '{{email}}',
     reportIssue: 'Informar de un problema',
     disclaimer:
       'Sin afiliación con GitHub, Bluesky, X o Instagram. Úsalo en tus propias cuentas, bajo tu propia responsabilidad.',

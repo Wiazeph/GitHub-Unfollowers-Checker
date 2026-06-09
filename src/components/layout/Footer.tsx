@@ -55,7 +55,7 @@ export const Footer = () => {
 
       {/* Row 2 — project links: source, privacy, issue tracker, sponsor. */}
       <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
-        <a href={REPO_URL} target="_blank" rel="noopener noreferrer" className={linkClass}>
+        <a href={REPO_URL} target="_blank" rel="noopener noreferrer" className={`text-brand-400 focus-visible:ring-2 focus-visible:ring-brand-400' ${linkClass}`}>
           <GithubIcon />
           <span>{t('footer.viewSource')}</span>
         </a>

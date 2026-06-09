@@ -130,10 +130,10 @@ export const de: Translation = {
   },
 
   footer: {
-    viewSource: 'Quellcode',
+    viewSource: 'Auf GitHub favorisieren',
     sponsor: 'Unterstützen',
     privacy: 'Datenschutz',
-    contact: 'Kontakt: {{email}}',
+    contact: '{{email}}',
     reportIssue: 'Problem melden',
     disclaimer:
       'Nicht verbunden mit GitHub, Bluesky, X oder Instagram. Nutzung mit eigenen Konten, auf eigene Verantwortung.',

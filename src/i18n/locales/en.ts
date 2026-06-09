@@ -127,10 +127,10 @@ export const en = {
   },
 
   footer: {
-    viewSource: 'Source code',
+    viewSource: 'Star on GitHub',
     sponsor: 'Sponsor',
     privacy: 'Privacy',
-    contact: 'Contact: {{email}}',
+    contact: '{{email}}',
     reportIssue: 'Report an issue',
     disclaimer:
       'Not affiliated with GitHub, Bluesky, X, or Instagram. Use on your own accounts, at your own discretion.',

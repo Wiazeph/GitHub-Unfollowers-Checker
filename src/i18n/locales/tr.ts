@@ -129,10 +129,10 @@ export const tr: Translation = {
   },
 
   footer: {
-    viewSource: 'Kaynak kodu',
+    viewSource: 'GitHub’da yıldızla',
     sponsor: 'Destek ol',
     privacy: 'Gizlilik',
-    contact: 'İletişim: {{email}}',
+    contact: '{{email}}',
     reportIssue: 'Sorun bildir',
     disclaimer:
       'GitHub, Bluesky, X veya Instagram ile bağlantılı değildir. Kendi hesaplarında, kendi sorumluluğunda kullan.',
