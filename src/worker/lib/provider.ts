@@ -75,6 +75,10 @@ export interface Provider {
   id: PlatformId
   /** Validate a handle before hitting the upstream API. */
   validateHandle(handle: string): boolean
-  /** Public read path (no user auth): who does `handle` follow that doesn't follow back. */
-  getUnfollowers(handle: string): Promise<Account[]>
+  /**
+   * Public read path (no user auth): who does `handle` follow that doesn't
+   * follow back. `env` carries Worker bindings/secrets (e.g. GITHUB_TOKEN);
+   * providers that don't need it simply ignore it.
+   */
+  getUnfollowers(handle: string, env: Env): Promise<Account[]>
 }

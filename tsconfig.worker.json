@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.node.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.worker.tsbuildinfo",
+    // node:crypto + Buffer come from @types/node (available under nodejs_compat);
+    // the Cloudflare runtime types come from worker-configuration.d.ts.
+    "types": ["node", "vite/client", "./worker-configuration.d.ts"]
+  },
+  "include": ["src/worker"]
+}

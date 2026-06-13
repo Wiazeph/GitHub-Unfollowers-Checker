@@ -1,0 +1,47 @@
+# Copy this file to .dev.vars and fill in the values for local development
+# (`npm run dev`). .dev.vars is local-only and gitignored — NEVER commit it.
+#
+# For production, set each of these with:
+#   wrangler secret put <NAME>
+#
+# The OAUTH_KV namespace and ASSETS binding come from wrangler.jsonc, not here.
+
+# --- Shared -----------------------------------------------------------------
+
+# Random 32+ byte secret used to sign session cookies (HMAC-SHA256).
+# Generate with: node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"
+AUTH_SECRET=
+
+# Stable public origin of the deployment, no trailing slash
+# (e.g. https://unfollowerschecker.com). The Bluesky OAuth client_id is derived
+# from it, so it must be stable in production. For local dev: http://localhost:5173
+PUBLIC_URL=
+
+# --- GitHub -----------------------------------------------------------------
+
+# Server-side token for the public GitHub API (authenticated rate limit, 5000/h).
+# A fine-grained token with read-only public access is enough (no scopes needed).
+# Create at: https://github.com/settings/tokens
+GITHUB_TOKEN=
+
+# OAuth App credentials so users can sign in and unfollow on their own account.
+# Create at https://github.com/settings/developers, callback:
+#   <PUBLIC_URL>/api/auth/callback
+GITHUB_OAUTH_CLIENT_ID=
+GITHUB_OAUTH_CLIENT_SECRET=
+
+# --- GitLab (gitlab.com OAuth) ----------------------------------------------
+# GitLab's follow lists aren't public, so GitLab is sign-in-only.
+# Create an application at https://gitlab.com/-/user_settings/applications with:
+#   Redirect URI: <PUBLIC_URL>/api/auth/gitlab/callback
+#   Scope: api   (reading follow lists + unfollowing both need full API access)
+#   Confidential: yes
+GITLAB_OAUTH_CLIENT_ID=
+GITLAB_OAUTH_CLIENT_SECRET=
+
+# --- Bluesky (AT Protocol OAuth) --------------------------------------------
+# ES256 private signing key (JWK, single line) for private_key_jwt. Generate with:
+# node -e "const {JoseKey}=require('@atproto/jwk-jose');JoseKey.generate(['ES256'],'bsky-key-1').then(k=>console.log(JSON.stringify(k.privateJwk)))"
+# OAuth state/session are stored in the OAUTH_KV namespace (see wrangler.jsonc) —
+# no external Redis needed.
+BLUESKY_PRIVATE_KEY=

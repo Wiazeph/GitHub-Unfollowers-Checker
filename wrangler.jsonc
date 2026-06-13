@@ -1,0 +1,44 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "unfollowers-checker",
+  "main": "./src/worker/index.ts",
+  "compatibility_date": "2025-10-08",
+  // node:crypto (HMAC cookie signing) + the AT Protocol OAuth client need Node APIs.
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": {
+    "enabled": true
+  },
+  "upload_source_maps": true,
+  // Vite (@cloudflare/vite-plugin) builds the SPA into ./dist/client. Anything the
+  // Worker doesn't handle falls back to index.html (client-side routing).
+  //
+  // run_worker_first: the backend routes MUST run the Worker before the static
+  // asset layer. Otherwise a full-page browser navigation to /api/auth/*/login
+  // (Sec-Fetch-Mode: navigate) gets served the SPA index.html instead of hitting
+  // the Worker's 302 redirect — the OAuth buttons would just "change the URL but
+  // load the same page". These paths are server-only, so force the Worker first.
+  "assets": {
+    "directory": "./dist/client",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": [
+      "/api/*",
+      "/client-metadata.json",
+      "/jwks.json"
+    ]
+  },
+  // Bluesky AT Protocol OAuth state (TTL ~10m) + session (TTL ~90d) — replaces
+  // the old Upstash Redis store. Keys: bsky:oauth:state:* / bsky:oauth:session:*.
+  "kv_namespaces": [
+    {
+      "binding": "OAUTH_KV",
+      "id": "2a34d4462fc049d6b326e047a469f8fd"
+    }
+  ],
+  // Production custom domains. Cloudflare manages the DNS + SSL once the domain
+  // is in this account. Comment out for a first workers.dev-only test deploy.
+  "routes": [
+    { "pattern": "unfollowerschecker.com", "custom_domain": true },
+    { "pattern": "www.unfollowerschecker.com", "custom_domain": true }
+  ]
+}

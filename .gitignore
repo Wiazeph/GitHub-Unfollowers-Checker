@@ -11,12 +11,17 @@ node_modules
 dist
 dist-ssr
 *.local
+
+# Cloudflare / Wrangler local state
+.wrangler
+.dev.vars
+
+# Leftover Vercel project link (migrated off Vercel)
 .vercel
 
-# Environment variables (keep .env.local.example committed)
+# Environment variables (.dev.vars.example stays committed; *.local is ignored above)
 .env
 .env.*
-!.env.local.example
 
 # Editor directories and files
 .vscode/*

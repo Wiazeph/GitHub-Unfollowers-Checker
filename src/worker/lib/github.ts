@@ -1,9 +1,9 @@
 /**
  * Server-side GitHub provider.
  *
- * The GitHub token lives only on the server (process.env.GITHUB_TOKEN), so the
- * browser never sees it and we get the authenticated rate limit (5000 req/h)
- * instead of the unauthenticated one (60 req/h).
+ * The GitHub token lives only on the server (env.GITHUB_TOKEN), so the browser
+ * never sees it and we get the authenticated rate limit (5000 req/h) instead of
+ * the unauthenticated one (60 req/h).
  */
 
 import { ProviderError, type Account, type Provider } from './provider.js'
@@ -152,12 +152,12 @@ export const getUnfollowers = async (
   return following.filter((user) => !followerHandles.has(user.handle))
 }
 
-/** The GitHub provider. Reads its token from the environment itself. */
+/** The GitHub provider. Reads its server token from the Worker env binding. */
 export const githubProvider: Provider = {
   id: 'github',
   validateHandle: (handle) => USERNAME_PATTERN.test(handle),
-  getUnfollowers: (handle) => {
-    const token = process.env.GITHUB_TOKEN
+  getUnfollowers: (handle, env) => {
+    const token = env.GITHUB_TOKEN
     if (!token) {
       throw new ProviderError('UPSTREAM', 'Server is misconfigured', 500)
     }

@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Toaster } from 'sonner'
-import { Analytics } from '@vercel/analytics/react'
 import { Header } from './components/layout/Header'
 import { Footer } from './components/layout/Footer'
 import { Unfollowers } from './components/features/unfollowers/Unfollowers'
@@ -23,7 +22,6 @@ function App() {
         </main>
         <Footer />
         <Toaster richColors theme={theme} position="bottom-right" />
-        <Analytics />
       </div>
     </ActiveTabContext>
   )
