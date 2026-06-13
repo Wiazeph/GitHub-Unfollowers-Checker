@@ -13,12 +13,9 @@ export const fetchUnfollowers = async (
   platform: PlatformId,
   handle: string,
 ): Promise<UnfollowersResponse> => {
-  // GitLab's follow lists aren't public, so it goes through the authenticated
-  // "my list" endpoint (the handle is implicit — it's always the signed-in user).
-  const url =
-    platform === 'gitlab'
-      ? `/api/unfollowers-authed?platform=gitlab`
-      : `/api/unfollowers?platform=${platform}&handle=${encodeURIComponent(handle)}`
+  // GitLab's follow lists aren't public, so the server reads the signed-in
+  // user's own list from their session token; the handle is ignored there.
+  const url = `/api/unfollowers?platform=${platform}&handle=${encodeURIComponent(handle)}`
 
   let response: Response
   try {

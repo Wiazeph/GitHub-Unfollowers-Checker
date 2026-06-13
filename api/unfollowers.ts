@@ -1,6 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { getProvider } from './_lib/registry.js'
 import { ProviderError, normalizeHandle, type PlatformId } from './_lib/provider.js'
+import { getPlatformSession } from './_lib/auth.js'
+import { getMyUnfollowers } from './_lib/gitlab.js'
 
 /** Read a single string value from a query param that may be string | string[]. */
 const param = (raw: VercelRequest['query'][string]): string =>
@@ -18,6 +20,34 @@ export default async function handler(
 
   // Default to GitHub so existing `?username=` links keep working unchanged.
   const platform = param(req.query.platform) || 'github'
+
+  // GitLab is the odd one out: its follow lists aren't public, so there's no
+  // provider in the registry. Instead we read the signed-in user's own list
+  // using their session token — the handle is implicit ("me").
+  if (platform === 'gitlab') {
+    const token = getPlatformSession(req, 'gitlab')
+    if (!token) {
+      res.status(401).json({ error: 'You must sign in first', code: 'UNAUTHORIZED' })
+      return
+    }
+    try {
+      const unfollowers = await getMyUnfollowers(token)
+      res.setHeader('Cache-Control', 'private, max-age=0')
+      res.status(200).json({ unfollowers, count: unfollowers.length })
+    } catch (error) {
+      if (error instanceof ProviderError) {
+        res.status(error.status).json({
+          error: error.message,
+          code: error.code,
+          ...(error.retryAfter !== undefined && { retryAfter: error.retryAfter }),
+        })
+        return
+      }
+      res.status(502).json({ error: 'Unexpected server error', code: 'UPSTREAM' })
+    }
+    return
+  }
+
   const provider = getProvider(platform)
   if (!provider) {
     res

@@ -45,4 +45,17 @@ export default tseslint.config(
       globals: globals.node,
     },
   },
+
+  // bluesky-oauth.ts deliberately uses `@ts-nocheck`: it's the single module
+  // that touches the `exports`-only @atproto packages, whose types the
+  // @vercel/node function builder can't resolve under its legacy `node` module
+  // resolution. Isolating them here (behind plainly-typed wrappers) lets every
+  // other function build cleanly; `tsc -b` in `pnpm build` still type-checks
+  // the rest. See the file header for the full rationale.
+  {
+    files: ['api/_lib/bluesky-oauth.ts'],
+    rules: {
+      '@typescript-eslint/ban-ts-comment': 'off',
+    },
+  },
 )
