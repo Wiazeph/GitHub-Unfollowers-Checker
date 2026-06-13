@@ -1,6 +1,7 @@
 import {
   GithubIcon,
   BlueskyIcon,
+  GitlabIcon,
   InstagramIcon,
   TwitterIcon,
   type BrandIcon,
@@ -32,6 +33,8 @@ export interface PlatformConfig {
 const GITHUB_HANDLE = /^[a-zA-Z0-9](?:[a-zA-Z0-9]|-(?=[a-zA-Z0-9])){0,38}$/
 /** Bluesky handles are domain-style: at least one dot, e.g. name.bsky.social. */
 const BLUESKY_HANDLE = /^(?!-)[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+$/
+/** GitLab usernames: alphanumeric plus _ . - (we only ever show our own, so this is lenient). */
+const GITLAB_HANDLE = /^[a-zA-Z0-9][a-zA-Z0-9._-]{0,254}$/
 
 export const PLATFORMS: Record<PlatformId, PlatformConfig> = {
   github: {
@@ -55,6 +58,19 @@ export const PLATFORMS: Record<PlatformId, PlatformConfig> = {
     validationKey: 'search.invalidBluesky',
     authKind: 'oauth',
     profileNoun: 'Bluesky',
+  },
+  gitlab: {
+    id: 'gitlab',
+    label: 'GitLab',
+    icon: GitlabIcon,
+    handlePattern: GITLAB_HANDLE,
+    // GitLab is sign-in-only (its follow lists aren't public), so the search
+    // box is never shown for guests — these placeholders are only the authed one.
+    placeholderKey: 'search.placeholderGitlabAuthed',
+    placeholderAuthedKey: 'search.placeholderGitlabAuthed',
+    validationKey: 'search.invalidGitlab',
+    authKind: 'oauth',
+    profileNoun: 'GitLab',
   },
 }
 
@@ -93,6 +109,7 @@ export const normalizeHandle = (platform: PlatformId, raw: string): string => {
 export const PLATFORM_LIST: PlatformConfig[] = [
   PLATFORMS.github,
   PLATFORMS.bluesky,
+  PLATFORMS.gitlab,
 ]
 
 /** Instagram is a separate, browser-only tool (no server API), shown as its own tab. */

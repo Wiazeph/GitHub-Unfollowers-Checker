@@ -13,11 +13,16 @@ export const fetchUnfollowers = async (
   platform: PlatformId,
   handle: string,
 ): Promise<UnfollowersResponse> => {
+  // GitLab's follow lists aren't public, so it goes through the authenticated
+  // "my list" endpoint (the handle is implicit — it's always the signed-in user).
+  const url =
+    platform === 'gitlab'
+      ? `/api/unfollowers-authed?platform=gitlab`
+      : `/api/unfollowers?platform=${platform}&handle=${encodeURIComponent(handle)}`
+
   let response: Response
   try {
-    response = await fetch(
-      `/api/unfollowers?platform=${platform}&handle=${encodeURIComponent(handle)}`,
-    )
+    response = await fetch(url)
   } catch {
     throw new ApiError(
       { error: i18n.t('errors.network'), code: 'UPSTREAM' },
@@ -54,7 +59,7 @@ const localizeError = (body: ApiErrorBody): ApiErrorBody => {
 
 /** Fetch the current per-platform authentication state. */
 export const fetchMe = async (): Promise<AuthState> => {
-  const empty: AuthState = { github: null, bluesky: null }
+  const empty: AuthState = { github: null, bluesky: null, gitlab: null }
   const response = await fetch('/api/auth/me')
   if (!response.ok) return empty
   return { ...empty, ...((await response.json()) as Partial<AuthState>) }
@@ -68,6 +73,11 @@ export const login = (): void => {
 /** Redirect the browser into the Bluesky OAuth flow for a given handle. */
 export const loginBluesky = (handle: string): void => {
   window.location.href = `/api/auth/bluesky/login?handle=${encodeURIComponent(handle)}`
+}
+
+/** Redirect the browser into the GitLab OAuth flow (one-click, like GitHub). */
+export const loginGitlab = (): void => {
+  window.location.href = '/api/auth/gitlab/login'
 }
 
 /** Sign out of one platform (or all if omitted) and reload. */

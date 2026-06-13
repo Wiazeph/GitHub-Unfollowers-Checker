@@ -1,32 +1,43 @@
 import { useEffect, useRef, useState } from 'react'
 import { LoaderCircle } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { login, loginBluesky } from '../../api/client'
+import { login, loginBluesky, loginGitlab } from '../../api/client'
 import { PLATFORMS, normalizeHandle } from '../../platforms'
 import type { PlatformId } from '../../types/platform'
 
 /**
  * Always-visible sign-in affordance for the header (guests only). It's keyed to
  * the active platform so a first-time visitor never has to search before they
- * can find how to sign in. GitHub is a one-click redirect; Bluesky's OAuth
- * needs the handle up front, so it opens a small popover to collect it.
+ * can find how to sign in. GitHub and GitLab are one-click redirects; Bluesky's
+ * OAuth needs the handle up front, so it opens a small popover to collect it.
  */
 export const HeaderSignIn = ({ platform }: { platform: PlatformId }) => {
   if (platform === 'bluesky') return <BlueskyHeaderSignIn />
-  return <GithubHeaderSignIn />
+  if (platform === 'gitlab') {
+    return <OneClickHeaderSignIn platform="gitlab" label="GitLab" onStart={loginGitlab} />
+  }
+  return <OneClickHeaderSignIn platform="github" label="GitHub" onStart={login} />
 }
 
 const buttonClass =
   'inline-flex h-9 shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3 text-sm font-medium text-bg outline-none transition-colors hover:bg-brand-600 focus-visible:ring-2 focus-visible:ring-brand-400 disabled:cursor-not-allowed disabled:opacity-70'
 
-const GithubHeaderSignIn = () => {
+const OneClickHeaderSignIn = ({
+  platform,
+  label,
+  onStart,
+}: {
+  platform: PlatformId
+  label: string
+  onStart: () => void
+}) => {
   const { t } = useTranslation()
-  const Icon = PLATFORMS.github.icon
+  const Icon = PLATFORMS[platform].icon
   const [redirecting, setRedirecting] = useState(false)
 
   const start = () => {
     setRedirecting(true)
-    login()
+    onStart()
   }
 
   return (
@@ -37,7 +48,7 @@ const GithubHeaderSignIn = () => {
         <Icon className="h-4 w-4" aria-hidden="true" />
       )}
       <span className="hidden sm:inline">
-        {redirecting ? t('results.signingIn') : t('results.signInWith', { platform: 'GitHub' })}
+        {redirecting ? t('results.signingIn') : t('results.signInWith', { platform: label })}
       </span>
       <span className="sm:hidden">
         {redirecting ? t('results.signingIn') : t('auth.signIn')}
