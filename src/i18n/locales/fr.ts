@@ -38,6 +38,8 @@ export const fr: Translation = {
     placeholderBlueskyAuthed: 'Rechercher un autre identifiant…',
     invalidGithub: 'Veuillez saisir un nom d’utilisateur GitHub valide',
     invalidBluesky: 'Veuillez saisir un identifiant Bluesky valide (ex. nom.bsky.social)',
+    placeholderGitlabAuthed: 'Votre liste GitLab',
+    invalidGitlab: 'Veuillez saisir un nom d’utilisateur GitLab valide',
   },
 
   results: {
@@ -59,6 +61,9 @@ export const fr: Translation = {
     signingIn: 'Redirection…',
     blueskySignInCta:
       'Connectez-vous avec Bluesky pour retirer les personnes qui ne vous suivent pas en retour.',
+    gitlabGateTitle: 'Connectez-vous pour vérifier GitLab',
+    gitlabGateBody:
+      'GitLab garde les listes d’abonnements privées. Connectez-vous pour voir qui vous suivez sans être suivi en retour — et vous désabonner.',
     blueskyHandlePlaceholder: 'votre-identifiant.bsky.social',
     blueskyHandleAriaLabel: 'Votre identifiant Bluesky',
     selectAll: 'Tout sélectionner',
@@ -135,7 +140,7 @@ export const fr: Translation = {
     contact: '{{email}}',
     reportIssue: 'Signaler un problème',
     disclaimer:
-      'Sans affiliation avec GitHub, Bluesky, X ou Instagram. À utiliser sur vos propres comptes, à votre discrétion.',
+      'Sans affiliation avec GitHub, Bluesky, GitLab, X ou Instagram. À utiliser sur vos propres comptes, à votre discrétion.',
   },
 
   privacy: {
@@ -143,14 +148,14 @@ export const fr: Translation = {
     close: 'Fermer',
     whatTitle: 'Ce que fait cet outil',
     whatBody:
-      'Le Vérificateur d’abonnements vous aide à trouver les comptes que vous suivez sans être suivi en retour, sur GitHub, Bluesky, X (Twitter) et Instagram. C’est un outil gratuit et personnel, sans affiliation, approbation ni lien avec ces plateformes.',
+      'Le Vérificateur d’abonnements vous aide à trouver les comptes que vous suivez sans être suivi en retour, sur GitHub, Bluesky, GitLab, X (Twitter) et Instagram. C’est un outil gratuit et personnel, sans affiliation, approbation ni lien avec ces plateformes.',
     storeTitle: 'Ce que nous stockons',
     storeBody:
       'Rien sur nos serveurs. Nous n’avons pas de base de données et ne conservons pas vos données. Les listes d’abonnés et d’abonnements sont récupérées, comparées et renvoyées pour cette seule requête — jamais enregistrées ni journalisées. Vos préférences (thème, langue et les réglages/disposition du panneau Instagram) sont enregistrées uniquement dans le stockage local de votre navigateur et ne sont envoyées nulle part.',
     howTitle: 'Comment fonctionne chaque plateforme',
-    howGithubLabel: 'GitHub et Bluesky :',
+    howGithubLabel: 'GitHub, Bluesky et GitLab :',
     howGithubBody:
-      'les données publiques d’abonnés sont lues via leurs API officielles par nos fonctions sans serveur, de sorte que les identifiants de plateforme n’atteignent jamais votre navigateur. Si vous vous connectez pour vous désabonner, cela passe par l’OAuth officiel de la plateforme et la session sert uniquement à effectuer les actions que vous choisissez — les jetons ne sont pas conservés.',
+      'les données d’abonnés sont lues via leurs API officielles par nos fonctions sans serveur, de sorte que les identifiants de plateforme n’atteignent jamais votre navigateur. Les listes GitHub et Bluesky sont publiques ; GitLab les garde privées, vous vous connectez donc d’abord. La connexion passe par l’OAuth officiel de la plateforme et la session sert uniquement à effectuer les actions que vous choisissez — les jetons ne sont pas conservés.',
     howXLabel: 'X (Twitter) :',
     howXBody:
       's’exécute entièrement dans votre navigateur. Les fichiers de votre archive de données sont lus et comparés localement, et ne sont jamais téléversés.',

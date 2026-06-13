@@ -8,6 +8,7 @@ import { UnfollowersResults } from './UnfollowersResults'
 import { PlatformSelector } from '../PlatformSelector'
 import { InstagramGuide } from '../instagram/InstagramGuide'
 import { TwitterArchiveGuide } from '../twitter/TwitterArchiveGuide'
+import { GitlabSignInGate } from './GitlabSignInGate'
 import type { PlatformId } from '../../../types/platform'
 import type { SelectorTab } from '../../../platforms'
 
@@ -25,6 +26,9 @@ export const Unfollowers = () => {
   const isTwitter = tab === 'twitter'
   const isStandaloneTab = isInstagram || isTwitter
   const platform = (isStandaloneTab ? 'github' : tab) as PlatformId
+  // GitLab's follow lists aren't public, so there's no "search any handle" mode:
+  // it's sign-in-only and you can only check your own account.
+  const isGitlab = tab === 'gitlab'
 
   // Each platform has its own session, so the user can be signed in to several
   // at once. "Authed" here means: signed in to the platform of the active tab.
@@ -54,7 +58,13 @@ export const Unfollowers = () => {
   useEffect(() => {
     if (tabInitialized.current || authLoading) return
     tabInitialized.current = true
-    const signedIn = auth?.github ? 'github' : auth?.bluesky ? 'bluesky' : null
+    const signedIn = auth?.github
+      ? 'github'
+      : auth?.bluesky
+        ? 'bluesky'
+        : auth?.gitlab
+          ? 'gitlab'
+          : null
     if (signedIn) {
       setTab(signedIn)
     }
@@ -86,20 +96,26 @@ export const Unfollowers = () => {
         <InstagramGuide />
       ) : isTwitter ? (
         <TwitterArchiveGuide />
+      ) : isGitlab && !isAuthed ? (
+        // GitLab is sign-in-only — show a sign-in gate instead of a search box.
+        <GitlabSignInGate />
       ) : (
         <div className="flex flex-col gap-8">
-          <div className="flex flex-col gap-2">
-            <UnfollowersSearch
-              platform={platform}
-              value={inputValue}
-              onChange={setInputValue}
-              onSearch={handleSearch}
-              isPending={mutation.isPending}
-              isAuthed={isAuthed}
-            />
-            {/* Inline privacy reassurance for the platforms we query server-side. */}
-            <p className="px-1 text-xs text-fg-muted">{t('results.privacyNote')}</p>
-          </div>
+          {/* GitLab can only check your own account, so it has no search box. */}
+          {!isGitlab && (
+            <div className="flex flex-col gap-2">
+              <UnfollowersSearch
+                platform={platform}
+                value={inputValue}
+                onChange={setInputValue}
+                onSearch={handleSearch}
+                isPending={mutation.isPending}
+                isAuthed={isAuthed}
+              />
+              {/* Inline privacy reassurance for the platforms we query server-side. */}
+              <p className="px-1 text-xs text-fg-muted">{t('results.privacyNote')}</p>
+            </div>
+          )}
           <UnfollowersResults
             platform={platform}
             handle={searchedHandle}

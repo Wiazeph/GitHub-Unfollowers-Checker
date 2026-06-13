@@ -38,6 +38,8 @@ export const de: Translation = {
     placeholderBlueskyAuthed: 'Anderes Handle nachschlagen…',
     invalidGithub: 'Bitte gib einen gültigen GitHub-Benutzernamen ein',
     invalidBluesky: 'Bitte gib ein gültiges Bluesky-Handle ein (z. B. name.bsky.social)',
+    placeholderGitlabAuthed: 'Deine GitLab-Liste',
+    invalidGitlab: 'Bitte gib einen gültigen GitLab-Benutzernamen ein',
   },
 
   results: {
@@ -59,6 +61,9 @@ export const de: Translation = {
     signingIn: 'Weiterleitung…',
     blueskySignInCta:
       'Melde dich mit Bluesky an, um Personen zu entfernen, die dir nicht zurückfolgen.',
+    gitlabGateTitle: 'Melde dich an, um GitLab zu prüfen',
+    gitlabGateBody:
+      'GitLab hält Folgelisten privat. Melde dich an, um zu sehen, wem du folgst, der dir nicht zurückfolgt — und entfolge ihnen.',
     blueskyHandlePlaceholder: 'dein-handle.bsky.social',
     blueskyHandleAriaLabel: 'Dein Bluesky-Handle',
     selectAll: 'Alle auswählen',
@@ -136,7 +141,7 @@ export const de: Translation = {
     contact: '{{email}}',
     reportIssue: 'Problem melden',
     disclaimer:
-      'Nicht verbunden mit GitHub, Bluesky, X oder Instagram. Nutzung mit eigenen Konten, auf eigene Verantwortung.',
+      'Nicht verbunden mit GitHub, Bluesky, GitLab, X oder Instagram. Nutzung mit eigenen Konten, auf eigene Verantwortung.',
   },
 
   privacy: {
@@ -144,14 +149,14 @@ export const de: Translation = {
     close: 'Schließen',
     whatTitle: 'Was dieses Tool macht',
     whatBody:
-      'Der Unfollower-Checker hilft dir, Konten zu finden, denen du folgst, die dir aber nicht zurückfolgen — auf GitHub, Bluesky, X (Twitter) und Instagram. Es ist ein kostenloses, persönliches Tool und steht in keiner Verbindung zu diesen Plattformen, wird von ihnen nicht unterstützt oder befürwortet.',
+      'Der Unfollower-Checker hilft dir, Konten zu finden, denen du folgst, die dir aber nicht zurückfolgen — auf GitHub, Bluesky, GitLab, X (Twitter) und Instagram. Es ist ein kostenloses, persönliches Tool und steht in keiner Verbindung zu diesen Plattformen, wird von ihnen nicht unterstützt oder befürwortet.',
     storeTitle: 'Was wir speichern',
     storeBody:
       'Nichts auf unseren Servern. Wir betreiben keine Datenbank und speichern deine Daten nicht. Follower- und Folgt-Listen werden für diese eine Anfrage abgerufen, verglichen und zurückgegeben — niemals protokolliert oder gespeichert. Deine Einstellungen (Design, Sprache und die Einstellungen/Anordnung des Instagram-Panels) werden nur im lokalen Speicher deines eigenen Browsers abgelegt und nirgendwohin gesendet.',
     howTitle: 'Wie jede Plattform funktioniert',
-    howGithubLabel: 'GitHub & Bluesky:',
+    howGithubLabel: 'GitHub, Bluesky & GitLab:',
     howGithubBody:
-      'Öffentliche Follower-Daten werden über ihre offiziellen APIs von unseren serverlosen Funktionen gelesen, sodass Plattform-Zugangsdaten nie deinen Browser erreichen. Wenn du dich zum Entfolgen anmeldest, geschieht das über das offizielle OAuth der Plattform und die Sitzung wird nur für die von dir gewählten Aktionen genutzt — Tokens werden nicht gespeichert.',
+      'Follower-Daten werden über ihre offiziellen APIs von unseren serverlosen Funktionen gelesen, sodass Plattform-Zugangsdaten nie deinen Browser erreichen. GitHub- und Bluesky-Listen sind öffentlich; GitLab hält sie privat, daher meldest du dich zuerst an. Die Anmeldung läuft über das offizielle OAuth der Plattform, und die Sitzung wird nur für die von dir gewählten Aktionen genutzt — Tokens werden nicht gespeichert.',
     howXLabel: 'X (Twitter):',
     howXBody:
       'läuft vollständig in deinem Browser. Die Dateien aus deinem Datenarchiv werden lokal gelesen und verglichen und nirgendwo hochgeladen.',

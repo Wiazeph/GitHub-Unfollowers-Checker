@@ -121,10 +121,13 @@ const ResultsState = ({
   const pageChangedRef = useRef(false)
 
   // The unfollow API identifies targets differently per platform: GitHub uses
-  // the handle (login), Bluesky uses the account id (DID). Map selected ids to
-  // the right identifier, and map results back to ids to update the list.
+  // the handle (login); Bluesky uses the account id (DID); GitLab uses the
+  // numeric user id. Map selected ids to the right identifier, and map results
+  // back to ids to update the list.
   const targetOf = (account: Account): string =>
-    platform === 'bluesky' ? account.id : account.handle
+    platform === 'bluesky' || platform === 'gitlab'
+      ? account.id
+      : account.handle
 
   const idByTarget = useMemo(() => {
     const map = new Map<string, string>()

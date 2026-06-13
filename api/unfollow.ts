@@ -3,6 +3,7 @@ import { Agent } from '@atproto/api'
 import { getPlatformSession, type Platform } from './_lib/auth.js'
 import { getOAuthClient } from './_lib/bluesky-oauth.js'
 import { isDid, unfollow as blueskyUnfollow } from './_lib/bluesky.js'
+import { isUserId, unfollow as gitlabUnfollow } from './_lib/gitlab.js'
 
 const USERNAME_PATTERN = /^[a-zA-Z0-9](?:[a-zA-Z0-9]|-(?=[a-zA-Z0-9])){0,38}$/
 const MAX_TARGETS = 200
@@ -63,7 +64,11 @@ export default async function handler(
     usernames?: unknown
   }
   const platform: Platform =
-    body.platform === 'bluesky' ? 'bluesky' : 'github'
+    body.platform === 'bluesky'
+      ? 'bluesky'
+      : body.platform === 'gitlab'
+        ? 'gitlab'
+        : 'github'
 
   const sessionValue = getPlatformSession(req, platform)
   if (!sessionValue) {
@@ -97,6 +102,22 @@ export default async function handler(
       res.status(200).json(result)
     } catch {
       res.status(502).json({ error: 'Could not unfollow on Bluesky', code: 'UPSTREAM' })
+    }
+    return
+  }
+
+  if (platform === 'gitlab') {
+    // GitLab unfollow takes numeric user ids, not usernames.
+    const ids = targets.filter(isUserId)
+    if (ids.length === 0) {
+      res.status(400).json({ error: 'No valid targets provided', code: 'BAD_REQUEST' })
+      return
+    }
+    try {
+      const result = await gitlabUnfollow(sessionValue, ids)
+      res.status(200).json(result)
+    } catch {
+      res.status(502).json({ error: 'Could not unfollow on GitLab', code: 'UPSTREAM' })
     }
     return
   }

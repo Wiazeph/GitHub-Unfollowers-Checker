@@ -1,15 +1,15 @@
 /** A normalized account that a target follows but who does not follow back. */
 export interface Account {
-  /** Stable unique id — GitHub: numeric id as string; Bluesky: the DID. */
+  /** Stable unique id — GitHub: numeric id as string; Bluesky: the DID; GitLab: numeric id as string. */
   id: string
-  /** Human-readable handle — GitHub login; Bluesky handle (name.bsky.social). */
+  /** Human-readable handle — GitHub login; Bluesky handle (name.bsky.social); GitLab username. */
   handle: string
   displayName?: string
   avatarUrl?: string
   profileUrl: string
 }
 
-export type PlatformId = 'github' | 'bluesky'
+export type PlatformId = 'github' | 'bluesky' | 'gitlab'
 
 /** Successful response shape from `/api/unfollowers`. */
 export interface UnfollowersResponse {

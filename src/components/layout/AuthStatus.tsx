@@ -16,7 +16,7 @@ export const AuthStatus = () => {
   const { tab } = useActiveTab()
 
   const platform: PlatformId | null =
-    tab === 'github' || tab === 'bluesky' ? tab : null
+    tab === 'github' || tab === 'bluesky' || tab === 'gitlab' ? tab : null
   const session = platform ? auth?.[platform] : null
   if (!platform || !session) return null
 
