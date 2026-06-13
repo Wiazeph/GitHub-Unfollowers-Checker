@@ -62,18 +62,37 @@ export const fetchMe = async (): Promise<AuthState> => {
   return { ...empty, ...((await response.json()) as Partial<AuthState>) }
 }
 
+/**
+ * Remember which platform an OAuth flow was started for, so that when the
+ * provider redirects back we can return the user to that tab — not just the
+ * first platform they happen to be signed in to. Read once and cleared on the
+ * next load (see Unfollowers' tab-initialization effect).
+ */
+export const PENDING_AUTH_KEY = 'pendingAuthPlatform'
+
+const rememberPendingAuth = (platform: PlatformId): void => {
+  try {
+    localStorage.setItem(PENDING_AUTH_KEY, platform)
+  } catch {
+    // Private mode / storage disabled — fall back to default tab behavior.
+  }
+}
+
 /** Redirect the browser into the GitHub OAuth flow. */
 export const login = (): void => {
+  rememberPendingAuth('github')
   window.location.href = '/api/auth/login'
 }
 
 /** Redirect the browser into the Bluesky OAuth flow for a given handle. */
 export const loginBluesky = (handle: string): void => {
+  rememberPendingAuth('bluesky')
   window.location.href = `/api/auth/bluesky/login?handle=${encodeURIComponent(handle)}`
 }
 
 /** Redirect the browser into the GitLab OAuth flow (one-click, like GitHub). */
 export const loginGitlab = (): void => {
+  rememberPendingAuth('gitlab')
   window.location.href = '/api/auth/gitlab/login'
 }
 

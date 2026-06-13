@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useUnfollowers } from '../../../hooks/useUnfollowers'
 import { useAuth } from '../../../hooks/useAuth'
 import { useActiveTab } from '../../../hooks/activeTab'
+import { PENDING_AUTH_KEY } from '../../../api/client'
 import { UnfollowersSearch } from './UnfollowersSearch'
 import { UnfollowersResults } from './UnfollowersResults'
 import { PlatformSelector } from '../PlatformSelector'
@@ -45,19 +46,35 @@ export const Unfollowers = () => {
   const handleTabChange = (next: SelectorTab) => {
     if (next === tab) return
     setTab(next)
-    setInputValue('')
-    setSearchedHandle('')
-    mutation.reset()
-    autoLoaded.current = false
   }
 
-  // On first load, land on a platform the user is signed in to (so a Bluesky
-  // login returns to the Bluesky tab, not GitHub). Only runs once; manual tab
-  // switches afterwards are respected.
+  // On first load, pick the starting tab. Priority:
+  //   1. The platform we just completed an OAuth flow for (so signing in to
+  //      GitLab returns to the GitLab tab, even if already signed in to GitHub).
+  //   2. Otherwise, the first platform the user is already signed in to.
+  // Only runs once; manual tab switches afterwards are respected.
   const tabInitialized = useRef(false)
   useEffect(() => {
     if (tabInitialized.current || authLoading) return
     tabInitialized.current = true
+
+    let pending: string | null = null
+    try {
+      pending = localStorage.getItem(PENDING_AUTH_KEY)
+      if (pending) localStorage.removeItem(PENDING_AUTH_KEY)
+    } catch {
+      // storage unavailable — fall through to signed-in detection
+    }
+
+    // Honor the just-completed login, but only if it actually succeeded.
+    if (
+      (pending === 'github' || pending === 'bluesky' || pending === 'gitlab') &&
+      auth?.[pending]
+    ) {
+      setTab(pending)
+      return
+    }
+
     const signedIn = auth?.github
       ? 'github'
       : auth?.bluesky
@@ -71,17 +88,44 @@ export const Unfollowers = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authLoading])
 
-  // When signed in (on the active platform), auto-load the user's own list once.
-  const autoLoaded = useRef(false)
+  // Reset the search state and (re)load whenever the active tab changes — no
+  // matter whether the change came from a click or a programmatic setTab (e.g.
+  // returning from an OAuth redirect). This is what keeps the results in sync
+  // with the tab: switching to GitLab clears the previous platform's list and
+  // auto-loads the signed-in user's own GitLab list. Keyed on `tab` (+ auth, so
+  // it fires once auth resolves after a redirect).
+  const loadedFor = useRef<string | null>(null)
   useEffect(() => {
-    if (autoLoaded.current || isStandaloneTab) return
-    if (isAuthed && ownHandle) {
-      autoLoaded.current = true
+    // Wait for auth to resolve AND for the initial tab to be picked before
+    // deciding. Otherwise, on a fresh load, we'd either run while isAuthed is
+    // still false (marking the tab "handled" and skipping the later auto-load),
+    // or load the default tab a moment before the OAuth-return tab is applied.
+    if (authLoading || !tabInitialized.current) return
+
+    if (isStandaloneTab) {
+      // Browser-only tabs (Instagram / X) don't use the search flow.
       // eslint-disable-next-line react-hooks/set-state-in-effect
+      setInputValue('')
+      setSearchedHandle('')
+      mutation.reset()
+      loadedFor.current = null
+      return
+    }
+    if (loadedFor.current === tab) return
+    loadedFor.current = tab
+
+    // Fresh tab → drop the previous platform's results.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setInputValue('')
+    setSearchedHandle('')
+    mutation.reset()
+
+    // Signed in to this platform → auto-load the user's own list.
+    if (isAuthed && ownHandle) {
       handleSearch(ownHandle)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthed, ownHandle, isStandaloneTab])
+  }, [tab, isAuthed, ownHandle, isStandaloneTab, authLoading])
 
   const isOwnList =
     isAuthed &&
