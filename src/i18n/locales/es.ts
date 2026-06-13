@@ -38,6 +38,8 @@ export const es: Translation = {
     placeholderBlueskyAuthed: 'Buscar otro identificador…',
     invalidGithub: 'Introduce un usuario de GitHub válido',
     invalidBluesky: 'Introduce un identificador de Bluesky válido (p. ej. nombre.bsky.social)',
+    placeholderGitlabAuthed: 'Tu lista de GitLab',
+    invalidGitlab: 'Introduce un usuario de GitLab válido',
   },
 
   results: {
@@ -59,6 +61,9 @@ export const es: Translation = {
     signingIn: 'Redirigiendo…',
     blueskySignInCta:
       'Inicia sesión con Bluesky para quitar a quienes no te siguen de vuelta.',
+    gitlabGateTitle: 'Inicia sesión para revisar GitLab',
+    gitlabGateBody:
+      'GitLab mantiene privadas las listas de seguidores. Inicia sesión para ver a quién sigues que no te sigue de vuelta — y dejar de seguirlos.',
     blueskyHandlePlaceholder: 'tu-identificador.bsky.social',
     blueskyHandleAriaLabel: 'Tu identificador de Bluesky',
     selectAll: 'Seleccionar todo',

@@ -36,6 +36,8 @@ export const en = {
     placeholderBlueskyAuthed: 'Look up another handle…',
     invalidGithub: 'Please enter a valid GitHub username',
     invalidBluesky: 'Please enter a valid Bluesky handle (e.g. name.bsky.social)',
+    placeholderGitlabAuthed: 'Your GitLab list',
+    invalidGitlab: 'Please enter a valid GitLab username',
   },
 
   results: {
@@ -56,6 +58,9 @@ export const en = {
     signingIn: 'Redirecting…',
     blueskySignInCta:
       "Sign in with Bluesky to remove the people who don't follow you back.",
+    gitlabGateTitle: 'Sign in to check GitLab',
+    gitlabGateBody:
+      "GitLab keeps follow lists private, so sign in to see who you follow that doesn't follow you back — and unfollow them.",
     blueskyHandlePlaceholder: 'your-handle.bsky.social',
     blueskyHandleAriaLabel: 'Your Bluesky handle',
     selectAll: 'Select all',

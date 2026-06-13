@@ -38,6 +38,8 @@ export const de: Translation = {
     placeholderBlueskyAuthed: 'Anderes Handle nachschlagen…',
     invalidGithub: 'Bitte gib einen gültigen GitHub-Benutzernamen ein',
     invalidBluesky: 'Bitte gib ein gültiges Bluesky-Handle ein (z. B. name.bsky.social)',
+    placeholderGitlabAuthed: 'Deine GitLab-Liste',
+    invalidGitlab: 'Bitte gib einen gültigen GitLab-Benutzernamen ein',
   },
 
   results: {
@@ -59,6 +61,9 @@ export const de: Translation = {
     signingIn: 'Weiterleitung…',
     blueskySignInCta:
       'Melde dich mit Bluesky an, um Personen zu entfernen, die dir nicht zurückfolgen.',
+    gitlabGateTitle: 'Melde dich an, um GitLab zu prüfen',
+    gitlabGateBody:
+      'GitLab hält Folgelisten privat. Melde dich an, um zu sehen, wem du folgst, der dir nicht zurückfolgt — und entfolge ihnen.',
     blueskyHandlePlaceholder: 'dein-handle.bsky.social',
     blueskyHandleAriaLabel: 'Dein Bluesky-Handle',
     selectAll: 'Alle auswählen',

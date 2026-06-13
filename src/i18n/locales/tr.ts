@@ -38,6 +38,8 @@ export const tr: Translation = {
     placeholderBlueskyAuthed: 'Başka bir handle’a bak…',
     invalidGithub: 'Lütfen geçerli bir GitHub kullanıcı adı gir',
     invalidBluesky: 'Lütfen geçerli bir Bluesky handle gir (ör. ad.bsky.social)',
+    placeholderGitlabAuthed: 'GitLab listen',
+    invalidGitlab: 'Lütfen geçerli bir GitLab kullanıcı adı gir',
   },
 
   results: {
@@ -59,6 +61,9 @@ export const tr: Translation = {
     signingIn: 'Yönlendiriliyor…',
     blueskySignInCta:
       'Seni geri takip etmeyenleri kaldırmak için Bluesky ile giriş yap.',
+    gitlabGateTitle: 'GitLab’ı kontrol etmek için giriş yap',
+    gitlabGateBody:
+      'GitLab takip listelerini gizli tutar; takip ettiğin ama seni geri takip etmeyenleri görmek ve takipten çıkmak için giriş yap.',
     blueskyHandlePlaceholder: 'senin-handle.bsky.social',
     blueskyHandleAriaLabel: 'Bluesky handle’ın',
     selectAll: 'Tümünü seç',
