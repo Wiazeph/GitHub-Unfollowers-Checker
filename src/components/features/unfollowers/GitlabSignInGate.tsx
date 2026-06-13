@@ -1,8 +1,8 @@
-import { useState } from 'react'
 import { LoaderCircle } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { loginGitlab } from '../../../api/client'
 import { PLATFORMS } from '../../../platforms'
+import { beginSignIn, useSigningIn } from '../../../hooks/useSigningIn'
 
 /**
  * GitLab's follower/following lists aren't public (the API returns 403 without a
@@ -13,10 +13,10 @@ import { PLATFORMS } from '../../../platforms'
 export const GitlabSignInGate = () => {
   const { t } = useTranslation()
   const Icon = PLATFORMS.gitlab.icon
-  const [redirecting, setRedirecting] = useState(false)
+  const redirecting = useSigningIn()
 
   const start = () => {
-    setRedirecting(true)
+    beginSignIn()
     loginGitlab()
   }
 

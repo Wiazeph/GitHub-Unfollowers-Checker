@@ -115,7 +115,6 @@ export const Unfollowers = () => {
     loadedFor.current = tab
 
     // Fresh tab → drop the previous platform's results.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setInputValue('')
     setSearchedHandle('')
     mutation.reset()

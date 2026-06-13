@@ -75,12 +75,30 @@ export const PLATFORMS: Record<PlatformId, PlatformConfig> = {
 }
 
 /**
+ * Characters a paste can sneak in that a strict handle pattern then rejects.
+ * Built from escapes (no literal invisible chars in source) so it covers:
+ *   - \s            all Unicode whitespace (incl. the non-breaking space)
+ *   - U+200B–U+200D zero-width space / non-joiner / joiner
+ *   - U+200E,U+200F left-to-right / right-to-left marks
+ *   - U+202A–U+202E bidi embedding/override — macOS adds U+202A/U+202C on copy!
+ *   - U+2066–U+2069 bidi isolates
+ *   - U+FEFF        byte-order mark
+ *   - " ' < >       stray wrapping quotes / brackets
+ * Stripping these makes a clean copy of "@name.bsky.social" validate instead of
+ * silently failing the sign-in button.
+ */
+const HANDLE_NOISE = new RegExp(
+  '[\\s"\'<>\\u200B-\\u200F\\u202A-\\u202E\\u2066-\\u2069\\uFEFF]',
+  'g',
+)
+
+/**
  * Turn whatever a user pasted into a bare handle. People paste profile links
  * (https://github.com/Wiazeph/, https://bsky.app/profile/name.bsky.social) or
  * prefix an @, so we strip all of that down to the identifier.
  */
 export const normalizeHandle = (platform: PlatformId, raw: string): string => {
-  let value = raw.trim()
+  let value = raw.replace(HANDLE_NOISE, '')
 
   // If it looks like a URL, pull out the relevant path segment.
   if (/^https?:\/\//i.test(value) || /^[\w.-]+\.[a-z]{2,}\//i.test(value)) {
@@ -101,8 +119,8 @@ export const normalizeHandle = (platform: PlatformId, raw: string): string => {
     }
   }
 
-  // Strip a leading @ and any surrounding slashes/whitespace.
-  return value.replace(/^@+/, '').replace(/^\/+|\/+$/g, '').trim()
+  // Strip a leading @ and any surrounding slashes.
+  return value.replace(/^@+/, '').replace(/^\/+|\/+$/g, '')
 }
 
 /** Ordered list for rendering the platform selector. */

@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { LoaderCircle } from 'lucide-react'
+import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
 import { login, loginBluesky, loginGitlab } from '../../api/client'
 import { PLATFORMS, normalizeHandle } from '../../platforms'
+import { beginSignIn, useSigningIn } from '../../hooks/useSigningIn'
 import type { PlatformId } from '../../types/platform'
 
 /**
@@ -33,10 +35,12 @@ const OneClickHeaderSignIn = ({
 }) => {
   const { t } = useTranslation()
   const Icon = PLATFORMS[platform].icon
-  const [redirecting, setRedirecting] = useState(false)
+  // Shared so the header button and the in-page sign-in gate both show the
+  // loading state when either one is clicked.
+  const redirecting = useSigningIn()
 
   const start = () => {
-    setRedirecting(true)
+    beginSignIn()
     onStart()
   }
 
@@ -62,12 +66,15 @@ const BlueskyHeaderSignIn = () => {
   const Icon = PLATFORMS.bluesky.icon
   const [open, setOpen] = useState(false)
   const [handle, setHandle] = useState('')
-  const [redirecting, setRedirecting] = useState(false)
+  const redirecting = useSigningIn()
   const ref = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const normalized = normalizeHandle('bluesky', handle)
-  const valid = PLATFORMS.bluesky.handlePattern.test(normalized)
+  // Enable as soon as something is typed/pasted. Validation happens on submit
+  // (and server-side) — a disabled button with no explanation is confusing,
+  // especially when a pasted handle has invisible characters.
+  const canSubmit = normalized.length > 0
 
   // Close on outside click or Escape.
   useEffect(() => {
@@ -93,8 +100,12 @@ const BlueskyHeaderSignIn = () => {
 
   const submit = (event: React.FormEvent) => {
     event.preventDefault()
-    if (!valid || redirecting) return
-    setRedirecting(true)
+    if (redirecting || !canSubmit) return
+    if (!PLATFORMS.bluesky.handlePattern.test(normalized)) {
+      toast.error(t('search.invalidBluesky'))
+      return
+    }
+    beginSignIn()
     loginBluesky(normalized)
   }
 
@@ -133,7 +144,7 @@ const BlueskyHeaderSignIn = () => {
             disabled={redirecting}
             className="w-full rounded-lg border border-border bg-bg px-3 py-1.5 text-sm text-fg placeholder:text-fg-muted outline-none focus-visible:border-brand-500 focus-visible:ring-2 focus-visible:ring-brand-400/40 disabled:opacity-60"
           />
-          <button type="submit" disabled={!valid || redirecting} className={`${buttonClass} w-full`}>
+          <button type="submit" disabled={!canSubmit || redirecting} className={`${buttonClass} w-full`}>
             {redirecting && (
               <LoaderCircle className="h-4 w-4 motion-safe:animate-spin" aria-hidden="true" />
             )}

@@ -16,6 +16,7 @@ import { useTranslation, Trans } from 'react-i18next'
 import { ConfirmDialog } from '../../ui/ConfirmDialog'
 import { useUnfollow } from '../../../hooks/useUnfollow'
 import { usePageSize } from '../../../hooks/usePageSize'
+import { beginSignIn, useSigningIn } from '../../../hooks/useSigningIn'
 import { login, loginBluesky } from '../../../api/client'
 import { PLATFORMS, normalizeHandle } from '../../../platforms'
 import type { Account, PlatformId, UnfollowersResponse } from '../../../types/platform'
@@ -388,10 +389,10 @@ const GuestCta = ({
 
 const GithubSignIn = () => {
   const { t } = useTranslation()
-  const [redirecting, setRedirecting] = useState(false)
+  const redirecting = useSigningIn()
 
   const start = () => {
-    setRedirecting(true)
+    beginSignIn()
     login()
   }
 
@@ -423,16 +424,21 @@ const GithubSignIn = () => {
 const BlueskySignIn = ({ defaultHandle }: { defaultHandle: string }) => {
   const { t } = useTranslation()
   const [handle, setHandle] = useState(defaultHandle)
-  const [redirecting, setRedirecting] = useState(false)
+  const redirecting = useSigningIn()
   const normalized = normalizeHandle('bluesky', handle)
-  const valid = PLATFORMS.bluesky.handlePattern.test(normalized)
+  // Enable as soon as something is entered; validate on submit (see HeaderSignIn).
+  const canSubmit = normalized.length > 0
 
   return (
     <form
       onSubmit={(event) => {
         event.preventDefault()
-        if (!valid || redirecting) return
-        setRedirecting(true)
+        if (redirecting || !canSubmit) return
+        if (!PLATFORMS.bluesky.handlePattern.test(normalized)) {
+          toast.error(t('search.invalidBluesky'))
+          return
+        }
+        beginSignIn()
         loginBluesky(normalized)
       }}
       className="flex flex-col gap-2 rounded-lg border border-brand-500/30 bg-brand-500/10 px-4 py-3"
@@ -457,7 +463,7 @@ const BlueskySignIn = ({ defaultHandle }: { defaultHandle: string }) => {
         />
         <button
           type="submit"
-          disabled={!valid || redirecting}
+          disabled={!canSubmit || redirecting}
           className="inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3 py-1.5 text-sm font-medium text-bg outline-none transition-colors hover:bg-brand-600 focus-visible:ring-2 focus-visible:ring-brand-400 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {redirecting && (

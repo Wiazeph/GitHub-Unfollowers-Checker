@@ -359,9 +359,14 @@ app.get('/api/auth/me', async (c) => {
   const cookie = c.req.header('cookie') ?? null
   const secret = c.env.AUTH_SECRET
 
-  const github = await resolveGithub(cookie, secret)
-  const bluesky = await resolveBluesky(c, cookie, secret)
-  const gitlab = await resolveGitlab(c, cookie, secret)
+  // Resolve all three platforms in parallel — each makes its own upstream call
+  // (GitHub/GitLab token check, Bluesky session restore + profile), so running
+  // them sequentially would add up their latencies on every page load.
+  const [github, bluesky, gitlab] = await Promise.all([
+    resolveGithub(cookie, secret),
+    resolveBluesky(c, cookie, secret),
+    resolveGitlab(c, cookie, secret),
+  ])
 
   return c.json({ github, bluesky, gitlab })
 })
