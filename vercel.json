@@ -5,6 +5,9 @@
     "api/unfollowers.ts": {
       "maxDuration": 60
     },
+    "api/unfollowers-authed.ts": {
+      "maxDuration": 60
+    },
     "api/unfollow.ts": {
       "maxDuration": 60
     }
