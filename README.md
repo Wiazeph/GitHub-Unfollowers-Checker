@@ -38,7 +38,7 @@ The pasted script injects a small, self-contained panel into instagram.com. It c
 ## Privacy & security
 
 - **No data is stored on our servers.** There's no database; follower/following lists are fetched, compared, and returned for a single request — never logged or saved. Your preferences (theme, language, and the Instagram panel's settings/layout) are kept only in your browser's local storage and never sent anywhere.
-- Public follower data (GitHub, Bluesky) is read through serverless functions that hold the API credentials, so tokens never reach the browser.
+- Follower data (GitHub, Bluesky, GitLab) is read through serverless functions that hold the API credentials, so tokens never reach the browser. GitHub and Bluesky lists are public; GitLab requires you to sign in first.
 - Sign-in tokens are kept server-side (GitHub & GitLab: signed http-only cookie; Bluesky: stored server-side, only the account id rides in the cookie) and are not persisted beyond the actions you take.
 - The X archive diff and the Instagram script run entirely client-side in your own browser — your files and session never leave your device.
 - Bulk unfollowing affects only your own account, and only after an explicit confirmation.
