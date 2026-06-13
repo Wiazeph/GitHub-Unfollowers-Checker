@@ -6,13 +6,13 @@
  * produced the data.
  */
 
-export type PlatformId = 'github' | 'bluesky'
+export type PlatformId = 'github' | 'bluesky' | 'gitlab'
 
 /** A normalized account, the same shape regardless of platform. */
 export interface Account {
-  /** Stable unique id — GitHub: String(user.id); Bluesky: the DID. */
+  /** Stable unique id — GitHub: String(user.id); Bluesky: the DID; GitLab: String(user.id). */
   id: string
-  /** Human-readable handle — GitHub login; Bluesky handle (name.bsky.social). */
+  /** Human-readable handle — GitHub login; Bluesky handle (name.bsky.social); GitLab username. */
   handle: string
   displayName?: string
   avatarUrl?: string
