@@ -140,7 +140,7 @@ export const tr: Translation = {
     contact: '{{email}}',
     reportIssue: 'Sorun bildir',
     disclaimer:
-      'GitHub, Bluesky, X veya Instagram ile bağlantılı değildir. Kendi hesaplarında, kendi sorumluluğunda kullan.',
+      'GitHub, Bluesky, GitLab, X veya Instagram ile bağlantılı değildir. Kendi hesaplarında, kendi sorumluluğunda kullan.',
   },
 
   privacy: {
@@ -148,14 +148,14 @@ export const tr: Translation = {
     close: 'Kapat',
     whatTitle: 'Bu araç ne yapar',
     whatBody:
-      'Takip Etmeyenler; GitHub, Bluesky, X (Twitter) ve Instagram’da takip ettiğin ama seni geri takip etmeyen hesapları bulmana yardım eder. Ücretsiz, kişisel bir araçtır ve bu platformların hiçbiriyle bağlantılı, onaylı ya da ilişkili değildir.',
+      'Takip Etmeyenler; GitHub, Bluesky, GitLab, X (Twitter) ve Instagram’da takip ettiğin ama seni geri takip etmeyen hesapları bulmana yardım eder. Ücretsiz, kişisel bir araçtır ve bu platformların hiçbiriyle bağlantılı, onaylı ya da ilişkili değildir.',
     storeTitle: 'Neyi saklıyoruz',
     storeBody:
       'Sunucularımızda hiçbir şey. Veritabanı çalıştırmıyoruz ve verilerini saklamıyoruz. Takipçi ve takip listeleri yalnızca o tek istek için alınır, karşılaştırılır ve döndürülür — asla kaydedilmez veya loglanmaz. Tercihlerin (tema, dil ve Instagram panelinin ayarları/yerleşimi) yalnızca kendi tarayıcının yerel deposunda tutulur ve hiçbir yere gönderilmez.',
     howTitle: 'Her platform nasıl çalışır',
-    howGithubLabel: 'GitHub ve Bluesky:',
+    howGithubLabel: 'GitHub, Bluesky ve GitLab:',
     howGithubBody:
-      'public takipçi verisi, sunucusuz fonksiyonlarımız üzerinden resmi API’leriyle okunur, böylece platform kimlik bilgileri tarayıcına hiç ulaşmaz. Takip bırakmak için giriş yaparsan bu, platformun resmi OAuth’u üzerinden olur ve oturum yalnızca senin seçtiğin işlemleri yapmak için kullanılır — token’lar saklanmaz.',
+      'takipçi verisi, sunucusuz fonksiyonlarımız üzerinden resmi API’leriyle okunur, böylece platform kimlik bilgileri tarayıcına hiç ulaşmaz. GitHub ve Bluesky listeleri herkese açıktır; GitLab bunları gizli tuttuğu için önce giriş yaparsın. Giriş, platformun resmi OAuth’u üzerinden olur ve oturum yalnızca senin seçtiğin işlemleri yapmak için kullanılır — token’lar saklanmaz.',
     howXLabel: 'X (Twitter):',
     howXBody:
       'tamamen tarayıcında çalışır. Veri arşivindeki dosyalar yerel olarak okunur ve karşılaştırılır, hiçbir yere yüklenmez.',
