@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { getOAuthClient } from '../../_lib/bluesky-oauth.js'
+import { startAuthorize } from '../../_lib/bluesky-oauth.js'
 import { randomToken } from '../../_lib/auth.js'
 import { normalizeHandle } from '../../_lib/provider.js'
 
@@ -23,12 +23,8 @@ export default async function handler(
   }
 
   try {
-    const client = await getOAuthClient()
-    const url = await client.authorize(handle, {
-      scope: 'atproto transition:generic',
-      state: randomToken(),
-    })
-    res.redirect(302, url.toString())
+    const url = await startAuthorize(handle, randomToken())
+    res.redirect(302, url)
   } catch (error) {
     const reason =
       error instanceof Error && /resolve|handle|did/i.test(error.message)

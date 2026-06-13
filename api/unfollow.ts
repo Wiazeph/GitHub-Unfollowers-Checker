@@ -1,8 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { Agent } from '@atproto/api'
 import { getPlatformSession, type Platform } from './_lib/auth.js'
-import { getOAuthClient } from './_lib/bluesky-oauth.js'
-import { isDid, unfollow as blueskyUnfollow } from './_lib/bluesky.js'
+import { unfollowForDid } from './_lib/bluesky-oauth.js'
+import { isDid } from './_lib/bluesky.js'
 import { isUserId, unfollow as gitlabUnfollow } from './_lib/gitlab.js'
 
 const USERNAME_PATTERN = /^[a-zA-Z0-9](?:[a-zA-Z0-9]|-(?=[a-zA-Z0-9])){0,38}$/
@@ -95,10 +94,7 @@ export default async function handler(
       return
     }
     try {
-      const client = await getOAuthClient()
-      const oauthSession = await client.restore(sessionValue)
-      const agent = new Agent(oauthSession)
-      const result = await blueskyUnfollow(agent, sessionValue, dids)
+      const result = await unfollowForDid(sessionValue, dids)
       res.status(200).json(result)
     } catch {
       res.status(502).json({ error: 'Could not unfollow on Bluesky', code: 'UPSTREAM' })

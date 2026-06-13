@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { getOAuthClient } from './_lib/bluesky-oauth.js'
+import { getClientMetadata } from './_lib/bluesky-oauth.js'
 
 /**
  * Serves the AT Protocol OAuth client-metadata document at /client-metadata.json
@@ -12,11 +12,11 @@ export default async function handler(
   res: VercelResponse,
 ): Promise<void> {
   try {
-    const client = await getOAuthClient()
+    const metadata = await getClientMetadata()
     res.setHeader('Content-Type', 'application/json')
     res.setHeader('Cache-Control', 'public, max-age=300')
     // clientMetadata already includes the public jwks for a confidential client.
-    res.status(200).json(client.clientMetadata)
+    res.status(200).json(metadata)
   } catch {
     res.status(500).json({ error: 'OAuth is not configured', code: 'CONFIG' })
   }

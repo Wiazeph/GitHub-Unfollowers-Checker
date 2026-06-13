@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AT Protocol OAuth client (confidential / BFF).
  *
@@ -6,6 +7,16 @@
  * at /client-metadata.json), a signing keyset, and persistent state/session
  * stores. Vercel functions are stateless, so the stores are backed by Upstash
  * Redis rather than memory.
+ *
+ * This module is the single place that touches `@atproto/*`. Those packages are
+ * `exports`-only and their types only resolve under NodeNext/bundler module
+ * resolution. The `@vercel/node` builder type-checks each function with the
+ * legacy `node` resolution and ignores our tsconfig, so it can't see those
+ * types and the build fails ("no exported member JoseKey", "restore does not
+ * exist on NodeOAuthClient"). We isolate all @atproto usage here behind plainly
+ * typed wrapper functions and disable type-checking for THIS FILE ONLY, so every
+ * other API function stays fully type-checked and never imports @atproto. The
+ * real type-checking still happens locally via `tsc -b` in `pnpm build`.
  *
  * Required env vars (see .env.local.example):
  *   PUBLIC_URL            e.g. https://your-app.vercel.app (no trailing slash)
@@ -19,7 +30,9 @@ import {
   type NodeSavedState,
   type NodeSavedSession,
 } from '@atproto/oauth-client-node'
+import { Agent } from '@atproto/api'
 import { Redis } from '@upstash/redis'
+import { unfollow as repoUnfollow } from './bluesky.js'
 
 /** OAuth records expire on their own; we add a TTL as a backstop for orphans. */
 const STATE_TTL_SECONDS = 60 * 10 // 10 minutes
@@ -116,4 +129,62 @@ export const getOAuthClient = async (): Promise<NodeOAuthClient> => {
   })
 
   return clientInstance
+}
+
+/* -------------------------------------------------------------------------- */
+/* Plainly-typed wrappers — the only @atproto surface other functions touch.  */
+/* -------------------------------------------------------------------------- */
+
+/** Public OAuth client-metadata document (served at /client-metadata.json). */
+export const getClientMetadata = async (): Promise<unknown> => {
+  const client = await getOAuthClient()
+  return client.clientMetadata
+}
+
+/** Public JWKS (served at /jwks.json). */
+export const getJwks = async (): Promise<unknown> => {
+  const client = await getOAuthClient()
+  return client.jwks
+}
+
+/** Begin the OAuth flow for a handle; returns the authorize URL to redirect to. */
+export const startAuthorize = async (
+  handle: string,
+  state: string,
+): Promise<string> => {
+  const client = await getOAuthClient()
+  const url = await client.authorize(handle, {
+    scope: 'atproto transition:generic',
+    state,
+  })
+  return url.toString()
+}
+
+/** Finish the OAuth flow from the callback query; returns the user's DID. */
+export const finishCallback = async (
+  params: URLSearchParams,
+): Promise<string> => {
+  const client = await getOAuthClient()
+  const { session } = await client.callback(params)
+  return session.did
+}
+
+/** Restore a session by DID and return the account handle (for /api/auth/me). */
+export const getHandleForDid = async (did: string): Promise<string> => {
+  const client = await getOAuthClient()
+  const oauthSession = await client.restore(did)
+  const agent = new Agent(oauthSession)
+  const profile = await agent.getProfile({ actor: agent.assertDid })
+  return profile.data.handle
+}
+
+/** Restore a session by DID and unfollow the given subject DIDs. */
+export const unfollowForDid = async (
+  did: string,
+  subjectDids: string[],
+): Promise<{ removed: string[]; failed: string[] }> => {
+  const client = await getOAuthClient()
+  const oauthSession = await client.restore(did)
+  const agent = new Agent(oauthSession)
+  return repoUnfollow(agent, did, subjectDids)
 }

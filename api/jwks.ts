@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { getOAuthClient } from './_lib/bluesky-oauth.js'
+import { getJwks } from './_lib/bluesky-oauth.js'
 
 /**
  * Serves the public JWKS at /jwks.json (see the rewrite in vercel.json). The
@@ -11,10 +11,10 @@ export default async function handler(
   res: VercelResponse,
 ): Promise<void> {
   try {
-    const client = await getOAuthClient()
+    const jwks = await getJwks()
     res.setHeader('Content-Type', 'application/json')
     res.setHeader('Cache-Control', 'public, max-age=300')
-    res.status(200).json(client.jwks)
+    res.status(200).json(jwks)
   } catch {
     res.status(500).json({ error: 'OAuth is not configured', code: 'CONFIG' })
   }

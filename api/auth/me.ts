@@ -1,7 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { Agent } from '@atproto/api'
 import { clearPlatformSession, getPlatformSession } from '../_lib/auth.js'
-import { getOAuthClient } from '../_lib/bluesky-oauth.js'
+import { getHandleForDid } from '../_lib/bluesky-oauth.js'
 import { getMyHandle } from '../_lib/gitlab.js'
 
 /**
@@ -81,11 +80,8 @@ const resolveBluesky = async (
   if (!did) return null
 
   try {
-    const client = await getOAuthClient()
-    const oauthSession = await client.restore(did)
-    const agent = new Agent(oauthSession)
-    const profile = await agent.getProfile({ actor: agent.assertDid })
-    return { handle: profile.data.handle }
+    const handle = await getHandleForDid(did)
+    return { handle }
   } catch {
     clearPlatformSession(res, 'bluesky')
     return null

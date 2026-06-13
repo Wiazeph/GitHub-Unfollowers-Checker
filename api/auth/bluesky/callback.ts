@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { getOAuthClient } from '../../_lib/bluesky-oauth.js'
+import { finishCallback } from '../../_lib/bluesky-oauth.js'
 import { setPlatformSession } from '../../_lib/auth.js'
 
 /**
@@ -18,9 +18,8 @@ export default async function handler(
   const url = new URL(req.url ?? '', 'http://localhost')
 
   try {
-    const client = await getOAuthClient()
-    const { session } = await client.callback(url.searchParams)
-    setPlatformSession(res, 'bluesky', session.did)
+    const did = await finishCallback(url.searchParams)
+    setPlatformSession(res, 'bluesky', did)
     res.redirect(302, '/')
   } catch {
     fail('bluesky_exchange_failed')
