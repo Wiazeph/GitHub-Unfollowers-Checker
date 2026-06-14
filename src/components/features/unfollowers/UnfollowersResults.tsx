@@ -207,6 +207,10 @@ const ResultsState = ({
     <span className="rounded-full bg-brand-500/15 px-2.5 py-0.5 font-medium text-brand-400" />
   )
 
+  // Cleared the whole list (e.g. unfollowed the last non-follower) → show the
+  // same celebratory empty state as when there were none to begin with.
+  if (count === 0) return <ZeroState />
+
   return (
     <div ref={topRef} className="flex flex-col gap-4 scroll-mt-4">
       <OnboardingHint show={isOwnList} />
@@ -725,7 +729,7 @@ const CenteredState = ({
     </div>
     <div className="space-y-1">
       <p className="font-medium text-fg">{title}</p>
-      <p className="max-w-sm text-sm text-fg-muted">{description}</p>
+      <p className="max-w-md text-sm text-fg-muted">{description}</p>
     </div>
     {footer}
   </div>
