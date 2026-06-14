@@ -9,6 +9,9 @@ interface __BaseEnv_Env {
 	GITHUB_OAUTH_CLIENT_SECRET: string;
 	GITLAB_OAUTH_CLIENT_ID: string;
 	GITLAB_OAUTH_CLIENT_SECRET: string;
+	MASTODON_INSTANCE: string;
+	MASTODON_OAUTH_CLIENT_ID: string;
+	MASTODON_OAUTH_CLIENT_SECRET: string;
 	AUTH_SECRET: string;
 	BLUESKY_PRIVATE_KEY: string;
 	PUBLIC_URL: string;
@@ -24,7 +27,7 @@ type StringifyValues<EnvType extends Record<string, unknown>> = {
 	[Binding in keyof EnvType]: EnvType[Binding] extends string ? EnvType[Binding] : string;
 };
 declare namespace NodeJS {
-	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "GITHUB_TOKEN" | "GITHUB_OAUTH_CLIENT_ID" | "GITHUB_OAUTH_CLIENT_SECRET" | "GITLAB_OAUTH_CLIENT_ID" | "GITLAB_OAUTH_CLIENT_SECRET" | "AUTH_SECRET" | "BLUESKY_PRIVATE_KEY" | "PUBLIC_URL">> {}
+	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "GITHUB_TOKEN" | "GITHUB_OAUTH_CLIENT_ID" | "GITHUB_OAUTH_CLIENT_SECRET" | "GITLAB_OAUTH_CLIENT_ID" | "GITLAB_OAUTH_CLIENT_SECRET" | "MASTODON_INSTANCE" | "MASTODON_OAUTH_CLIENT_ID" | "MASTODON_OAUTH_CLIENT_SECRET" | "AUTH_SECRET" | "BLUESKY_PRIVATE_KEY" | "PUBLIC_URL">> {}
 }
 
 // Begin runtime types

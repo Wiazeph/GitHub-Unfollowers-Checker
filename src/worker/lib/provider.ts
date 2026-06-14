@@ -6,7 +6,7 @@
  * produced the data.
  */
 
-export type PlatformId = 'github' | 'bluesky' | 'gitlab'
+export type PlatformId = 'github' | 'bluesky' | 'gitlab' | 'mastodon'
 
 /** A normalized account, the same shape regardless of platform. */
 export interface Account {

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { LoaderCircle } from 'lucide-react'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
-import { login, loginBluesky, loginGitlab } from '../../api/client'
+import { login, loginBluesky, loginGitlab, loginMastodon } from '../../api/client'
 import { PLATFORMS, normalizeHandle } from '../../platforms'
 import { beginSignIn, useSigningIn } from '../../hooks/useSigningIn'
 import type { PlatformId } from '../../types/platform'
@@ -10,13 +10,19 @@ import type { PlatformId } from '../../types/platform'
 /**
  * Always-visible sign-in affordance for the header (guests only). It's keyed to
  * the active platform so a first-time visitor never has to search before they
- * can find how to sign in. GitHub and GitLab are one-click redirects; Bluesky's
- * OAuth needs the handle up front, so it opens a small popover to collect it.
+ * can find how to sign in. GitHub, GitLab and Mastodon are one-click redirects;
+ * Bluesky's OAuth needs the handle up front, so it opens a small popover to
+ * collect it.
  */
 export const HeaderSignIn = ({ platform }: { platform: PlatformId }) => {
   if (platform === 'bluesky') return <BlueskyHeaderSignIn />
   if (platform === 'gitlab') {
     return <OneClickHeaderSignIn platform="gitlab" label="GitLab" onStart={loginGitlab} />
+  }
+  if (platform === 'mastodon') {
+    return (
+      <OneClickHeaderSignIn platform="mastodon" label="Mastodon" onStart={loginMastodon} />
+    )
   }
   return <OneClickHeaderSignIn platform="github" label="GitHub" onStart={login} />
 }

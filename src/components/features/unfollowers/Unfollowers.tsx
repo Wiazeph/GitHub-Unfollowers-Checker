@@ -68,7 +68,10 @@ export const Unfollowers = () => {
 
     // Honor the just-completed login, but only if it actually succeeded.
     if (
-      (pending === 'github' || pending === 'bluesky' || pending === 'gitlab') &&
+      (pending === 'github' ||
+        pending === 'bluesky' ||
+        pending === 'gitlab' ||
+        pending === 'mastodon') &&
       auth?.[pending]
     ) {
       setTab(pending)
@@ -81,7 +84,9 @@ export const Unfollowers = () => {
         ? 'bluesky'
         : auth?.gitlab
           ? 'gitlab'
-          : null
+          : auth?.mastodon
+            ? 'mastodon'
+            : null
     if (signedIn) {
       setTab(signedIn)
     }

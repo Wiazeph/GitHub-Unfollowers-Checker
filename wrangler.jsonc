@@ -9,6 +9,11 @@
     "enabled": true
   },
   "upload_source_maps": true,
+  // Non-secret config. The Mastodon instance to sign in / unfollow against
+  // (public lookup still works for any user@instance). Not a secret — safe here.
+  "vars": {
+    "MASTODON_INSTANCE": "mastodon.social"
+  },
   // Vite (@cloudflare/vite-plugin) builds the SPA into ./dist/client. Anything the
   // Worker doesn't handle falls back to index.html (client-side routing).
   //

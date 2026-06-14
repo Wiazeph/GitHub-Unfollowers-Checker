@@ -2,6 +2,7 @@ import {
   GithubIcon,
   BlueskyIcon,
   GitlabIcon,
+  MastodonIcon,
   InstagramIcon,
   TwitterIcon,
   type BrandIcon,
@@ -35,6 +36,8 @@ const GITHUB_HANDLE = /^[a-zA-Z0-9](?:[a-zA-Z0-9]|-(?=[a-zA-Z0-9])){0,38}$/
 const BLUESKY_HANDLE = /^(?!-)[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+$/
 /** GitLab usernames: alphanumeric plus _ . - (we only ever show our own, so this is lenient). */
 const GITLAB_HANDLE = /^[a-zA-Z0-9][a-zA-Z0-9._-]{0,254}$/
+/** Mastodon handles are webfinger-style: user@instance.tld (no leading @). */
+const MASTODON_HANDLE = /^[a-zA-Z0-9_]+@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/
 
 export const PLATFORMS: Record<PlatformId, PlatformConfig> = {
   github: {
@@ -71,6 +74,17 @@ export const PLATFORMS: Record<PlatformId, PlatformConfig> = {
     validationKey: 'search.invalidGitlab',
     authKind: 'oauth',
     profileNoun: 'GitLab',
+  },
+  mastodon: {
+    id: 'mastodon',
+    label: 'Mastodon',
+    icon: MastodonIcon,
+    handlePattern: MASTODON_HANDLE,
+    placeholderKey: 'search.placeholderMastodon',
+    placeholderAuthedKey: 'search.placeholderMastodonAuthed',
+    validationKey: 'search.invalidMastodon',
+    authKind: 'oauth',
+    profileNoun: 'Mastodon',
   },
 }
 
@@ -110,6 +124,10 @@ export const normalizeHandle = (platform: PlatformId, raw: string): string => {
         // bsky.app/profile/<handle-or-did>
         const idx = segments.indexOf('profile')
         value = idx >= 0 && segments[idx + 1] ? segments[idx + 1] : (segments[0] ?? '')
+      } else if (platform === 'mastodon') {
+        // <instance>/@<user>  →  <user>@<instance>
+        const user = (segments[0] ?? '').replace(/^@+/, '')
+        value = user ? `${user}@${url.hostname}` : ''
       } else {
         // github.com/<user>[/...]
         value = segments[0] ?? ''
@@ -128,6 +146,7 @@ export const PLATFORM_LIST: PlatformConfig[] = [
   PLATFORMS.github,
   PLATFORMS.bluesky,
   PLATFORMS.gitlab,
+  PLATFORMS.mastodon,
 ]
 
 /** Instagram is a separate, browser-only tool (no server API), shown as its own tab. */

@@ -40,6 +40,9 @@ export const es: Translation = {
     invalidBluesky: 'Introduce un identificador de Bluesky válido (p. ej. nombre.bsky.social)',
     placeholderGitlabAuthed: 'Tu lista de GitLab',
     invalidGitlab: 'Introduce un usuario de GitLab válido',
+    placeholderMastodon: 'Introduce un identificador de Mastodon (usuario@instancia.social)',
+    placeholderMastodonAuthed: 'Buscar otro identificador…',
+    invalidMastodon: 'Introduce un identificador de Mastodon válido (p. ej. usuario@mastodon.social)',
   },
 
   results: {
@@ -140,7 +143,7 @@ export const es: Translation = {
     contact: '{{email}}',
     reportIssue: 'Informar de un problema',
     disclaimer:
-      'Sin afiliación con GitHub, Bluesky, GitLab, X o Instagram. Úsalo en tus propias cuentas, bajo tu propia responsabilidad.',
+      'Sin afiliación con GitHub, Bluesky, GitLab, Mastodon, X o Instagram. Úsalo en tus propias cuentas, bajo tu propia responsabilidad.',
   },
 
   privacy: {
@@ -148,14 +151,14 @@ export const es: Translation = {
     close: 'Cerrar',
     whatTitle: 'Qué hace esta herramienta',
     whatBody:
-      'El Comprobador de seguidores te ayuda a encontrar cuentas que sigues y que no te siguen de vuelta, en GitHub, Bluesky, GitLab, X (Twitter) e Instagram. Es una herramienta gratuita y personal, sin afiliación, respaldo ni conexión con ninguna de esas plataformas.',
+      'El Comprobador de seguidores te ayuda a encontrar cuentas que sigues y que no te siguen de vuelta, en GitHub, Bluesky, GitLab, Mastodon, X (Twitter) e Instagram. Es una herramienta gratuita y personal, sin afiliación, respaldo ni conexión con ninguna de esas plataformas.',
     storeTitle: 'Qué almacenamos',
     storeBody:
       'Nada en nuestros servidores. No tenemos base de datos ni guardamos tus datos. Las listas de seguidores y seguidos se obtienen, comparan y devuelven para esa única solicitud — nunca se registran ni se guardan. Tus preferencias (tema, idioma y los ajustes/diseño del panel de Instagram) se guardan solo en el almacenamiento local de tu propio navegador y nunca se envían a ningún sitio.',
     howTitle: 'Cómo funciona cada plataforma',
-    howGithubLabel: 'GitHub, Bluesky y GitLab:',
+    howGithubLabel: 'GitHub, Bluesky, GitLab y Mastodon:',
     howGithubBody:
-      'los datos de seguidores se leen a través de sus API oficiales mediante nuestras funciones sin servidor, de modo que las credenciales de la plataforma nunca llegan a tu navegador. Las listas de GitHub y Bluesky son públicas; GitLab las mantiene privadas, así que inicias sesión primero. El inicio de sesión usa el OAuth oficial de la plataforma y la sesión solo se usa para realizar las acciones que elijas — los tokens no se conservan.',
+      'los datos de seguidores se leen a través de sus API oficiales mediante nuestras funciones sin servidor, de modo que las credenciales de la plataforma nunca llegan a tu navegador. Las listas de GitHub, Bluesky y Mastodon son públicas; GitLab las mantiene privadas, así que inicias sesión primero. El inicio de sesión usa el OAuth oficial de la plataforma y la sesión solo se usa para realizar las acciones que elijas — los tokens no se conservan.',
     howXLabel: 'X (Twitter):',
     howXBody:
       'se ejecuta por completo en tu navegador. Los archivos de tu archivo de datos se leen y comparan localmente y nunca se suben a ningún sitio.',

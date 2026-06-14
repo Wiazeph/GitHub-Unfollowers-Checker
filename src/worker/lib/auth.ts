@@ -12,13 +12,14 @@
  */
 import { createHmac, timingSafeEqual } from 'node:crypto'
 
-export type Platform = 'github' | 'bluesky' | 'gitlab'
+export type Platform = 'github' | 'bluesky' | 'gitlab' | 'mastodon'
 
 /** One cookie per platform, so the user can stay signed in to several at once. */
 const SESSION_COOKIES: Record<Platform, string> = {
   github: 'gh_session',
   bluesky: 'bsky_session',
   gitlab: 'gl_session',
+  mastodon: 'masto_session',
 }
 export const STATE_COOKIE = 'oauth_state'
 

@@ -17,7 +17,7 @@ import { ConfirmDialog } from '../../ui/ConfirmDialog'
 import { useUnfollow } from '../../../hooks/useUnfollow'
 import { usePageSize } from '../../../hooks/usePageSize'
 import { beginSignIn, useSigningIn } from '../../../hooks/useSigningIn'
-import { login, loginBluesky } from '../../../api/client'
+import { login, loginBluesky, loginMastodon } from '../../../api/client'
 import { PLATFORMS, normalizeHandle } from '../../../platforms'
 import type { Account, PlatformId, UnfollowersResponse } from '../../../types/platform'
 
@@ -122,11 +122,11 @@ const ResultsState = ({
   const pageChangedRef = useRef(false)
 
   // The unfollow API identifies targets differently per platform: GitHub uses
-  // the handle (login); Bluesky uses the account id (DID); GitLab uses the
-  // numeric user id. Map selected ids to the right identifier, and map results
-  // back to ids to update the list.
+  // the handle (login); Bluesky uses the DID, GitLab the numeric user id, and
+  // Mastodon the numeric account id. Map selected ids to the right identifier,
+  // and map results back to ids to update the list.
   const targetOf = (account: Account): string =>
-    platform === 'bluesky' || platform === 'gitlab'
+    platform === 'bluesky' || platform === 'gitlab' || platform === 'mastodon'
       ? account.id
       : account.handle
 
@@ -383,17 +383,24 @@ const GuestCta = ({
     return <BlueskySignIn defaultHandle={handle} />
   }
 
-  // GitHub: one-click redirect.
-  return <GithubSignIn />
+  // GitHub / Mastodon: one-click redirect.
+  return <OneClickSignIn platform={platform} />
 }
 
-const GithubSignIn = () => {
+/** One-click sign-in CTA for the platforms whose OAuth needs no handle up front. */
+const ONE_CLICK_LOGINS: Partial<Record<PlatformId, () => void>> = {
+  github: login,
+  mastodon: loginMastodon,
+}
+
+const OneClickSignIn = ({ platform }: { platform: PlatformId }) => {
   const { t } = useTranslation()
   const redirecting = useSigningIn()
+  const config = PLATFORMS[platform]
 
   const start = () => {
     beginSignIn()
-    login()
+    ONE_CLICK_LOGINS[platform]?.()
   }
 
   return (
@@ -415,7 +422,7 @@ const GithubSignIn = () => {
         )}
         {redirecting
           ? t('results.signingIn')
-          : t('results.signInWith', { platform: 'GitHub' })}
+          : t('results.signInWith', { platform: config.profileNoun })}
       </button>
     </div>
   )

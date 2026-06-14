@@ -52,6 +52,18 @@ import {
   GITLAB_TOKEN_URL,
   getRedirectUri as getGitlabRedirectUri,
 } from './lib/gitlab-oauth.js'
+import { isMastodonId } from './lib/mastodon.js'
+import {
+  MASTODON_OAUTH_SCOPE,
+  authorizeUrl as mastodonAuthorizeUrl,
+  getMyHandle as getMastodonHandle,
+  getRedirectUri as getMastodonRedirectUri,
+  normalizeInstance,
+  packSession as packMastodonSession,
+  tokenUrl as mastodonTokenUrl,
+  unfollow as mastodonUnfollow,
+  unpackSession as unpackMastodonSession,
+} from './lib/mastodon-oauth.js'
 
 type Ctx = Context<{ Bindings: Env }>
 
@@ -125,7 +137,9 @@ app.post('/api/unfollow', async (c) => {
       ? 'bluesky'
       : body.platform === 'gitlab'
         ? 'gitlab'
-        : 'github'
+        : body.platform === 'mastodon'
+          ? 'mastodon'
+          : 'github'
 
   const session = getPlatformSession(c.req.header('cookie') ?? null, platform, c.env.AUTH_SECRET)
   if (!session) {
@@ -166,6 +180,22 @@ app.post('/api/unfollow', async (c) => {
       return c.json(await gitlabUnfollow(session, ids))
     } catch {
       return c.json({ error: 'Could not unfollow on GitLab', code: 'UPSTREAM' }, 502)
+    }
+  }
+
+  if (platform === 'mastodon') {
+    const unpacked = unpackMastodonSession(session)
+    if (!unpacked) {
+      return c.json({ error: 'You must sign in first', code: 'UNAUTHORIZED' }, 401)
+    }
+    const ids = targets.filter(isMastodonId)
+    if (ids.length === 0) {
+      return c.json({ error: 'No valid targets provided', code: 'BAD_REQUEST' }, 400)
+    }
+    try {
+      return c.json(await mastodonUnfollow(unpacked.token, unpacked.instance, ids))
+    } catch {
+      return c.json({ error: 'Could not unfollow on Mastodon', code: 'UPSTREAM' }, 502)
     }
   }
 
@@ -323,6 +353,84 @@ app.get('/api/auth/gitlab/callback', async (c) => {
   return c.redirect(`${origin}/`, 302)
 })
 
+/* ------------------------------ Mastodon auth ----------------------------- */
+
+// Single-instance MVP: sign-in (and therefore unfollow) targets the configured
+// MASTODON_INSTANCE. Public lookup still works for accounts on any instance.
+
+app.get('/api/auth/mastodon/login', (c) => {
+  const clientId = c.env.MASTODON_OAUTH_CLIENT_ID
+  const instanceRaw = c.env.MASTODON_INSTANCE
+  if (!clientId || !instanceRaw) {
+    return c.json({ error: 'OAuth is not configured', code: 'CONFIG' }, 500)
+  }
+  const instance = normalizeInstance(instanceRaw)
+
+  const state = randomToken()
+  addCookie(c, stateCookie(state, c.env.AUTH_SECRET))
+
+  const params = new URLSearchParams({
+    client_id: clientId,
+    redirect_uri: getMastodonRedirectUri(c.req.raw, c.env),
+    response_type: 'code',
+    scope: MASTODON_OAUTH_SCOPE,
+    state,
+  })
+  return c.redirect(`${mastodonAuthorizeUrl(instance)}?${params.toString()}`, 302)
+})
+
+app.get('/api/auth/mastodon/callback', async (c) => {
+  const origin = getOrigin(c.req.raw, c.env)
+  const fail = (reason: string) =>
+    c.redirect(`${origin}/?auth_error=${encodeURIComponent(reason)}`, 302)
+
+  const clientId = c.env.MASTODON_OAUTH_CLIENT_ID
+  const clientSecret = c.env.MASTODON_OAUTH_CLIENT_SECRET
+  const instanceRaw = c.env.MASTODON_INSTANCE
+  if (!clientId || !clientSecret || !instanceRaw) {
+    return c.json({ error: 'OAuth is not configured', code: 'CONFIG' }, 500)
+  }
+  const instance = normalizeInstance(instanceRaw)
+
+  const code = c.req.query('code') ?? ''
+  const state = c.req.query('state') ?? ''
+  const expectedState = unsign(
+    parseCookies(c.req.header('cookie') ?? null)[STATE_COOKIE],
+    c.env.AUTH_SECRET,
+  )
+  addCookie(c, clearStateCookie())
+
+  if (!code || !state || !expectedState || state !== expectedState) return fail('invalid_state')
+
+  let tokenResponse: Response
+  try {
+    tokenResponse = await fetch(mastodonTokenUrl(instance), {
+      method: 'POST',
+      headers: { Accept: 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        client_id: clientId,
+        client_secret: clientSecret,
+        code,
+        grant_type: 'authorization_code',
+        redirect_uri: getMastodonRedirectUri(c.req.raw, c.env),
+        scope: MASTODON_OAUTH_SCOPE,
+      }).toString(),
+    })
+  } catch {
+    return fail('network')
+  }
+  if (!tokenResponse.ok) return fail('exchange_failed')
+
+  const data = (await tokenResponse.json()) as { access_token?: string; error?: string }
+  if (!data.access_token) return fail(data.error ?? 'no_token')
+
+  addCookie(
+    c,
+    sessionCookie('mastodon', packMastodonSession(data.access_token, instance), c.env.AUTH_SECRET),
+  )
+  return c.redirect(`${origin}/`, 302)
+})
+
 /* ------------------------------ Bluesky auth ------------------------------ */
 
 app.get('/api/auth/bluesky/login', async (c) => {
@@ -362,24 +470,31 @@ app.get('/api/auth/me', async (c) => {
   // Resolve all three platforms in parallel — each makes its own upstream call
   // (GitHub/GitLab token check, Bluesky session restore + profile), so running
   // them sequentially would add up their latencies on every page load.
-  const [github, bluesky, gitlab] = await Promise.all([
+  const [github, bluesky, gitlab, mastodon] = await Promise.all([
     resolveGithub(cookie, secret),
     resolveBluesky(c, cookie, secret),
     resolveGitlab(c, cookie, secret),
+    resolveMastodon(c, cookie, secret),
   ])
 
-  return c.json({ github, bluesky, gitlab })
+  return c.json({ github, bluesky, gitlab, mastodon })
 })
 
 app.post('/api/auth/logout', (c) => {
   const raw = c.req.query('platform')
   const platform = raw as Platform | undefined
-  if (platform === 'github' || platform === 'bluesky' || platform === 'gitlab') {
+  if (
+    platform === 'github' ||
+    platform === 'bluesky' ||
+    platform === 'gitlab' ||
+    platform === 'mastodon'
+  ) {
     addCookie(c, clearSessionCookie(platform))
   } else {
     addCookie(c, clearSessionCookie('github'))
     addCookie(c, clearSessionCookie('bluesky'))
     addCookie(c, clearSessionCookie('gitlab'))
+    addCookie(c, clearSessionCookie('mastodon'))
   }
   return c.json({ ok: true })
 })
@@ -493,6 +608,22 @@ async function resolveBluesky(
     return { handle: await getHandleForDid(did, c.env, c.req.raw) }
   } catch {
     addCookie(c, clearSessionCookie('bluesky'))
+    return null
+  }
+}
+
+async function resolveMastodon(
+  c: Ctx,
+  cookie: string | null,
+  secret: string,
+): Promise<{ handle: string } | null> {
+  const session = getPlatformSession(cookie, 'mastodon', secret)
+  const unpacked = session ? unpackMastodonSession(session) : null
+  if (!unpacked) return null
+  try {
+    return { handle: await getMastodonHandle(unpacked.token, unpacked.instance) }
+  } catch {
+    addCookie(c, clearSessionCookie('mastodon'))
     return null
   }
 }

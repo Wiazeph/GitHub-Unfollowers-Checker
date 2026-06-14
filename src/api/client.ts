@@ -56,7 +56,7 @@ const localizeError = (body: ApiErrorBody): ApiErrorBody => {
 
 /** Fetch the current per-platform authentication state. */
 export const fetchMe = async (): Promise<AuthState> => {
-  const empty: AuthState = { github: null, bluesky: null, gitlab: null }
+  const empty: AuthState = { github: null, bluesky: null, gitlab: null, mastodon: null }
   const response = await fetch('/api/auth/me')
   if (!response.ok) return empty
   return { ...empty, ...((await response.json()) as Partial<AuthState>) }
@@ -94,6 +94,16 @@ export const loginBluesky = (handle: string): void => {
 export const loginGitlab = (): void => {
   rememberPendingAuth('gitlab')
   window.location.href = '/api/auth/gitlab/login'
+}
+
+/**
+ * Redirect the browser into the Mastodon OAuth flow. Single-instance MVP: the
+ * server signs in against its configured instance, so this is a one-click
+ * redirect (the public search box is what accepts any user@instance handle).
+ */
+export const loginMastodon = (): void => {
+  rememberPendingAuth('mastodon')
+  window.location.href = '/api/auth/mastodon/login'
 }
 
 /** Sign out of one platform (or all if omitted) and reload. */

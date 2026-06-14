@@ -19,9 +19,11 @@ export const HeaderActions = () => {
   const { data: auth, isLoading } = useAuth()
   const { tab } = useActiveTab()
 
-  // GitHub / Bluesky / GitLab have a server session + sign-in.
+  // GitHub / Bluesky / GitLab / Mastodon have a server session + sign-in.
   const platform: PlatformId | null =
-    tab === 'github' || tab === 'bluesky' || tab === 'gitlab' ? tab : null
+    tab === 'github' || tab === 'bluesky' || tab === 'gitlab' || tab === 'mastodon'
+      ? tab
+      : null
   const isAuthedHere = platform ? Boolean(auth?.[platform]) : false
   const canSignIn =
     platform !== null && PLATFORMS[platform].authKind === 'oauth'

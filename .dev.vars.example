@@ -39,6 +39,16 @@ GITHUB_OAUTH_CLIENT_SECRET=
 GITLAB_OAUTH_CLIENT_ID=
 GITLAB_OAUTH_CLIENT_SECRET=
 
+# --- Mastodon (single-instance OAuth) ---------------------------------------
+# Public lookup works for any user@instance handle (unauthenticated). Sign-in
+# and unfollow target ONE configured instance — register an app there at
+#   https://<instance>/settings/applications  (Developers → New application)
+# with Redirect URI: <PUBLIC_URL>/api/auth/mastodon/callback
+# and scopes: read:accounts read:follows write:follows
+# The instance host itself is set as a plain var in wrangler.jsonc (MASTODON_INSTANCE).
+MASTODON_OAUTH_CLIENT_ID=
+MASTODON_OAUTH_CLIENT_SECRET=
+
 # --- Bluesky (AT Protocol OAuth) --------------------------------------------
 # ES256 private signing key (JWK, single line) for private_key_jwt. Generate with:
 # node -e "const {JoseKey}=require('@atproto/jwk-jose');JoseKey.generate(['ES256'],'bsky-key-1').then(k=>console.log(JSON.stringify(k.privateJwk)))"

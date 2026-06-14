@@ -38,6 +38,9 @@ export const en = {
     invalidBluesky: 'Please enter a valid Bluesky handle (e.g. name.bsky.social)',
     placeholderGitlabAuthed: 'Your GitLab list',
     invalidGitlab: 'Please enter a valid GitLab username',
+    placeholderMastodon: 'Enter a Mastodon handle (user@instance.social)',
+    placeholderMastodonAuthed: 'Look up another handle…',
+    invalidMastodon: 'Please enter a valid Mastodon handle (e.g. user@mastodon.social)',
   },
 
   results: {
@@ -138,7 +141,7 @@ export const en = {
     contact: '{{email}}',
     reportIssue: 'Report an issue',
     disclaimer:
-      'Not affiliated with GitHub, Bluesky, GitLab, X, or Instagram. Use on your own accounts, at your own discretion.',
+      'Not affiliated with GitHub, Bluesky, GitLab, Mastodon, X, or Instagram. Use on your own accounts, at your own discretion.',
   },
 
   privacy: {
@@ -146,14 +149,14 @@ export const en = {
     close: 'Close',
     whatTitle: 'What this tool does',
     whatBody:
-      "Unfollowers Checker helps you find accounts you follow that don't follow you back, across GitHub, Bluesky, GitLab, X (Twitter), and Instagram. It's a free, personal utility and is not affiliated with, endorsed by, or connected to any of those platforms.",
+      "Unfollowers Checker helps you find accounts you follow that don't follow you back, across GitHub, Bluesky, GitLab, Mastodon, X (Twitter), and Instagram. It's a free, personal utility and is not affiliated with, endorsed by, or connected to any of those platforms.",
     storeTitle: 'What we store',
     storeBody:
       "Nothing on our servers. We don't run a database and we don't keep your data. Follower and following lists are fetched, compared, and returned for that one request — never logged or saved. Your preferences (theme, language, and the Instagram panel's settings/layout) are saved only in your own browser's local storage and never sent anywhere.",
     howTitle: 'How each platform works',
-    howGithubLabel: 'GitHub, Bluesky & GitLab:',
+    howGithubLabel: 'GitHub, Bluesky, GitLab & Mastodon:',
     howGithubBody:
-      "follower data is read through their official APIs by our serverless functions, so platform credentials never reach your browser. GitHub and Bluesky lists are public; GitLab keeps them private, so you sign in first. Signing in uses the platform's official OAuth, and the session is used only to carry out the actions you choose — tokens aren't persisted.",
+      "follower data is read through their official APIs by our serverless functions, so platform credentials never reach your browser. GitHub, Bluesky and Mastodon lists are public; GitLab keeps them private, so you sign in first. Signing in uses the platform's official OAuth, and the session is used only to carry out the actions you choose — tokens aren't persisted.",
     howXLabel: 'X (Twitter):',
     howXBody:
       'runs entirely in your browser. The files from your data archive are read and compared locally and never uploaded anywhere.',

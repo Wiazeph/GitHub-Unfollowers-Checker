@@ -2,11 +2,13 @@
 
 import { githubProvider } from './github.js'
 import { blueskyProvider } from './bluesky.js'
+import { mastodonProvider } from './mastodon.js'
 import type { PlatformId, Provider } from './provider.js'
 
 const providers: Partial<Record<PlatformId, Provider>> = {
   github: githubProvider,
   bluesky: blueskyProvider,
+  mastodon: mastodonProvider,
 }
 
 export const getProvider = (id: string): Provider | null =>
